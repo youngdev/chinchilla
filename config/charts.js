@@ -1,23 +1,24 @@
 /*
 	load the module that allows you to request JSON.
 */
-var json = require("jsonreq"),
-	_	 = require("underscore"),
-	db 	 = require("../db/queries");
+var json    = require("jsonreq"),
+	_       = require("underscore"),
+	db      = require("../db/queries"),
+    charts  = this;
 /*
 	Load every 24h
 */
 this.update = function() {
-	var limit = 100
+	var limit = 100;
 	json.get("https://itunes.apple.com/us/rss/topsongs/limit=" + limit + "/explicit=true/json", function(err, result) {
 		if (!err) {
 			var songs = result.feed.entry;
-			songids = [], pureids = [];
+			var songids = [], pureids = [];
 			_.each(songs, function(entry) {
 				/*
 					Merge all songids together
 				*/
-				var id = parseFloat(entry.id.attributes['im:id'])
+				var id = parseFloat(entry.id.attributes['im:id']);
 				songids.push({preview: entry.link[1].attributes.href});
 				pureids.push(id);
 			});
@@ -27,10 +28,10 @@ this.update = function() {
 				*/
 				console.log(items.length);
 				if (items.length < limit) {
-					var request = pureids, dbtracks = [];
+					var dbtracks = [];
 					_.each(items, function(item) {
 						dbtracks.push(item.id);
-					})
+					});
 					var tofetch = (_.reject(pureids, function(item) { return _.contains(dbtracks, item) })).join(",");
 					/*
 						Fetch missing track
@@ -49,7 +50,6 @@ this.update = function() {
 									image: song.artworkUrl100,
 									name: song.trackName,
 									release: song.releaseDate.substr(0,4), 
-									image: song.artworkUrl100,
 									explicit: song.collectionExplicitness == "explicit" ? true : false,
 									genre: song.primaryGenreName,
 									listens: 0,
@@ -58,23 +58,23 @@ this.update = function() {
 									cdcount: song.discCount,
 									tracks: song.trackCount,
 									numberinalbum: song.trackNumber
-								}
+								};
 								items.push(track);
 								db.addTrack(track, function() {
 									toadd--;
-									if (toadd == 0) {
+									if (toadd === 0) {
 										charts.update();
 									}
-								})
+								});
 							});
 						}
-					})
+					});
 				}
 				else {
 					/*
 						Order the tracks right
 					*/
-					var ordered = []
+					var ordered = [];
 					_.each(pureids, function(track, key) {
 						ordered[key] = _.find(items, function(song) { return track == song.id });
 					});
@@ -83,6 +83,6 @@ this.update = function() {
 				}
 			});
 		}
-	})
-}
-this.table = []
+	});
+};
+this.table = [];

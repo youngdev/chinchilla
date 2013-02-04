@@ -3,7 +3,7 @@
 	-FS is used for template fetching.
 */
 var fs = require('fs'),
-	db = require('../db/queries')
+	db = require('../db/queries');
 /*
 	Specifies the parent directory path in a string.
 */
@@ -21,7 +21,7 @@ this.connection = function (socket) {
 				This automates the process of keeping both versions up to date.
 			*/
 			var templatename = data.name,
-				filename     = dirup + '/sites/' + templatename + ".html"
+				filename     = dirup + '/sites/' + templatename + ".html";
 			/*
 				Read the template, get it from the file system. For example: templatename is "album". Get /sites/album.html
 			*/
@@ -30,27 +30,27 @@ this.connection = function (socket) {
 					Error handling if somebody tries to send a malicious request via console.
 				*/
 				if (err) {
-					socket.emit('error', 	{'message': 'The file path does not exist.'})
+					socket.emit('error',    {'message': 'The file path does not exist.'});
 				}
 				else {
 					socket.emit('template', {'template': data});
 				}
-			})   
+			});   
 		});
 		socket.on('new-track', function (data) {
 			var track = data;
 			/*
 				Add a element where we can store the play count.
 			*/
-			track["listens"] = 0;
+			track.listens = 0;
 			db.addTrack(track, function() {
 				console.log("Track added successfully.");
-			})
-		})
+			});
+		});
 		socket.on('new-album', function (data) {
 			var album = data;
 			db.addAlbum(album, function() {
-				console.log("Album added successfully.")
-			})
-		})
-}
+				console.log("Album added successfully.");
+			});
+		});
+};

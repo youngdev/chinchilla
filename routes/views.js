@@ -2,7 +2,7 @@
 	Require the Swig module for templating.
 */
 var swig    = require('swig'),
-	_       = require('underscore')
+	_       = require('underscore'),
 	dbquery = require('../db/queries'),
 	itunes  = require('../config/itunes'),
 	charts  = require('../config/charts'),
@@ -10,10 +10,11 @@ var swig    = require('swig'),
 	helpers = require('../frontend/scripts/helpers'),
 	helpers = helpers.helpers,
 	lastfm  = new Lastfm({
-		api_key: 	"29c1ce9127061d03c0770b857b3cb741",
-		secret: "473680e0257daa9a7cb45207ed22f5ef"
-	})
-_.str = require('underscore.string')
+		api_key:    "29c1ce9127061d03c0770b857b3cb741",
+		secret:     "473680e0257daa9a7cb45207ed22f5ef"
+	}),
+    views   = this;
+_.str = require('underscore.string');
 _.mixin(_.str.exports());
 _.str.include('Underscore.string', 'string');
 /*
@@ -23,20 +24,20 @@ var dirup = __dirname.substr(0, __dirname.length - 7);
 var	parseduration = function(number) {
 	var fullseconds = Math.round(number / 1000), 
 		minutes = Math.floor(fullseconds/60),
-		seconds = fullseconds-(minutes*60)
+		seconds = fullseconds-(minutes*60);
 	if (seconds < 10) {
 		seconds = "0" + seconds;
 	}
 	return minutes+":"+seconds;
-}
+};
 /*
 	This function returns the artistpage to the user
 */
 this.lastloop = null;
-var artisttemplate    = dirup + '/sites/artist.html',
-	albumtemplate     = dirup + '/sites/album.html',
-	tracklisttemplate = dirup + '/sites/tracklist.html',
-	albumwrapper 	  = dirup + '/sites/album-page.html'
+var artisttemplate      = dirup + '/sites/artist.html',
+	albumtemplate       = dirup + '/sites/album.html',
+	tracklisttemplate   = dirup + '/sites/tracklist.html',
+    tracktemplate       = dirup + '/sites/track.html';
 this.drawartist = function(request, response) {
 	/*
 		Define custom parameters
@@ -54,20 +55,19 @@ this.drawartist = function(request, response) {
 		/*
 			If nothing found, return null
 		*/
-		var artistinfo = artistarray.length == 0 ? null : artistarray[0];
+		var artistinfo = artistarray.length === 0 ? null : artistarray[0];
 		/*
 			If null, add to the database
 		*/
-		if (artistinfo == null && views.lastloop != artistid) {
-			var loop = 0;
+		if (artistinfo === null && views.lastloop != artistid) {
 			itunes.lookup(artistid, {entity: "musicArtist"}, function(res) {
-				if (res.results.length != 0) {
-					var firstResult = res.results[0]
+				if (res.results.length !== 0) {
+					var firstResult = res.results[0];
 					var a = {
 						name: firstResult.artistName,
 						id: firstResult.artistId,
 						genre: firstResult.primaryGenreName
-					}
+					};
 					dbquery.addArtist(a, function() {
 						views.lastloop = artistid;
 						/*
@@ -81,10 +81,10 @@ this.drawartist = function(request, response) {
 				}
 			});
 		}
-		else if (artistinfo != null) {
-			var artist = artistinfo.name
+		else if (artistinfo !== null) {
+			var artist = artistinfo.name;
 
-			if (artistinfo.lastfm == undefined) {
+			if (artistinfo.lastfm === undefined) {
 				lastfm.artist.getInfo(
 					{
 						artist: artist
@@ -92,15 +92,15 @@ this.drawartist = function(request, response) {
 					function(err, data) {
 						if (!err) {
 							var lfmdata = {
-								image: 		_.last(data.image)["#text"],
-								mbid: 		data.mbid
-							}
+								image:      _.last(data.image)["#text"],
+								mbid:       data.mbid
+							};
 							artistinfo.lastfm = lfmdata;
 							dbquery.updateArtist(artistinfo);
 						}
 					}
 				)
-			}
+			};
 			/*
 				Db query for albums
 			*/
@@ -108,19 +108,17 @@ this.drawartist = function(request, response) {
 				/*
 					If no albums were found, return null
 				*/
-				var albumsinfo = albumarray.length == 0 ? null : albumarray
+				var albumsinfo = albumarray.length === 0 ? null : albumarray;
 				/*
 					Handle duplicates: Filter them out and show them as extra options.
 				*/
-				var before = albumsinfo
 				if (albumsinfo) {
 					albumsinfo = _.uniq(albumsinfo, false, function(album) {
-						var prename = (album.name != 1) ? album.name : '' // Some albums are not strings, they are numbers! wtf...
-						name = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("("))
+						var prename = (album.name != 1) ? album.name : '', // Some albums are not strings, they are numbers! wtf...
+                            name = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("("));
 						return _.str.slugify(name);
 					});
 				}
-				var after = albumsinfo;
 				/*
 					Get songs for each album from MongoDB
 				*/
@@ -136,8 +134,8 @@ this.drawartist = function(request, response) {
 								Add tracks to correct CD
 								Sort album tracks
 							*/
-							if (items[0] == undefined) {
-								console.log("Error: No items in album! Left album out. Album id:", album.id)
+							if (items[0] === undefined) {
+								console.log("Error: No items in album! Left album out. Album id:", album.id);
 								//response.end("Server error.");
 								return;
 							}
@@ -148,47 +146,47 @@ this.drawartist = function(request, response) {
 							_.each(items, function(track) {
 								cds[track.cdinalbum-1].push(track);
 							});
-							var discs = []
+							var discs = [];
 							/*	Sort the tracks by their number*/
-							_.each(cds, function(cd, key) {
+							_.each(cds, function(cd) {
 								var disc = _.sortBy(cd, function(track) {return track.numberinalbum});
-								discs.push(disc)
-							})
+								discs.push(disc);
+							});
 							album.cds = discs;
-							albums.push(album)
+							albums.push(album);
 						});
 						j++;
 						if (j == albumcount) {
-							return
+							return;
 						}
 						else {
-							getAlbumTracks()
+							getAlbumTracks();
 						}
 					}
-					var j 		   = 0,
-						albumcount = albumsinfo.length 
-					getAlbumTracks()
+					var j           = 0,
+						albumcount  = albumsinfo.length;
+					getAlbumTracks();
 				}
 				/*
 					Parse () in album titles
 				*/
 				var newAlbumsArray = [];
 				_.each(albumsinfo, function(album) {
-					var prename 		   = album.name != 1 ? album.name : '',
-						name   		   	   = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("(")),
-						parenthesisregex   = /\(([^()]+)\)/g,
-						inparenthesis 	   = prename.match(parenthesisregex),
-						withoutbrackets    = inparenthesis ? inparenthesis[0].substr(1, inparenthesis[0].length-2) : null
-					album.name 			   = name;
-					album.subtitle 		   = withoutbrackets;
+					var prename             = album.name != 1 ? album.name : '',
+						name                = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("(")),
+						parenthesisregex    = /\(([^()]+)\)/g,
+						inparenthesis       = prename.match(parenthesisregex),
+						withoutbrackets     = inparenthesis ? inparenthesis[0].substr(1, inparenthesis[0].length-2) : null;
+					album.name              = name;
+					album.subtitle          = withoutbrackets;
 					newAlbumsArray.push(album);
-				})
+				});
 				albumsinfo = newAlbumsArray;
 				/*
 					Query for top tracks
 				*/
 				dbquery.getTracks(artist, function(tracksarray) {
-					var tracks = tracksarray
+					var tracks = tracksarray;
 					if (tracks) {
 						tracks = _.uniq(tracks, false, function(song) {
 							return _.str.slugify(song.name.toLowerCase());
@@ -198,30 +196,30 @@ this.drawartist = function(request, response) {
 						pass in parameters, custom for every artist
 					*/
 					var output = tmpl.render({
-						artist: 			artistinfo,
-						albums: 			albums,
-						tracks: 			tracks,
-						albumtemplate: 		albumtemplate,
-						tracklist: 			tracklisttemplate,
-						parseduration: 		parseduration,
-						fromserver: 		true,
+						artist:             artistinfo,
+						albums:             albums,
+						tracks:             tracks,
+						albumtemplate:      albumtemplate,
+						tracklist:          tracklisttemplate,
+						parseduration:      parseduration,
+						fromserver:         true,
 						coverstack:         _.first(albums, 10)
-					})
+					});
 					/*
 						Send to user
 					*/
 					response.end(output);
 				});
-			})
+			});
 		}
 		else {
 			console.log("Error! No artist info.");
 			response.end("Server error.");
 		}
 		
-	})
-}
-this.drawalbum = function(request, response) {
+	});
+};
+this.drawalbum  = function(request, response) {
 	/*
 		Load template
 	*/
@@ -235,7 +233,7 @@ this.drawalbum = function(request, response) {
 		/*
 			If not found, album is null
 		*/
-		var albuminfo = albumarray.length == 0 ? null : albumarray[0]
+		var albuminfo = albumarray.length === 0 ? null : albumarray[0];
 		/*
 			Pass parameters to template
 		*/
@@ -248,7 +246,7 @@ this.drawalbum = function(request, response) {
 					Add tracks to correct CD
 					Sort album tracks
 				*/
-				if (items[0] == undefined) {
+				if (items[0] === undefined) {
 					response.end("Server error.");
 					return;
 				}
@@ -259,12 +257,12 @@ this.drawalbum = function(request, response) {
 				_.each(items, function(track) {
 					cds[track.cdinalbum-1].push(track);
 				});
-				var discs = []
+				var discs = [];
 				/*	Sort the tracks by their number*/
-				_.each(cds, function(cd, key) {
+				_.each(cds, function(cd) {
 					var disc = _.sortBy(cd, function(track) {return track.numberinalbum});
-					discs.push(disc)
-				})
+					discs.push(disc);
+				});
 				albuminfo.cds = discs;
 				var output = tmpl.render({
 					album: albuminfo,
@@ -284,8 +282,8 @@ this.drawalbum = function(request, response) {
 				Add album to the database!
 			*/
 			itunes.lookup(albumid, {entity: 'song'}, function(answer) {
-				var result 		= answer.results,
-					info  		= (result.splice(0,1))[0],
+				var result      = answer.results,
+					info        = (result.splice(0,1))[0],
 					albumtracks = [];
 				_.each(result, function(track) {
 					var song = {
@@ -305,7 +303,7 @@ this.drawalbum = function(request, response) {
 						cdcount: track.discCount,
 						preview: track.previewUrl,
 						release: track.releaseDate
-					}
+					};
 					dbquery.addTrack(song, function() {
 						console.log("Track added successfully! (Scraped server side)");
 					});
@@ -321,49 +319,58 @@ this.drawalbum = function(request, response) {
 					release: helpers.parseyear(info.releaseDate),
 					name: info.collectionName,
 					explicit: info.collectionExplicitness == "explicit" ? true : false
-				}
+				};
 				dbquery.addAlbum(album, function() {
-					console.log("Album added successfully! (Scraped server side)")
+					console.log("Album added successfully! (Scraped server side)");
 				});
 				/*
 					Repeat the whole thing now the album is added to the DB.
 				*/
-				console.log("Album added. Now repeating!")
+				console.log("Album added. Now repeating!");
 				views.drawalbum(request, response);
 			});
 			//views.error({params: {code: 498}}, response);
 		}
-	})
+	});
+};
+this.drawtrack  = function(request, response) {
+    var tmpl    = swig.compileFile(tracktemplate);
+    var output  = tmpl.render({
+        track: {
+            name: 'hi'
+        }
+    });
+    response.end(output);
 }
-this.mainview = function(request, response) {
+this.mainview   = function(request, response) {
 	response.sendfile(dirup + "/frontend/index.html");
-}
-this.charts = function(request, response) {
-	var tmpl 	  = swig.compileFile(dirup + "/sites/charts.html"),
-		tracklist = dirup + "/sites/tracklist.html",
-		table	  = charts.table,
-		output	  = tmpl.render({
-			album: 			 {cds: [table]},
-			tracklist: 		 tracklist,
-			parseduration:   parseduration,
-			showartistalbum: true,
-			coverstack: 	 _.first(table, 10)
+};
+this.charts     = function(request, response) {
+	var tmpl        = swig.compileFile(dirup + "/sites/charts.html"),
+		tracklist   = dirup + "/sites/tracklist.html",
+		table       = charts.table,
+		output      = tmpl.render({
+			album:              {cds: [table]},
+			tracklist:          tracklist,
+			parseduration:      parseduration,
+			showartistalbum:    true,
+			coverstack:         _.first(table, 10)
 		});
 		response.end(output);
-}
-this.error = function(request, response) {
-	var tmpl 	 = swig.compileFile(dirup + "/sites/error.html"),
-		error 	 = request.params.code,
+};
+this.error      = function(request, response) {
+	var tmpl        = swig.compileFile(dirup + "/sites/error.html"),
+		error       = request.params.code,
 		messages = {
 			404: "We couldn't find that. If this problem persists, please contact the support!", 
 			499: "It seems like this artist doesn't exist. ",
 			498: "Whoops... this album doesn't seem to exist. "
 		},
-		message  = messages[request.params.code],
-		phrase	 = message != undefined ? message : "Super fail: Not only that something didn't work, we also don't know what this error code means."
-	var	output 	 = tmpl.render({error: phrase});
-	response.end(output)
-}
-this.about = function(request, response) {
+		message     = messages[error],
+		phrase      = message !== undefined ? message : "Super fail: Not only that something didn't work, we also don't know what this error code means.",
+        output      = tmpl.render({error: phrase});
+	response.end(output);
+};
+this.about      = function(request, response) {
 	response.sendfile(dirup + "/sites/about.html");
-}
+};
