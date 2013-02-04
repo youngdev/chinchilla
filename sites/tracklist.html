@@ -1,0 +1,35 @@
+<div class="album-tracks">
+	{% if album.cds %}
+		{% for cd in album.cds %}
+			{% if album.cds.length > 1 %}
+				<h1>Disc {{loop.key+1}}</h1>
+			{% endif %}
+			<table>
+				<tr>
+					<th data-value="menu"></th>
+					<th data-value="number"></th>
+					<th data-value="trackname">Name</th>
+					{% if showartistalbum %} 
+					<th>Artist</th>
+					<th>Album</th>
+					{% endif %}
+					<th data-value="duration">Length</th>
+				</tr>
+				{% for track in cd %}
+				<tr class="song{% if track.ytid %} recognized{% else %} not-recognized{% endif %}" data-album="{{track.album}}" data-name="{{track.name}}" data-duration="{{track.duration}}" data-albumid="{{track.albumid}}" data-artist="{{track.artist}}" data-artistid="{{track.artistid}}" data-image="{{track.image}}" data-id="{{track.id}}" data-explicit="{{track.explicit}}" data-genre="{{track.genre}}" data-numberinalbum="{{track.numberinalbum}}" data-cdinalbum="{{track.cdinalbum}}" data-tracks="{{track.tracks}}" data-cdcount="{{track.cdcount}}" data-preview="{{track.preview}}" data-release="{{track.release}}" {% if track.ytid %} data-ytid="{{track.ytid}}" {% endif %}>
+					<td></td>
+					<td>{{loop.index}}</td>
+					<td>{{track.name}}</td>
+					{% if showartistalbum %} 
+					<td><a data-navigate="/artist/{{track.artistid}}">{{track.artist}}</a></td>
+					<td><a data-navigate="/album/{{track.albumid}}">{{track.album}}</a></td>
+					{% endif %}
+					<td>{{parseduration(track.duration)}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		{% endfor %}
+	{% else %}
+	<p class="album-loading">Loading tracks...</p>
+	{% endif %}
+</div>

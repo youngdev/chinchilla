@@ -1,0 +1,15 @@
+{% if album %}
+	<div data-id="{{album.id}}" data-tracks="{{album.tracks}}" class="album" data-resource="https://itunes.apple.com/lookup?id={{album.id}}&entity=song&limit=200" data-artist="{{album.artist}}" data-release="{{album.release}}" data-image="{{album.image}}" data-artistid="{{album.artistid}}" data-explicit="{{album.explicit}}" data-name="{{album.name}}" {% if !fromserver %} data-fetch {% endif %}>
+		<div class="album-header">
+			<img src="{{ album.image }}" title="{{ album.name }}" class="album-cover">
+			<div class="album-tracks-count">{{album.tracks}}</div>
+			<div class="album-name" title="{{album.name}}">{{ album.name }}</div>
+			<div class="album-releaseyear">{{album.release}}{%  if album.subtitle%} • {{album.subtitle}}{% endif %}</div>
+		</div>
+		<div class="album-tracks">
+			{% include tracklist %}
+		</div>
+	</div>
+{% else %}
+<h1>No album found.</h1>
+{% endif %}

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Chinchilla</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/api/script/underscore"></script>
+	<script src="/api/script/helpers"></script>	
+	<script src="/api/script/fetchFeeds"></script>
+	<script src="/api/script/navigation"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/api/script/sockets"></script>
+	<script src="/api/script/swig"></script>
+	<script src="/api/script/templates"></script>
+	<script src="/api/script/player"></script>
+	<script src="/api/script/search"></script>
+	<script src="/api/script/UI"></script>
+	<script src="/api/script/errors"></script>
+	<script src="/api/script/recognition"></script>
+	<script src="/api/script/swfobject"></script>
+	<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="/api/styles/main">
+</head>
+<body>
+	<div id="player">
+		<div id="player-controls">
+			<div id="rewind">
+				<div class="arrow-left"></div>
+				<div class="arrow-left"></div>
+			</div>
+			<div id="play">
+				<div class="arrow-right"></div>
+			</div>
+			<div id="pause">
+				<div class="vertical-bar"></div>
+				<div class="vertical-bar"></div>
+			</div>
+			<div id="skip">
+				<div class="arrow-right"></div>
+				<div class="arrow-right"></div>
+			</div>
+		</div>
+		<div id="player-center">
+			<p id="track-title"><a></a></p>
+			<p id="track-artist"><a></a></p>
+			<p id="track-album"><a></a></p>
+			<div id="time-left">0:00</div>
+			<input type="range" id="seekbar" min="0" max="100" value="0">
+			<div id="time-right">0:00</div>
+		</div>
+		<div id="queue"></div>
+	</div>
+	<div id="sidebar">
+		<input type="text" id="search-field" placeholder="Search for songs or artists">
+		<div id="search-results">
+			<h1><span>Artists</span></h1>
+			<div id="results-artist"></div>
+			<h1><span>Albums</span></h1>
+			<div id="results-albums"></div>
+		</div>
+		<ul>
+			<li data-navigate="/artist/7057812"><a>Ratatat</a></li>
+			<li data-navigate="/artist/273058501"><a>Kid Cudi</a></li>
+			<li data-navigate="/charts"><a>Charts</a></li>
+			<li data-navigate="/about"><a>About</a></li>
+		</ul>
+	</div>
+	<div id="view">
+		<div class="loading-indicator">
+			<div class="spinner"></div>
+		</div>
+	</div>
+	<div id="ytplayer" style="opacity: 0; position: absolute; z-index: -3; top: -3000px">
+		<div id="ytapiplayer">
+  		</div>
+		<script>
+			function onYouTubePlayerReady(playerId) {
+				ytplayer = document.getElementById("myytplayer");
+				player.setUpEvents()
+			}
+    		var params = { allowScriptAccess: "always" };
+    		var atts = { id: "myytplayer" };
+    		swfobject.embedSWF("http://www.youtube.com/v/dFVxGRekRSg?enablejsapi=1&playerapiid=ytplayer&version=3", "ytapiplayer", "425", "356", "8", null, null, params, atts);
+    </script>
+	</div>
+</body>
+</html>

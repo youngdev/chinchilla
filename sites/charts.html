@@ -1,0 +1,11 @@
+<div class="coverstack nomargin">
+	{% for track in coverstack %}<img src="{{track.image}}" border="0">{% endfor %}
+</div>
+
+<h1 class="oncoverstack">Best selling tracks</h1>
+<div class="extendedtable noheader charts">
+	<div class="album-tracks">
+		{% include tracklist %}
+	</div>
+</div>
+<p class="attribution">Source: iTunes</p>
