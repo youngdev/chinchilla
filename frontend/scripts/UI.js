@@ -80,6 +80,9 @@ var tooltip 			= function(e) {
 		$(tooltip).remove()
 	})
 }
+var playbutton 			= function() {
+	player.playSong(this);
+}
 var autocomplete  		= function() {
 	/*
 		Trigger search method
@@ -110,3 +113,4 @@ $(document)
 .on('click',	 '#rewind',		  	rewind		) //Go back to previous track.
 .on('mouseover', '[data-tooltip]',  tooltip     ) //Show small black tooltips.
 .on('keyup',	 '#search-field', 	autocomplete) //Show suggestions when user types into search.
+.on('click',	 '.play-button', 	playbutton  ) //Play buttons are in track views for instance.

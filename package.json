@@ -12,7 +12,7 @@
     "jsonreq": "0.1.0",
     "lastfmapi": "0.0.3",
     "request": "2.12.0",
-    "jquery": "1.9.0"
+    "jquery": "1.8.3"
   },
   "subdomain": "chinchilla",
   "scripts": {

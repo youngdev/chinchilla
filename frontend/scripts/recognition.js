@@ -82,14 +82,14 @@ recognition = {
 		recognition.started = false;
 	},
 	findVideo: function (song, callback, jquery, underscore, underscorestring) {
-        if (jquery) {
-            var $ = jquery;
+        if (jquery != undefined) {
+            $ = jquery 
         }
-        if (underscore) {
-            var _ = underscore;
+        if (underscore != undefined) {
+            _ = underscore;
         }
-        if (underscorestring) {
-            var _s = underscorestring;
+        if (underscorestring != undefined) {
+            _s = underscorestring;
         }
         $.ajax({
             url: "http://gdata.youtube.com/feeds/api/videos",

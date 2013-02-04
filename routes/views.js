@@ -321,6 +321,9 @@ this.drawtrack  = function(request, response) {
     var tmpl            = swig.compileFile(tracktemplate),
         onlynumbers     = new RegExp('^[0-9]+$'),
         trackid         = request.params.id,
+        /*
+			Passing in the parseduration function with the song for simplicity
+        */
         song            = null;
     if (!onlynumbers.test(trackid)) {
         views.error({params: {code: 501}}, response);
@@ -330,7 +333,8 @@ this.drawtrack  = function(request, response) {
         if (tracks.length === 0) {
             itunes.lookup(trackid, {entity: 'song'}, function(res) {
                 if (res.results.length !== 0) {
-                    song = itunes.remap(res.results.splice(0,1)[0]);
+                    song 				= itunes.remap(res.results.splice(0,1)[0]);
+                    song.parseduration 	= parseduration;
                     /*
                         Fetch YouTube video
                     */
@@ -353,7 +357,9 @@ this.drawtrack  = function(request, response) {
             });
         }
         else {
-            response.end(tmpl.render(tracks[0]));
+        	var track = tracks[0]
+        	track.parseduration = parseduration;
+            response.end(tmpl.render(track));
         }
     });
 };

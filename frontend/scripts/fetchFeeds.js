@@ -247,7 +247,8 @@ album = {
 					data: {callback: "?"},
 					url: resource,
 					success: function(data) {
-						var results = data.results;
+						var albuminfo = data.results.splice(0,1),
+							results = data.results
 						if (results !== undefined && results.length > 1) {
 							var	disccount = results[0].discCount;
 							/*
@@ -279,6 +280,7 @@ album = {
 									preview: track.previewUrl,
 									release: track.releaseDate
 								};
+								console.log(tracks, track.discNumber, track);
 								tracks[track.discNumber-1].push(remap);
 							});
 							templates.buildElement({

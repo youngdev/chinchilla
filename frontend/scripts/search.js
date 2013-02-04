@@ -12,7 +12,7 @@ search = {
 				iTunesName: 'musicArtist',
 				title: 		'artistName',
 				sub: 		'primaryGenreName',
-				element: 	$('#results-artist'),
+				element: 	$('#results-artists'),
 				link: 		'/artist/$1',
 				id: 		'artistId'
 			},
@@ -23,6 +23,14 @@ search = {
 				element: 	$('#results-albums'),
 				link: 		'/album/$1',
 				id: 		'collectionId'
+			},
+			track: {
+				iTunesName: 'song',
+				title: 		'trackName',
+				sub: 		'artistName',
+				element: 	$('#results-tracks'),
+				link: 		'/track/$1',
+				id: 		'trackId'
 			}
 		}
 		$.each(types, function(type, info) 

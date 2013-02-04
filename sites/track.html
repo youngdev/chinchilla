@@ -1,8 +1,63 @@
 <div>
     <div class="single-song">
-        <h1>{{name}}</h1>
-        <h2>by <a href="/artist/{{artistid}}">{{artist}}</a></h2>
+        <h1><span>{{name}}</span></h1>
+        <h2>by <a data-navigate="/artist/{{artistid}}">{{artist}}</a></h2><br>
         <img src="{{image}}">
-        <div class="single-song-play recognized" data-album="{{album}}" data-name="{{name}}" data-duration="{{duration}}" data-albumid="{{albumid}}" data-artist="{{artist}}" data-artistid="{{artistid}}" data-image="{{image}}" data-id="{{id}}" data-explicit="{{explicit}}" data-genre="{{genre}}" data-numberinalbum="{{numberinalbum}}" data-cdinalbum="{{cdinalbum}}" data-tracks="{{tracks}}" data-cdcount="{{cdcount}}" data-preview="{{preview}}" data-release="{{release}}" {% if ytid %} data-ytid="{{ytid}}" {% endif %}>Play</div>
+        <div class="single-song-description">
+        	<table>
+        		<tr>
+        			<td>Name</td>
+        			<td>{{name}}</td>
+        		</tr>
+        		<tr>
+        			<td>Artist</td>
+        			<td><a data-navigate="/artist/{{artistid}}">{{artist}} (See full discography)</a></td>
+        		</tr>
+        		<tr>
+        			<td>Album</td>
+        			<td><a data-navigate="/album/{{albumid}}">{{album}} (See full album)</a></td>
+        		</tr>
+        		<tr>
+        			<td>Duration</td>
+        			<td>{{parseduration(duration)}}</td>
+        		</tr>
+        		<tr>
+        			<td>Explicit</td>
+        			<td>{% if explicit%}Yes{% else %}No{% endif %}</td>
+        		</tr>
+        		<tr>
+        			<td>Number in album</td>
+        			<td>{{numberinalbum}}/{{tracks}}</td>
+        		</tr>
+        		<tr>
+        			<td>CD in album</td>
+        			<td>{{cdinalbum}}/{{cdcount}}</td>
+        		</tr>
+        	</table>
+        </div>
+        <div class="single-song-actions">
+        	<div class="play-button recognized" data-album="{{album}}" data-name="{{name}}" data-duration="{{duration}}" data-albumid="{{albumid}}" data-artist="{{artist}}" data-artistid="{{artistid}}" data-image="{{image}}" data-id="{{id}}" data-explicit="{{explicit}}" data-genre="{{genre}}" data-numberinalbum="{{numberinalbum}}" data-cdinalbum="{{cdinalbum}}" data-tracks="{{tracks}}" data-cdcount="{{cdcount}}" data-preview="{{preview}}" data-release="{{release}}" {% if ytid %} data-ytid="{{ytid}}" {% endif %}>Play</div>
+        	<div>
+        		Add to queue
+        	</div>
+        	<div>
+        		Add to library
+        	</div>
+        	<div>
+        		Add to favorites
+        	</div>
+        	<div>
+        		<a href="http://youtube.com/watch?v={{ytid}}">Watch on YouTube</a>
+        	</div>
+        	<div>
+        		<a href="http://www.filsh.net/?url=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%{{ytid}}">Download MP3 with filsh.net</a>
+        	</div>
+        	<div>
+        		Lookup on Spotify
+        	</div>
+        	<div>
+        		Share
+        	</div>
+        </div>
     </div>
 </div>
