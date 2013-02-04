@@ -65,6 +65,9 @@ helpers = {
 	escapeRegExp: function(str) {
 		 if (str == null) return '';
       		return String(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
-	}
+	},
+    parseYTId: function(video) {
+        return video.id.$t.substr(-11)
+    }
 }
 this.helpers = helpers;

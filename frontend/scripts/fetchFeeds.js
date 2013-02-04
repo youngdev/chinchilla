@@ -32,23 +32,6 @@ views = {
 			})
 		}
 	},
-	charts: {
-		load: function() {
-			$.ajax({
-				url: "/api/charts",
-				dataType: "html",
-				success: function(data) {
-					var view = $("#view");
-					view.html(data);
-					views.loadingindicator.hide();
-					tracklist.complete($("#view .album-tracks"));
-				},
-				error: function() {
-					errors.draw(404)
-				}
-			})
-		}
-	},
 	album: {
 		load: function(id) {
 			$.ajax({
@@ -62,6 +45,39 @@ views = {
 				},
 				error: function() {
 					errors.draw(404);
+				}
+			})
+		}
+	},
+    track: {
+        load: function(id) {
+            $.ajax({
+                url: "/api/track/" + id,
+                dataType: "html",
+                success: function(data) {
+                    var view = $("#view");
+                    view.html(data);
+                    views.loadingindicator.hide();
+                },
+                error: function() {
+                    errors.draw(404);
+                }
+            });
+        }
+    },
+    charts: {
+        load: function() {
+			$.ajax({
+				url: "/api/charts",
+				dataType: "html",
+				success: function(data) {
+					var view = $("#view");
+					view.html(data);
+					views.loadingindicator.hide();
+					tracklist.complete($("#view .album-tracks"));
+				},
+				error: function() {
+					errors.draw(404)
 				}
 			})
 		}
@@ -106,7 +122,7 @@ album = {
 					/*
 						Map to results 
 					*/
-					var results = json.results
+					var results = json.results;
 					/*
 						Remove first entry which is not an album, but artist info
 						First result should confirm the artist data we have
@@ -118,12 +134,12 @@ album = {
 							Define albums
 							Create array of albums that are already there
 						*/
-						var albums 					= results,
-							albumsalreadythere 		= [],
+						var albums                  = results,
+							albumsalreadythere      = [],
 							albumsalreadytherenames = [];
 						$.each($('.artist-container .album-list .album'), function(k,v) {
 							albumsalreadythere.push($(v).data('id'));
-							var name 		= $(v).data('name'),
+							var name        = $(v).data('name'),
 								shortened	= helpers.slugify(name.substr(0, (name.indexOf("(") == -1) ? name.length : name.indexOf("(")));
 							albumsalreadytherenames.push(shortened);
 						});
@@ -132,14 +148,14 @@ album = {
 							And albums that are not from this artist.
 						*/
 						var toadd = _.filter(albums, function(album) {
-							var name  		= album.collectionName.substr(0, (album.collectionName.indexOf("(") == -1) ? album.collectionName.length : album.collectionName.indexOf("("));
-							var included = _.contains(albumsalreadytherenames, helpers.slugify(name));
-							return (_.contains(albumsalreadythere, album.collectionId) == false) && album.artistId == artist && !included;
+							var name        = album.collectionName.substr(0, (album.collectionName.indexOf("(") == -1) ? album.collectionName.length : album.collectionName.indexOf("(")),
+                                included    = _.contains(albumsalreadytherenames, helpers.slugify(name));
+							return (_.contains(albumsalreadythere, album.collectionId) === false) && album.artistId == artist && !included;
 						});
 						/*
 							When no albums need to be added, end it!
 						*/
-						if (toadd.length == 0) {
+						if (toadd.length === 0) {
 							$(".album-refresh-message").remove();
 							return;
 						}
@@ -148,29 +164,29 @@ album = {
 						*/
 						var sortedAlbums = _.sortBy(toadd, function(album) {
 							return helpers.parseyear(album.releaseDate);
-						}).reverse()
+						}).reverse();
 						/*
 							Loop through toadds, check if the template is available, add to DOM.
 							The whole thing is async, so no $.each loop possible
 						*/
 						var divs = [];
-						function buildAlbum() {
+						var buildAlbum = function() {
 							var album = sortedAlbums[i];
 							templates.buildElement({
 								template:   "album",
 								parameters: {album: {
 									tracks: album.trackCount,
-								 	name: album.collectionName, 
-								 	/*
+                                    name: album.collectionName, 
+                                    /*
 										Year is the first 4 numbers form the release date.
-								 	*/
-								 	release: helpers.parseyear(album.releaseDate), 
-								 	image: album.artworkUrl100,
-								 	artist: album.artistName, 
-								 	artistid: album.artistId,
-								 	id: album.collectionId,
-								 	explicit: album.collectionExplicitness == "explicit" ? true : false
-								 }},
+                                    */
+                                    release: helpers.parseyear(album.releaseDate),
+                                    image: album.artworkUrl100,
+                                    artist: album.artistName,
+                                    artistid: album.artistId,
+                                    id: album.collectionId,
+                                    explicit: album.collectionExplicitness == "explicit" ? true : false
+                                }},
 								callback: function(output) {
 									divs.push(output);
 									/*
@@ -178,13 +194,13 @@ album = {
 									*/
 									i++;
 									if (i < albums) {
-										buildAlbum()
+										buildAlbum();
 									}
 									else {
-										onAlbumsFinishedLoading()
+										onAlbumsFinishedLoading();
 									} 
 								}
-							})
+							});
 						}
 						/*
 							Loop variables and initial loop
@@ -197,7 +213,7 @@ album = {
 							Now we have a sorted array of all the albums.
 							Add those div's to the DOM!
 						*/
-						function onAlbumsFinishedLoading() {
+						var onAlbumsFinishedLoading  = function() {
 							/*
 								Refresh is done. At this point, albums will be added.
 							*/
@@ -206,17 +222,17 @@ album = {
 								albumlist.append(div);
 							});
 							album.tracklist.complete(albumlist);
-						}
+						};
 					}
 				}
-			})
+			});
 		}
 	},
 	tracklist: {
 		complete: function(albumlist) {
-			var albums 	   = $(albumlist).find(".album[data-fetch]"),
-				albumcount = albums.length,
-				k          = 0
+            var albums      = $(albumlist).find(".album[data-fetch]"),
+				albumcount  = albums.length,
+				k           = 0;
 			/*
 				Loop through each album and load tracks.
 			*/
@@ -232,16 +248,15 @@ album = {
 					url: resource,
 					success: function(data) {
 						var results = data.results;
-						if (results != undefined && results.length > 1) {
-							var albuminfo = results.splice(0,1),
-								disccount = results[0].discCount;
+						if (results !== undefined && results.length > 1) {
+							var	disccount = results[0].discCount;
 							/*
 								Create object for every disc.
 							*/
-							var tracks = []
+							var tracks = [];
 							for (i=0; i<disccount; i++) {
-								tracks[i] = []
-							};
+								tracks[i] = [];
+							}
 							/*
 								Push songs into structure.
 							*/
@@ -263,35 +278,35 @@ album = {
 									cdcount: track.discCount,
 									preview: track.previewUrl,
 									release: track.releaseDate
-								}
-								tracks[track.discNumber-1].push(remap)
+								};
+								tracks[track.discNumber-1].push(remap);
 							});
 							templates.buildElement({
 								template: "tracklist",
 								parameters: {album: {cds: tracks}},
 								callback: function(element) {
-									console.log($(album))
-									$(album).find(".album-tracks").replaceWith(element)
-									recognition.recognizeAlbum(album)
+									console.log($(album));
+									$(album).find(".album-tracks").replaceWith(element);
+									recognition.recognizeAlbum(album);
 								}
-							})
+							});
 						}
 						/*
 							Next loop
 						*/
 						k++;
 						if (k < albumcount) {
-							loadTracks()
+							loadTracks();
 						}
 					}
-				})
+				});
 			}
-			loadTracks()
+			loadTracks();
 		}
 	}
-}
+};
 tracklist = {
-	complete: function(list) {
+	complete: function (list) {
 		recognition.recognizeTrackList(list);
 	}
-}
+};

@@ -24,6 +24,7 @@ app.get('/artist/:id',                  views.mainview);
 app.get('/charts',                      views.mainview);
 app.get('/album/:id',                   views.mainview);
 app.get('/about',                       views.mainview);
+app.get('/track/:id',                   views.mainview);
 app.get('/api/script/:scriptname',      scripts.get);
 app.get('/api/styles/:filename',        styles.get);
 app.get('/api/artist/:id',              views.drawartist);

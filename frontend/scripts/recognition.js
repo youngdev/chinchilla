@@ -81,7 +81,16 @@ recognition = {
 	stop: function() {
 		recognition.started = false;
 	},
-	findVideo: function (song, callback) {
+	findVideo: function (song, callback, jquery, underscore, underscorestring) {
+        if (jquery) {
+            var $ = jquery;
+        }
+        if (underscore) {
+            var _ = underscore;
+        }
+        if (underscorestring) {
+            var _s = underscorestring;
+        }
         $.ajax({
             url: "http://gdata.youtube.com/feeds/api/videos",
             data: {
@@ -104,9 +113,9 @@ recognition = {
                 //Find the video most related to our video by duration.
                 var videos = json.feed.entry;
                 //TODO: Do we also want to compare levenshtein distance of song titles?
-                var videos = (_.filter(videos, function(video) {
-                    return (filterVideos(video.title.$t) == false)
-                }))
+                videos = (_.filter(videos, function(video) {
+                    return (filterVideos(video.title.$t) === false)
+                }));
                     var closestVideo = _.sortBy(videos, function (video) {
                         return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ song.title))
                     })[0];          
@@ -134,10 +143,6 @@ recognition = {
 
     }
 }
-
-
-
-
 function EventedArray(handler) {
    this.stack = [];
    this.mutationHandler = handler || function() {};
@@ -163,3 +168,7 @@ function EventedArray(handler) {
       return this.stack;
    }
 }
+/*
+    For backend
+*/
+this.recognition = recognition;

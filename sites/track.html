@@ -1,3 +1,8 @@
 <div>
-    <h1>{{track.name}}</h1>
+    <div class="single-song">
+        <h1>{{name}}</h1>
+        <h2>by <a href="/artist/{{artistid}}">{{artist}}</a></h2>
+        <img src="{{image}}">
+        <div class="single-song-play recognized" data-album="{{album}}" data-name="{{name}}" data-duration="{{duration}}" data-albumid="{{albumid}}" data-artist="{{artist}}" data-artistid="{{artistid}}" data-image="{{image}}" data-id="{{id}}" data-explicit="{{explicit}}" data-genre="{{genre}}" data-numberinalbum="{{numberinalbum}}" data-cdinalbum="{{cdinalbum}}" data-tracks="{{tracks}}" data-cdcount="{{cdcount}}" data-preview="{{preview}}" data-release="{{release}}" {% if ytid %} data-ytid="{{ytid}}" {% endif %}>Play</div>
+    </div>
 </div>

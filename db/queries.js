@@ -75,7 +75,7 @@ this.getTracks      = function(artist, callback) {
 	});
 };
 this.getSingleTrack = function (id, callback) {
-    connection.collection("tracks").find({"id": id}).toArray(function(err, item) {
+    connection.collection("tracks").find({"id": parseFloat(id)}).toArray(function(err, item) {
         if (!err) {
             callback(item);
         }

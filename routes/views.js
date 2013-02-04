@@ -1,14 +1,15 @@
 /*
 	Require the Swig module for templating.
 */
-var swig    = require('swig'),
-	_       = require('underscore'),
-	dbquery = require('../db/queries'),
-	itunes  = require('../config/itunes'),
-	charts  = require('../config/charts'),
-	Lastfm  = require('lastfmapi'),
-	helpers = require('../frontend/scripts/helpers'),
-	helpers = helpers.helpers,
+var swig        = require('swig'),
+	_           = require('underscore'),
+    $           = require('jquery'),
+	dbquery     = require('../db/queries'),
+	itunes      = require('../config/itunes'),
+	charts      = require('../config/charts'),
+	Lastfm      = require('lastfmapi'),
+	helpers     = require('../frontend/scripts/helpers').helpers,
+    recognition = require('../frontend/scripts/recognition').recognition,
 	lastfm  = new Lastfm({
 		api_key:    "29c1ce9127061d03c0770b857b3cb741",
 		secret:     "473680e0257daa9a7cb45207ed22f5ef"
@@ -286,24 +287,7 @@ this.drawalbum  = function(request, response) {
 					info        = (result.splice(0,1))[0],
 					albumtracks = [];
 				_.each(result, function(track) {
-					var song = {
-						name: track.trackName,
-						duration: track.trackTimeMillis,
-						album: track.collectionName,
-						albumid: track.collectionId,
-						artistid: track.artistId,
-						artist: track.artistName,
-						image: track.artworkUrl100,
-						id: track.trackId,
-						explicit: track.trackExplicitness == "explicit" ? true : false,
-						genre: track.primaryGenreName,
-						numberinalbum: track.trackNumber,
-						cdinalbum: track.discNumber,
-						tracks: track.trackCount,
-						cdcount: track.discCount,
-						preview: track.previewUrl,
-						release: track.releaseDate
-					};
+					var song = itunes.remap(track);
 					dbquery.addTrack(song, function() {
 						console.log("Track added successfully! (Scraped server side)");
 					});
@@ -334,14 +318,45 @@ this.drawalbum  = function(request, response) {
 	});
 };
 this.drawtrack  = function(request, response) {
-    var tmpl    = swig.compileFile(tracktemplate);
-    var output  = tmpl.render({
-        track: {
-            name: 'hi'
+    var tmpl            = swig.compileFile(tracktemplate),
+        onlynumbers     = new RegExp('^[0-9]+$'),
+        trackid         = request.params.id,
+        song            = null;
+    if (!onlynumbers.test(trackid)) {
+        views.error({params: {code: 501}}, response);
+        return;
+    }
+    dbquery.getSingleTrack(trackid, function (tracks) {
+        if (tracks.length === 0) {
+            itunes.lookup(trackid, {entity: 'song'}, function(res) {
+                if (res.results.length !== 0) {
+                    song = itunes.remap(res.results.splice(0,1)[0]);
+                    /*
+                        Fetch YouTube video
+                    */
+                    recognition.findVideo(song, function(video) {
+                        song.ytid = helpers.parseYTId(video);
+                        response.end(tmpl.render(song));
+                        dbquery.addTrack(song, function() {
+                            console.log("Track successfully added (Through /track/:id site)");
+                        });
+                    /*
+                        Below you see jQuery and underscore are passed in. This is because the file
+                        is used on the client-side too and there is no require
+                    */
+                    }, $, _, _.str);
+                }
+                else {
+                    console.log("No track here");
+                    views.error({params: {code: 497}}, response);
+                }
+            });
+        }
+        else {
+            response.end(tmpl.render(tracks[0]));
         }
     });
-    response.end(output);
-}
+};
 this.mainview   = function(request, response) {
 	response.sendfile(dirup + "/frontend/index.html");
 };
@@ -364,7 +379,9 @@ this.error      = function(request, response) {
 		messages = {
 			404: "We couldn't find that. If this problem persists, please contact the support!", 
 			499: "It seems like this artist doesn't exist. ",
-			498: "Whoops... this album doesn't seem to exist. "
+			498: "Whoops... this album doesn't seem to exist. ",
+            497: "Sorry... this track doesn't seem to exist.",
+            501: "The Track ID can only contain numbers, so there is no music here :("
 		},
 		message     = messages[error],
 		phrase      = message !== undefined ? message : "Super fail: Not only that something didn't work, we also don't know what this error code means.",

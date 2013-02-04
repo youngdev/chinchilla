@@ -35,15 +35,15 @@ exports.lookup = function(id, options, callback) {
   })
 }
 exports.remap = function (track) {
-   var song = {
-    	name: track.trackName,
+   return {
+        name: track.trackName,
 		duration: track.trackTimeMillis,
 		album: track.collectionName,
 		albumid: track.collectionId,
 		artistid: track.artistId,
 		artist: track.artistName,
-	    image: track.artworkUrl100,
-	    id: track.trackId,
+        image: track.artworkUrl100,
+        id: track.trackId,
 		explicit: track.trackExplicitness == "explicit" ? true : false,
 		genre: track.primaryGenreName,
 		numberinalbum: track.trackNumber,
@@ -53,5 +53,4 @@ exports.remap = function (track) {
 		preview: track.previewUrl,
 		release: track.releaseDate
 	};
-    return song;
 }
