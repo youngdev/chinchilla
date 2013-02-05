@@ -9,7 +9,7 @@ var app     = require('express').createServer(),
     styles  = require('./routes/styles'),
     events  = require('./config/events'),
     charts  = require('./config/charts'),
-    fauth   = require('fauthentication'),
+    fauth   = require('./config/fauthentication'),
     fb      = require('./config/facebook');
 /*
     FB auth
@@ -19,7 +19,7 @@ fauth.settings({
     client_secret:      'f2bdb7700ef2d87a8c05b32ac31c013a',
     redirect_uri:       'http://chinchilla.jonnyburger.c9.io/facebook/token',
     app:                app,
-    callback:           fb.auth
+    callback:           fb.cb
 });
 /*
 	Listen to the fifty-one-fifty-one port!
@@ -33,31 +33,31 @@ console.log("App started on port", port);
 	These are the routes, they control what is sent to the user
 */
 
-app.get('/',                            views.mainview      );
-app.get('/artist/:id',                  views.mainview      );
-app.get('/charts',                      views.mainview      );
-app.get('/album/:id',                   views.mainview      );
-app.get('/about',                       views.mainview      );
-app.get('/track/:id',                   views.mainview      );
-app.get('/register',                    views.mainview      );
+app.get('/',                            views.mainview          );
+app.get('/artist/:id',                  views.mainview          );
+app.get('/charts',                      views.mainview          );
+app.get('/album/:id',                   views.mainview          );
+app.get('/about',                       views.mainview          );
+app.get('/track/:id',                   views.mainview          );
+app.get('/register',                    views.mainview          );
 /*
     Backedn routes
 */
-app.get('/api/script/:scriptname',      scripts.get         );
-app.get('/api/styles/:filename',        styles.get          );
-app.get('/api/artist/:id',              views.drawartist    );
-app.get('/api/charts',                  views.charts        );
-app.get('/api/album/:album',            views.drawalbum     );
-app.get('/api/i/:filename',             styles.images.get   );
-app.get('/api/error/:code',             views.error         );
-app.get('/api/about',                   views.about         );
-app.get('/api/track/:id',               views.drawtrack     );
-app.get('/api/registration',            views.registration  );
+app.get('/api/script/:scriptname',      scripts.get             );
+app.get('/api/styles/:filename',        styles.get              );
+app.get('/api/artist/:id',              views.drawartist        );
+app.get('/api/charts',                  views.charts            );
+app.get('/api/album/:album',            views.drawalbum         );
+app.get('/api/i/:filename',             styles.images.get       );
+app.get('/api/error/:code',             views.error             );
+app.get('/api/about',                   views.about             );
+app.get('/api/track/:id',               views.drawtrack         );
+app.get('/api/registration',            views.registration      );
 /*
     Authentication routes
 */
-app.get('/facebook/authenticate',       fauth.auth          );
-app.get('/facebook/token',              fauth.getAccessToken);
+app.get('/facebook/authenticate',       fb.auth                 );
+app.get('/facebook/token',              fauth.getAccessToken    );
 
 /*
 	Configure Websockets. Through websockets, users can receive live updates and submit to the database.

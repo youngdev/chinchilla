@@ -67,7 +67,16 @@ helpers = {
       		return String(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 	},
     parseYTId: function(video) {
-        return video.id.$t.substr(-11)
+        return video.id.$t.substr(-11);
+    },
+    createID: function() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    
+        for( var i=0; i < 16; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+        return text;
     }
-}
+};
 this.helpers = helpers;

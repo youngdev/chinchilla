@@ -114,8 +114,8 @@ this.drawartist     = function(request, response) {
 							dbquery.updateArtist(artistinfo);
 						}
 					}
-				)
-			};
+				);
+			}
 			/*
 				Db query for albums
 			*/
@@ -139,7 +139,7 @@ this.drawartist     = function(request, response) {
 				*/
 				var albums = [];
 				if (albumsinfo) {
-					function getAlbumTracks() {
+					var getAlbumTracks = function() {
 						var cds = [];
 						var album = albumsinfo[j];
 						dbquery.getTracksFromAlbum(album.id, function(items) {
