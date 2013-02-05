@@ -15,6 +15,9 @@ var swig        = require('swig'),
 		secret:     "473680e0257daa9a7cb45207ed22f5ef"
 	}),
     views   = this;
+/*
+    Underscore config
+*/
 _.str = require('underscore.string');
 _.mixin(_.str.exports());
 _.str.include('Underscore.string', 'string');
@@ -22,6 +25,9 @@ _.str.include('Underscore.string', 'string');
 	This is the current directory without the "/routes" at the end, so basically the parent directory
 */
 var dirup = __dirname.substr(0, __dirname.length - 7);
+/*
+    Function for displaying duration correctly
+*/
 var	parseduration = function(number) {
 	var fullseconds = Math.round(number / 1000), 
 		minutes = Math.floor(fullseconds/60),
@@ -32,14 +38,22 @@ var	parseduration = function(number) {
 	return minutes+":"+seconds;
 };
 /*
-	This function returns the artistpage to the user
+    View paths
+*/
+var artisttemplate      =   dirup + '/sites/artist.html',
+    albumtemplate       =   dirup + '/sites/album.html',
+	tracklisttemplate   =   dirup + '/sites/tracklist.html',
+    tracktemplate       =   dirup + '/sites/track.html';
+//Proposed syntax!
+var templates = {
+    registration:           dirup + '/sites/registration.html',
+    newuser:                dirup + '/sites/new-user.html'
+};
+/*
+    Routes
 */
 this.lastloop = null;
-var artisttemplate      = dirup + '/sites/artist.html',
-	albumtemplate       = dirup + '/sites/album.html',
-	tracklisttemplate   = dirup + '/sites/tracklist.html',
-    tracktemplate       = dirup + '/sites/track.html';
-this.drawartist = function(request, response) {
+this.drawartist     = function(request, response) {
 	/*
 		Define custom parameters
 	*/
@@ -220,7 +234,7 @@ this.drawartist = function(request, response) {
 		
 	});
 };
-this.drawalbum  = function(request, response) {
+this.drawalbum      = function(request, response) {
 	/*
 		Load template
 	*/
@@ -317,7 +331,7 @@ this.drawalbum  = function(request, response) {
 		}
 	});
 };
-this.drawtrack  = function(request, response) {
+this.drawtrack      = function(request, response) {
     var tmpl            = swig.compileFile(tracktemplate),
         onlynumbers     = new RegExp('^[0-9]+$'),
         trackid         = request.params.id,
@@ -363,10 +377,10 @@ this.drawtrack  = function(request, response) {
         }
     });
 };
-this.mainview   = function(request, response) {
+this.mainview       = function(request, response) {
 	response.sendfile(dirup + "/frontend/index.html");
 };
-this.charts     = function(request, response) {
+this.charts         = function(request, response) {
 	var tmpl        = swig.compileFile(dirup + "/sites/charts.html"),
 		tracklist   = dirup + "/sites/tracklist.html",
 		table       = charts.table,
@@ -379,7 +393,7 @@ this.charts     = function(request, response) {
 		});
 		response.end(output);
 };
-this.error      = function(request, response) {
+this.error          = function(request, response) {
 	var tmpl        = swig.compileFile(dirup + "/sites/error.html"),
 		error       = request.params.code,
 		messages = {
@@ -394,6 +408,9 @@ this.error      = function(request, response) {
         output      = tmpl.render({error: phrase});
 	response.end(output);
 };
-this.about      = function(request, response) {
+this.about          = function(request, response) {
 	response.sendfile(dirup + "/sites/about.html");
+};
+this.registration   = function(request, response) {
+    response.sendfile(templates.registration);
 };

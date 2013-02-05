@@ -143,3 +143,10 @@ this.getSongsByIds  = function(ids, callback) {
 this.updateArtist    = function(info) {
 	connection.collection("artists").update({id: info.id}, info, options);
 };
+this.addUser         = function(user, callback) {
+    connection.collection("users")  .update({id: user.id}, user, options, function(err) {
+        if (!err) {
+            callback();
+        }
+    });
+};

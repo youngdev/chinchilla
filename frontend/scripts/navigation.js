@@ -14,6 +14,9 @@ routes = {
     '/track/:id':           function(match) {
         views.track.load(match[1]);
     },
+    '/register':        function(match) {
+        registration.facebook.load();
+    },
 	'/':                    function(match) {
 
 	}

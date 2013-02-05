@@ -95,7 +95,7 @@ views = {
 				error: function() {
 					errors.draw(404);
 				}
-			})
+			});
 		}
 	},
 	loadingindicator: {
@@ -103,7 +103,7 @@ views = {
 			var indicator = $(".loading-indicator").remove()
 		}
 	}
-}
+};
 album = {
 	list: {
 		complete: function(albumlist, artist) {
@@ -311,4 +311,22 @@ tracklist = {
 	complete: function (list) {
 		recognition.recognizeTrackList(list);
 	}
+};
+registration = {
+    facebook: {
+        load: function() {
+            $.ajax({
+                url:        '/api/registration',
+                dataType:   'html',
+                success:    function(data) {
+                    var view = $('#view');
+                    view.html(data);
+                    views.loadingindicator.hide();
+                },
+                error: function() {
+                    errors.draw(404);
+                }
+            });
+        }
+    }
 };
