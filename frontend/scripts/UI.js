@@ -102,7 +102,7 @@ var autocomplete        = function() {
 	}
 };
 var register            = function() {
-    window.open('/facebook/authenticate?next=/', 'Facebook Login', 'width=300px, height=300');
+    window.open('/auth/facebook', 'Facebook Login', 'width=300px, height=300');
 }
 $(document)
 .on('mousedown',    '.song',            select      ) //Selecting tracks

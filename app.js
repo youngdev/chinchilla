@@ -2,25 +2,14 @@
 	Require the basic stuff like the express framework
 */
 
-var app     = require('express').createServer(),
-    io      = require('socket.io').listen(app),
-    views   = require('./routes/views'),
-    scripts = require('./routes/scripts'),
-    styles  = require('./routes/styles'),
-    events  = require('./config/events'),
-    charts  = require('./config/charts'),
-    fauth   = require('./config/fauthentication'),
-    fb      = require('./config/facebook');
-/*
-    FB auth
-*/
-fauth.settings({
-    client_id:          212482748876564,
-    client_secret:      'f2bdb7700ef2d87a8c05b32ac31c013a',
-    redirect_uri:       'http://chinchilla.jonnyburger.c9.io/facebook/token',
-    app:                app,
-    callback:           fb.cb
-});
+var app         = require('express').createServer(),
+    io          = require('socket.io').listen(app),
+    views       = require('./routes/views'),
+    scripts     = require('./routes/scripts'),
+    styles      = require('./routes/styles'),
+    events      = require('./config/events'),
+    charts      = require('./config/charts'),
+    fb          = require('./config/facebook');
 /*
 	Listen to the fifty-one-fifty-one port!
 */
@@ -54,11 +43,9 @@ app.get('/api/about',                   views.about             );
 app.get('/api/track/:id',               views.drawtrack         );
 app.get('/api/registration',            views.registration      );
 /*
-    Authentication routes
+    Auth routes
 */
-app.get('/facebook/authenticate',       fb.auth                 );
-app.get('/facebook/token',              fauth.getAccessToken    );
-
+app.get('/auth/facebook',               fb.login                );
 /*
 	Configure Websockets. Through websockets, users can receive live updates and submit to the database.
 */

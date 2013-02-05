@@ -1,30 +1,7 @@
-var fauth   = require("../config/fauthentication"),
-    db      = require("../db/queries"),
-    helpers = require("../frontend/scripts/helpers").helpers,
-    cookies = require("cookies");
-this.cb   = function(accessToken, request, response) {
-    console.log("Access token is", accessToken);
-    fauth.getUser(function(profile) {
-        var token = helpers.createID();
-        var user = {
-            first:      profile.first_name,
-            last:       profile.last_name,
-            username:   profile.username,
-            email:      profile.email,
-            id:         profile.id,
-            favorites:  [],
-            library:    [],
-            playlists:  [],
-            preferences:{},
-            token:      token
-        };
-        var cookie = new cookies(request, response);
-        cookie.set("token", token);
-        db.addUser(user, function() {
-            console.log("User added to DB!");
-        });
-    });
-};
-this.auth   = function(request, response) {
-    fauth.auth(request, response);
+this.clientID       = 212482748876564;
+this.clientSecret   = 'f2bdb7700ef2d87a8c05b32ac31c013a';
+this.redirect_uri   = 'http://chinchilla.jonnyburger.c9.io/auth/facebook/token';
+
+this.login = function(request, response) {
+    response.redirect('https://www.facebook.com/dialog/oauth?client_id=' + facebook.clientID + '&redirect_uri=' + facebook.redirect_uri);
 };
