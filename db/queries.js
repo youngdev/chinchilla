@@ -1,7 +1,9 @@
 var mongo       = require("mongoskin"),
 	auth        = require("../auth/auth"),
+	_			= require("underscore"),
 	connection  = mongo.db(auth.auth, {safe: true}),
-    options     = {save: true, upsert: true};
+    options     = {save: true, upsert: true},
+    standards   = require("../config/standards");
 /*
 	Get matching artists.
 	Example structure of an artist:
@@ -10,7 +12,7 @@ var mongo       = require("mongoskin"),
         "id": 5078430       --> iTunes ID of the artist.
     }
 */
-this.getArtist = function(artistid, callback) {
+this.getArtist 				= function(artistid, callback) 	{
 	connection.collection("artists").find({"id": parseFloat(artistid)}).toArray(function(err, items) {
         if (!err) {
             callback(items);
@@ -37,7 +39,7 @@ this.getArtist = function(artistid, callback) {
         ]
     }
 */
-this.getAlbums = function(artistid, callback) {
+this.getAlbums 				= function(artistid, callback) 	{
 	connection.collection("albums").find({"artistid": parseFloat(artistid)}, {sort:[['release', -1]]}).toArray(function(err, items) {
         if (!err) {
             callback(items);
@@ -67,21 +69,21 @@ this.getAlbums = function(artistid, callback) {
 		"ytid": "fsdfs-fssSfs" //Optional!
 }
 */
-this.getTracks      = function(artist, callback) {
+this.getTracks      		= function(artist, callback) 	{
 	connection.collection("tracks").find({"artist": artist}).toArray(function(err, items) {
         if (!err) {
             callback(items);
         }
 	});
 };
-this.getSingleTrack = function (id, callback) {
+this.getSingleTrack 		= function (id, callback) 		{
     connection.collection("tracks").find({"id": parseFloat(id)}).toArray(function(err, item) {
         if (!err) {
             callback(item);
         }
     });
 };
-this.getSingleAlbum = function(albumid, callback) {
+this.getSingleAlbum 		= function(albumid, callback) 	{
 	/*
 		Convert albumid from a number into a string
 	*/
@@ -92,7 +94,7 @@ this.getSingleAlbum = function(albumid, callback) {
         }
 	});
 };
-this.getTracksFromAlbum = function(albumid, callback) {
+this.getTracksFromAlbum 	= function(albumid, callback) 	{
 	/*
 		Convert albumid from anumber into a string
 	*/
@@ -103,7 +105,7 @@ this.getTracksFromAlbum = function(albumid, callback) {
         }
 	});
 };
-this.addTrack		= function(track, callback) {
+this.addTrack				= function(track, callback) 	{
 	//TODO: This could overwrite previous listens.
 	track.listens = 0;
 	connection.collection("tracks").update({id: track.id}, track, options, function(err) {
@@ -115,7 +117,7 @@ this.addTrack		= function(track, callback) {
 		}
 	});
 };
-this.addAlbum		= function(album, callback) {
+this.addAlbum				= function(album, callback) 	{
 	connection.collection("albums").update({id: album.id}, album, options, function(err) {
 		if (err) {
 			console.log(err);
@@ -125,28 +127,96 @@ this.addAlbum		= function(album, callback) {
 		}
 	});
 };
-this.addArtist		= function(artist, callback) {
+this.addArtist				= function(artist, callback) 	{
 	connection.collection("artists").update({id: artist.id}, artist, options, function(err) {
 		if (!err) {
 			callback();
 		}
 	});
 };
-this.getSongsByIds  = function(ids, callback) {
-	//This seems to fail on a few tracks! Alternative: getSongsByNames
-	connection.collection("tracks").find({$or: ids}).toArray(function(err, items) {
+this.getSongsByQuery  		= function(query, callback) 	{
+	connection.collection("tracks").find({$or: query}).toArray(function(err, items) {
 		if (!err) {
             callback(items);
 		}
 	});
 };
-this.updateArtist    = function(info) {
+this.getSongsByIdList		= function(ids, callback) 		{
+	var queries = [];
+	_.each(ids, function(id) {
+		queries.push({id: id});
+	});
+	connection.collection("tracks").find({$or: queries}).toArray(function(err, items) {
+		if (!err) {
+			callback(items);
+		}
+	})
+}
+this.updateArtist   		= function(info) {
 	connection.collection("artists").update({id: info.id}, info, options);
 };
-this.addUser         = function(user, callback) {
-    connection.collection("users")  .update({id: user.id}, user, options, function(err) {
-        if (!err) {
-            callback();
-        }
+this.addUser         		= function(user, callback) 		{
+    connection.collection("users")	.find({id: user.id}).toArray(function(err, items) {
+    	if (!err) {
+    		var result 		= (items.length != 0) ? items[0] : user;
+    		result.token 	= user.token;
+    		connection.collection("users").update({id: user.id}, result, options, function(err) {
+    			if (!err) {
+    				callback()
+    			}
+    		}); 
+    	}
     });
 };
+this.getUser		 		= function(token, callback) 	{
+	connection.collection("users")	.find	({token: token}).toArray(function(err, items) {
+		if (!err) {
+			var user = (items.length != 0) ? items[0] : null
+			callback(user);
+		}
+	})
+}
+this.getUserCollections 	= function(user, callback) 		{
+	connection.collection("libraries").find({id: user.id}).toArray(function(err, item) {
+		if (!err) {
+			if (item.length === 0) {
+				var collections = {
+					library: 	[],
+					starred: 	[],
+					playlists: 	[],
+					id: 		user.id,
+					settings: 	standards.settings, 
+				}
+			}
+			else {
+				var collections = item[0]
+			}
+			callback(collections)
+		}
+	})
+}
+this.saveUserCollections	= function(coll, callback) 		{
+	connection.collection("libraries").update({id: coll.id}, coll, options, function(err) {
+		if (!err) {
+			callback(coll);
+		}
+	});
+}
+this.updateSettings			= function(data, callback)		{
+	connection.collection("users"). update({token: data.token}, {
+		$set: {
+			settings: data.settings
+		}
+	}, options, function(err) {
+		if (!err) {
+			callback();
+		}
+	});
+}
+this.getAlbumCovers			= function(limit, callback) 	{
+	connection.collection("albums").find({}, {limit: 100}).toArray(function(err, items) {
+		if (!err) {
+			callback(items)
+		}
+	})
+}

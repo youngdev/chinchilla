@@ -1,19 +1,41 @@
 player = {};
-player.playSong = function(song) {
+player.playSong = function(song, noautoplay) {
 	var songobj = helpers.parseDOM(song);
 	if ($(song).hasClass("recognized") || songobj.ytid != undefined) {
-		ytplayer.loadVideoById(songobj.ytid);
+		/*
+			Send YTID to YouTube player
+		*/
+		if (noautoplay) {
+			ytplayer.cueVideoById(songobj.ytid);
+		}
+		else {
+			ytplayer.loadVideoById(songobj.ytid);
+		}
+		
 		/*
 			Add current song to localStorage
 		*/
+		player.history.add(player.nowPlaying.get());
+		/*
+			Add old song to history
+		*/
  		player.nowPlaying.replace(songobj);
+ 		/*
+			Change the title of the page
+ 		*/
+ 		$('title').text(songobj.name + ' - ' + songobj.artist);
+ 		/*
+			If the user has wants to, set the album cover as favicon
+ 		*/
+ 		if (chinchilla.settings.favicon_album) {
+ 			$('#favicon').attr('href', songobj.image);
+ 		}
 	}
 	else {
 		var dom = (song instanceof HTMLElement) ? $(song) : $(".song[data-id=" + song.id + "]")[0];
 		$(dom).addClass("wantstobeplayed")
-		recognition.queue.push(dom)
+		recognition.queue.unshift(dom)
 	}
-	
 }
 player.nowPlaying = {
 	replace: function(song) {
@@ -37,7 +59,8 @@ player.nowPlaying = {
 		$("#rewind").attr("data-tooltip", "<div class='prev-update'>" + prevlabel + "</div>");
 	},
 	get: function(song) {
-		return JSON.parse(localStorage['nowPlaying']);
+		helpers.localStorageSafety('nowPlaying');
+		return (localStorage['nowPlaying'] == '[]') ? null :  JSON.parse(localStorage['nowPlaying']);
 	}
 }
 var Queue = function(name) {
@@ -45,7 +68,6 @@ var Queue = function(name) {
 		var song = helpers.parseDOM(song)
 		var lskey = name;
 		helpers.localStorageSafety(lskey);
-		var queue1 = helpers.getLocalStorage(lskey);
 		helpers.addToLocalStorage(lskey, song, first);
 		player.drawQueue();
 		return helpers.getLocalStorage(lskey);
@@ -113,7 +135,6 @@ player.setUpEvents = function() {
 			$("#time-right").text(parsedduration);
 			$("#time-left").text(parsedcurrent);
 			var percent = (current/duration)*100;
-
 			if (!player.automaticseekblocked && percent) {
 				$("#seekbar").val(percent);
 			}
@@ -139,11 +160,6 @@ player.playNext 	= function() {
 	*/
 	var queue = (player.queue1.get().length == 0) ? "queue2" : "queue1";
 	var firstsong = player[queue].getAndRemoveFirst();
-	/*
-		Add old song to history
-	*/
-	var oldsong = player.nowPlaying.get();
-	player.history.add(oldsong);
 	player.playSong(firstsong);
 }
 player.playLast		= function() {

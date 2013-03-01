@@ -1,0 +1,9 @@
+<div class="settings">
+	<h1>Settings</h1>
+	{% for setting in user.settings %}
+	<div class="setting" data-setting="{{setting.key}}">
+		<input type="checkbox" {% if setting.value %} checked {% endif %}>
+		<p>{{setting.label}}</p>
+	</div>
+	{% endfor %}
+</div>

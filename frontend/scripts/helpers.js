@@ -15,6 +15,9 @@ helpers = {
 		this.localStorageSafety(key);
 		var ls = this.getLocalStorage(key);
 		if (!first) {ls.push(obj)} else {ls.unshift(obj)}
+		if (key == 'history') {
+			ls = _.last(ls, 50);
+		}
 		localStorage[key] = JSON.stringify(ls);
 		return this.getLocalStorage(key);
 	},
@@ -67,16 +70,58 @@ helpers = {
       		return String(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 	},
     parseYTId: function(video) {
-        return video.id.$t.substr(-11);
+    	return (video == undefined) ? null : video.id.$t.substr(-11);
     },
     createID: function() {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     
-        for( var i=0; i < 16; i++ )
+        for( var i=0; i < 64; i++ )
             text += possible.charAt(Math.floor(Math.random() * possible.length));
     
         return text;
-    }
+    },
+    getHQAlbumImage: function(album, size) {
+    	var lq = album.image,
+    		replace = (size) ? size : '400',
+    		hq = lq.replace('100x100-75.jpg', (replace+'x'+replace+'-75.jpg'));
+    	return hq;
+    },
+    coverArrayToHQ: function(songs, size) {
+    	var newarray = [];
+    	for (i = 0; i < songs.length ;i++) {
+			newarray.push(helpers.getHQAlbumImage({image: songs[i]}, size));
+    	}
+    		
+    	return newarray;
+    },
+    parsetext: function(text) {
+		/*
+			Make all texts a string
+		*/
+		var text = text + '';
+		/*
+			Extract parenthesis text and wrap it in a span tag with the class 'lighttext'
+		*/
+		var parenthesis = (text.indexOf('(') != -1) ? '<span class="lighttext">' + ((text.substr(text.indexOf('('))).substr(1)).replace(')', '') + '</span>' : '';
+		/*
+			Get the text outside the parentesis
+		*/
+		var light 	  = (text.indexOf('(') != -1) ? text.substr(0, text.indexOf('(')) : text
+		/*
+			Return the text
+		*/
+		return light + parenthesis;
+	},
+	parsehours: function(number) {
+		var seconds = number / 1000,
+			label;
+		if 			(seconds < 90) 	{ label = 'One minute' }
+		else if 	(seconds < 3600) { label = Math.round(seconds/60) + ' minutes' }
+		else if 	(3600 <= seconds) { label = Math.round(seconds/360)/10 + ' hours'}
+		else 		{label = 'Unknown length'}
+		
+		return label;
+	}
 };
 this.helpers = helpers;

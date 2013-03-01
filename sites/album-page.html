@@ -1,5 +1,9 @@
 <div class="album-page">
-	<h1><span>{{album.name}}</span></h1>
-	<h2><span>by {{album.artist}}</span></h2>
+	<div class="album-page-header">
+		{% for cover in background %}
+			<img src="{{cover.image}}" class="background-cover" onload="this.className += ' fadein'">
+		{% endfor %}
+		<img src="{{hqimage}}" class="album-hq">
+	</div>
 	{% include albumhtml %}
 </div>

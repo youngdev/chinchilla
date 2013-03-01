@@ -131,7 +131,9 @@ templates = {
 				/*
 					Add a function that parses the duration to the template!
 				*/
-				parameters.parseduration = parseduration;
+				parameters.parseduration 	= parseduration;
+				parameters.parsetext 		= helpers.parsetext;
+				parameters.parsehours 		= helpers.parsehours;
 				/*
 					And finally, compile and render the file.
 				*/

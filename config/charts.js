@@ -22,10 +22,7 @@ this.update = function() {
 				songids.push({preview: entry.link[1].attributes.href});
 				pureids.push(id);
 			});
-			db.getSongsByIds(songids, function(items) {
-				/*
-					TODO: The order doesn't seem right.
-				*/
+			db.getSongsByQuery(songids, function(items) {
 				console.log(items.length);
 				if (items.length < limit) {
 					var dbtracks = [];

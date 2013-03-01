@@ -3,38 +3,29 @@
 		{% if artist.lastfm.image %}<img class="artist-header-image" src="{{artist.lastfm.image}}" border="0">{% endif%}{% for song in coverstack %}<img src="{{song.image}}" border="0">{% endfor %}
 	</div>
 	<h1 class="oncoverstack">{{artist.name}}</h1>
-	<div class="artist-container" data-id="{{artist.id}}">
-		<h2>Albums</h2>
-		<section class="album-list" data-resource="https://itunes.apple.com/lookup?id={{artist.id}}&entity=album">
-			{% if albums %}
-				{% for album in albums %}
-				{% include albumtemplate %}
-				{% endfor %}
-			{% endif %}
-		</section>
-	{% if tracks %}
-		<section class="tracks">
-			<h2>Tracks</h2>
-			<table>
-				<tr>
-					<th data-value="menu"></th>
-					<th data-value="number"></th>
-					<th data-value="trackname">Name</th>
-					<th data-value="duration">Length</th>
-				</tr>
-			{% for track in tracks %}
-				<tr class="song{% if track.ytid %} recognized{% else %} not-recognized{% endif %}" data-album="{{track.album}}" data-name="{{track.name}}" data-duration="{{track.duration}}" data-albumid="{{track.albumid}}" data-artist="{{track.artist}}" data-artistid="{{track.artistid}}" data-image="{{track.image}}" data-id="{{track.id}}" data-explicit="{{track.explicit}}" data-genre="{{track.genre}}" data-numberinalbum="{{track.numberinalbum}}" data-cdinalbum="{{track.cdinalbum}}" data-tracks="{{track.tracks}}" data-cdcount="{{track.cdcount}}" data-preview="{{track.preview}}" data-release="{{track.release}}" {% if track.ytid %} data-ytid="{{track.ytid}}" {% endif %}>
-					<td></td>
-					<td>{{loop.index}}</td>
-					<td>{{track.name}}</td>
-					<td>{{parseduration(track.duration)}}</td>
-				</tr>
-			
-			{% endfor %}
-		</table>
-		</section>
-	{% endif %}
-	</div>
+
+<table class="artist-page-table artist-container" data-id="{{artist.id}}">
+	<tr>
+		<td class="artist-album-container">
+			<h2><span>Albums</span></h2>
+			<section class="album-list" data-resource="https://itunes.apple.com/lookup?id={{artist.id}}&entity=album">
+				{% if albums %}
+					{% for album in albums %}
+						{% include albumtemplate %}
+					{% endfor %}
+				{% endif %}
+			</section>
+		</td>
+		<td class="album-tracklist">
+			<section class="tracks">
+				<h2><span>Tracks</span></h2>
+				<div class="table-wrapper">
+					{% include tracklist %}
+				</div>
+			</section>
+		</td>
+	</tr>
+</table>
 {% else %}
 	<h1>No artist found.</h1>
 {% endif %}

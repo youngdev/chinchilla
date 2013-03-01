@@ -102,6 +102,37 @@ views = {
 		hide: function() {
 			var indicator = $(".loading-indicator").remove()
 		}
+	},
+	library: {
+		get: function() {
+			$.ajax({
+				url: "/api/library",
+				dataType: "html",
+				success: function(data) {
+					var view = $("#view");
+					view.html(data);
+					views.loadingindicator.hide();
+				},
+				error: function() {
+					errors.draw(404);
+				}
+			});
+		}
+	},
+	settings: {
+		get: function() {
+			$.ajax({
+				url: "/api/settings",
+				dataType: "html",
+				success: function(data) {
+					$("#view").html(data);
+					views.loadingindicator.hide();
+				},
+				errors: function() {
+					errors.draw(4040);
+				}
+			})
+		}
 	}
 };
 album = {
@@ -139,7 +170,7 @@ album = {
 							albumsalreadytherenames = [];
 						$.each($('.artist-container .album-list .album'), function(k,v) {
 							albumsalreadythere.push($(v).data('id'));
-							var name        = $(v).data('name'),
+							var name        = $(v).data('name')+'',
 								shortened	= helpers.slugify(name.substr(0, (name.indexOf("(") == -1) ? name.length : name.indexOf("(")));
 							albumsalreadytherenames.push(shortened);
 						});
@@ -172,6 +203,7 @@ album = {
 						var divs = [];
 						var buildAlbum = function() {
 							var album = sortedAlbums[i];
+							console.log(album);
 							templates.buildElement({
 								template:   "album",
 								parameters: {album: {
@@ -188,6 +220,7 @@ album = {
                                     explicit: album.collectionExplicitness == "explicit" ? true : false
                                 }},
 								callback: function(output) {
+									console.log(output);
 									divs.push(output);
 									/*
 										Start the next iteration, if the album length isn't already reached.
@@ -197,7 +230,7 @@ album = {
 										buildAlbum();
 									}
 									else {
-										onAlbumsFinishedLoading();
+										onAlbumsFinishedLoading(divs);
 									} 
 								}
 							});
@@ -209,20 +242,6 @@ album = {
 							albums = sortedAlbums.length;
 
 						buildAlbum()
-						/*
-							Now we have a sorted array of all the albums.
-							Add those div's to the DOM!
-						*/
-						var onAlbumsFinishedLoading  = function() {
-							/*
-								Refresh is done. At this point, albums will be added.
-							*/
-							var albumlist = $(".album-list");
-							$.each(divs, function (key, div) {
-								albumlist.append(div);
-							});
-							album.tracklist.complete(albumlist);
-						};
 					}
 				}
 			});
@@ -280,14 +299,12 @@ album = {
 									preview: track.previewUrl,
 									release: track.releaseDate
 								};
-								console.log(tracks, track.discNumber, track);
 								tracks[track.discNumber-1].push(remap);
 							});
 							templates.buildElement({
 								template: "tracklist",
 								parameters: {album: {cds: tracks}},
 								callback: function(element) {
-									console.log($(album));
 									$(album).find(".album-tracks").replaceWith(element);
 									recognition.recognizeAlbum(album);
 								}
@@ -329,4 +346,18 @@ registration = {
             });
         }
     }
+};
+/*
+	Now we have a sorted array of all the albums.
+	Add those div's to the DOM!
+*/
+var onAlbumsFinishedLoading  = function(divs) {
+	/*
+		Refresh is done. At this point, albums will be added.
+	*/
+	var albumlist = $(".album-list");
+	$.each(divs, function (key, div) {
+		albumlist.append(div);
+	});
+	album.tracklist.complete(albumlist);
 };

@@ -9,7 +9,8 @@ var app         = require('express').createServer(),
     styles      = require('./routes/styles'),
     events      = require('./config/events'),
     charts      = require('./config/charts'),
-    fb          = require('./config/facebook');
+    fb          = require('./config/facebook'),
+    os          = require('os');
 /*
 	Listen to the fifty-one-fifty-one port!
 */
@@ -29,6 +30,8 @@ app.get('/album/:id',                   views.mainview          );
 app.get('/about',                       views.mainview          );
 app.get('/track/:id',                   views.mainview          );
 app.get('/register',                    views.mainview          );
+app.get('/library',                     views.mainview          );
+app.get('/settings',                    views.mainview          ); 
 /*
     Backedn routes
 */
@@ -38,20 +41,25 @@ app.get('/api/artist/:id',              views.drawartist        );
 app.get('/api/charts',                  views.charts            );
 app.get('/api/album/:album',            views.drawalbum         );
 app.get('/api/i/:filename',             styles.images.get       );
+app.get('/api/svg/:filename',           styles.svg.get          );
+app.get('/api/svg/:filename/:color',    styles.svg.getColor     );
 app.get('/api/error/:code',             views.error             );
 app.get('/api/about',                   views.about             );
 app.get('/api/track/:id',               views.drawtrack         );
 app.get('/api/registration',            views.registration      );
+app.get('/api/library',                 views.library           );
+app.get('/api/settings',                views.settings          );
 /*
     Auth routes
 */
 app.get('/auth/facebook',               fb.login                );
+app.get('/auth/facebook/token',         fb.token                );
+app.get('/logout',                      fb.logout               );
 /*
 	Configure Websockets. Through websockets, users can receive live updates and submit to the database.
 */
 
 io.set('log level', 1);
-io.set('transports', ['xhr-polling']);
 io.sockets.on('connection', events.connection);
 
 /*

@@ -14,8 +14,14 @@ routes = {
     '/track/:id':           function(match) {
         views.track.load(match[1]);
     },
-    '/register':        function(match) {
+    '/register':        	function(match) {
         registration.facebook.load();
+    },
+    '/library': 			function(match) {
+    	views.library.get(match[1]);
+    },
+    'settings': 			function(match) {
+    	views.settings.get();
     },
 	'/':                    function(match) {
 
@@ -36,14 +42,16 @@ var showSpinner = function() {
 	$("#view").html(spinner);
 };
 navigation = {
-	to: function(path) {
+	to: function(path, prevent) {
 		$.each(routes, function (route, callback) {
 			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z-]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
 			if ((match && match != '/') || (match == '/' && path == '/')) {
 				callback(match);
 				showSpinner();
-				history.pushState(null, null, path);
+				var method = prevent ? 'replaceState' : 'pushState';
+				history[method](null, null, path);
+				$('#view').attr('data-route', path);
 			}
 		});
 		/*
@@ -54,3 +62,7 @@ navigation = {
 		$(selector).addClass('menuselected');
 	}
 };
+window.onpopstate = function() {
+	var pathname			= window.location.pathname;
+	navigation.to(pathname, true);
+}

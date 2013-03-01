@@ -20,9 +20,8 @@ recognition = {
 	recognizeTrack: function(obj) {
 		var track = obj.track,
 			  cb	  = obj.cb
-		var songtitle  = $(track).attr("data-name"),
-			songartist = $(track).attr("data-artist")
-		recognition.findVideo({artist: songartist, title: songtitle}, function(video) {
+		var song = helpers.parseDOM(track)
+		recognition.findVideo(song, function(video) {
 			cb();
 			/*
 				Upload track to database!
@@ -31,6 +30,7 @@ recognition = {
 			recognition.uploadTrack(track, video)
 			var dom   = (firsttrackinarray instanceof HTMLElement) ? $(firsttrackinarray) : $(".song[data-id=" + firsttrackinarray.id + "]")[0];
 			//Mark it as recognized
+			console.log(dom);
 			$(dom).addClass("recognized")
 			//Unmark it as not recognized
 			.removeClass("not-recognized pending")
@@ -91,12 +91,13 @@ recognition = {
         if (underscorestring != undefined) {
             _s = underscorestring;
         }
+        var songname = (song.title == undefined) ? song.name : song.title;
         $.ajax({
             url: "http://gdata.youtube.com/feeds/api/videos",
             data: {
                 alt: "json",
                 "max-results": 15,
-                q: song.artist + " - " + song.title
+                q: song.artist + " - " + songname
             },
             success: function (json) {
                 var filterVideos = function(videotitle) {
@@ -112,12 +113,15 @@ recognition = {
                 }
                 //Find the video most related to our video by duration.
                 var videos = json.feed.entry;
-                //TODO: Do we also want to compare levenshtein distance of song titles?
                 videos = (_.filter(videos, function(video) {
                     return (filterVideos(video.title.$t) === false)
                 }));
+                //Filter videos that are too short
+                videos = (_.filter(videos, function(video) {
+                	return video.media$group.yt$duration.seconds > (song.duration/1000);
+                }));
                     var closestVideo = _.sortBy(videos, function (video) {
-                        return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ song.title))
+                        return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ songname));
                     })[0];          
                 callback(closestVideo);
             }
@@ -166,6 +170,10 @@ function EventedArray(handler) {
    };
    this.getArray = function() {
       return this.stack;
+   }
+   this.unshift = function() {
+    this.stack.unshift();
+    this.callHandler();
    }
 }
 /*

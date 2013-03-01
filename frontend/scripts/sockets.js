@@ -13,4 +13,13 @@ var socket = io.connect(window.location.origin);
 */
 socket.on('connected', function() {
 	sockets.connected = true;
+});
+socket.on('track-added', function(data) {
+	
+});
+socket.on('tracks-added', function(songsadded) {
+	
 })
+socket.on('track-removed', function(data) {
+	
+});

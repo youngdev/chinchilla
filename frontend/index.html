@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Chinchilla</title>
+	<link id="favicon" rel="shortcut icon" type="image/png" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script src="/api/script/underscore"></script>
 	<script src="/api/script/helpers"></script>	
@@ -19,11 +20,13 @@
 	<script src="/api/script/errors"></script>
 	<script src="/api/script/recognition"></script>
 	<script src="/api/script/swfobject"></script>
+	<script src="/api/script/library"></script>
+  <script type='text/javascript' id='lt_ws' src='http://localhost:8833/socket.io/lighttable/ws.js'></script>
 	<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/api/styles/main">
 </head>
 <body>
-	<div id="player">
+	<div id="player" class="loading-player">
 		<div id="player-controls">
 			<div id="rewind">
 				<div class="arrow-left"></div>
@@ -53,6 +56,7 @@
 	</div>
 	<div id="sidebar">
 		<input type="text" id="search-field" placeholder="Search for songs or artists">
+		<div id="clear-input">x</div>
 		<div id="search-results">
 			<h1><span>Songs</span></h1>
 			<div id="results-tracks"></div>
@@ -62,13 +66,22 @@
 			<div id="results-albums"></div>
 		</div>
 		<ul>
-			<li data-navigate="/artist/7057812"><a>Example artist</a></li>
-			<li data-navigate="/album/571445253"><a>Example album</a></li>
-            <li data-navigate="/track/180537968"><a>Example song</a></li>
-			<li data-navigate="/charts"><a>Charts</a></li>
-			<li data-navigate="/about"><a>About</a></li>
-            <button id="register">Register</button>
+			<li data-navigate="/library"><a><img src="/api/svg/library/white">Library</a></li>
+			<li data-navigate="/artist/7057812"><a><img src="/api/svg/artist/white">Example artist</a></li>
+			<li data-navigate="/album/571445253"><a><img src="/api/svg/album/white">Example album</a></li>
+            <li data-navigate="/track/180537968"><a><img src="/api/svg/song/white">Example song</a></li>
+			<li data-navigate="/charts"><a><img src="/api/svg/star/white">Charts</a></li>
+			<li data-navigate="/about"><a><img src="/api/svg/info/white">About</a></li>
+			<li data-navigate="/settings"><a><img src="/api/svg/settings/white">Settings</a></li>
 		</ul>
+		{% if user %}
+		<div id="signed-in">
+			<img src="http://graph.facebook.com/{{user.id}}/picture" id="profile-image">
+			<p id="name">{{user.first}} <span id="logout"><a href="/logout">(Logout)</a></span></p>
+		</div>
+		{% else %}
+		<div id="register"><a href="/auth/facebook">Login with Facebook</a></div>
+		{% endif %}
 	</div>
 	<div id="view">
 		<div class="loading-indicator">
@@ -81,11 +94,31 @@
 		<script>
 			function onYouTubePlayerReady(playerId) {
 				ytplayer = document.getElementById("myytplayer");
-				player.setUpEvents()
+				player.setUpEvents();
+
+
+				var shouldLoad = player.nowPlaying.get();
+				if (shouldLoad) {
+					player.playSong(shouldLoad, true);
+					player.drawQueue();
+					$('#player').removeClass('loading-player');
+				}
 			}
             var params = { allowScriptAccess: "always" };
             var atts = { id: "myytplayer" };
             swfobject.embedSWF("http://www.youtube.com/v/dFVxGRekRSg?enablejsapi=1&playerapiid=ytplayer&version=3", "ytapiplayer", "425", "356", "8", null, null, params, atts);
+    </script>
+    <script>
+    	
+    	chinchilla = {
+    		loggedin: {% if user %} true,
+    		token: '{{user.token}}' {% else %} false {% endif %},
+    		settings: {% if user %} {
+    			{% for setting in user.settings %}
+    			{{setting.key}}: {{setting.value}} {% if !loop.last %}, {% endif %}
+    			{% endfor %}
+    		}{% else %} false{% endif %}
+    	}
     </script>
 	</div>
 </body>
