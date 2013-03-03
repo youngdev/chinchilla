@@ -13,9 +13,8 @@ var app         = require('express').createServer(),
 /*
 	Listen to the fifty-one-fifty-one port!
 */
-var ipaddr = process.env.OPENSHIFT_INTERNAL_IP || "127.0.0.1";
-var port = process.env.OPENSHIFT_INTERNAL_PORT || 5000;
-app.listen(port, ipaddr);
+var port = process.env.PORT || 5000;
+app.listen(port);
 console.log("App started on port", port);
 
 /*
