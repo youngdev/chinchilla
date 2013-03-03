@@ -13,7 +13,10 @@ var fs 		= require('fs'),
 	Specifies the parent directory path in a string.
 */
 var dirup = __dirname.substr(0, __dirname.length - 7);
-
+var notificationtemplates = {
+	track_added: 	swig.compileFile(dirup + '/sites/notifications/track-added.html'),
+	track_removed: 	swig.compileFile(dirup + '/sites/notifications/track-removed.html')
+}
 this.connection = function (socket) {
 		socket.emit('connected', {"message": "You are now connected to the socket.io server."});
 		/*
@@ -62,7 +65,11 @@ this.connection = function (socket) {
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.addTrack(data.song, user, function(collection) {
-						socket.emit('track-added', data.song);
+						db.getSingleTrack(data.song.id, function(song) {
+							data.song = song[0];
+							var notification = notificationtemplates.track_added.render({data: data});
+							socket.emit('track-added', notification);
+						});
 					});
 				}
 			});
@@ -80,7 +87,11 @@ this.connection = function (socket) {
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.removeTrack(data.song, user, function(collection) {
-						socket.emit('track-removed', data.song);
+						db.getSingleTrack(data.song.id, function(song) {
+							data.song = song[0];
+							var notification = notificationtemplates.track_removed.render({data: data});
+							socket.emit('track-removed', notification);
+						});
 					})
 				}
 			})

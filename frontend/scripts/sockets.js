@@ -14,12 +14,12 @@ var socket = io.connect(window.location.origin);
 socket.on('connected', function() {
 	sockets.connected = true;
 });
-socket.on('track-added', function(data) {
-	
+socket.on('track-added', function(notification) {
+	notifications.create(notification);
 });
 socket.on('tracks-added', function(songsadded) {
 	
 })
-socket.on('track-removed', function(data) {
-	
+socket.on('track-removed', function(notification) {
+	notifications.create(notification);
 });
