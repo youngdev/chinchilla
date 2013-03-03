@@ -21,7 +21,11 @@ library = {
 	}
 }
 var markAsInLibrary = function(id) {
-	$('.song[data-id=' + id + ']').removeClass('not-in-library').addClass('in-library');
+	var song = $('.song[data-id=' + id + ']')
+	song.removeClass('not-in-library').addClass('in-library animated');
+	setTimeout(function() {
+		song.removeClass('animated')
+	}, 300);
 
 }
 var markAsNotInLibrary = function(id) {

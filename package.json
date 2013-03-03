@@ -16,9 +16,9 @@
     "cookies": "0.3.6",
     "facebook-api": "0.1.2"
   },
-  "subdomain": "chinchilla",
+  "main": "app.js",
   "scripts": {
-    "start": "app.js"
+    "start": "node app.js"
   },
   "engines": {
     "node": "0.6.x"

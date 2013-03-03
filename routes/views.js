@@ -13,6 +13,7 @@ var swig        = require('swig'),
     facebook	= require('../config/facebook'),
     cookies		= require('cookies'),
     workers		= require('../config/workers'),
+    standards   = require('../config/standards'),
 	lastfm  = new Lastfm({
 		api_key:    "29c1ce9127061d03c0770b857b3cb741",
 		secret:     "473680e0257daa9a7cb45207ed22f5ef"
@@ -529,11 +530,28 @@ this.settings		= function(request, response) {
 	}
 	else {
 		dbquery.getUser(token, function(user) {
+			/*
+				Add new settings/remove deprecated settings
+			*/
+			var settings = [];
+			_.each(standards.settings, function(setting, key) {
+				console.log(setting);
+				var stg = _.where(user.settings, {key: setting.key});
+				if (stg.length !== 0) {
+					settings.push(stg[0])
+				}
+				else {
+					settings.push(setting)
+				}
+			});
+			user.settings = settings;
+			/*
+				Render settings
+			*/
 			var output = tmpl.render({
 				user: user
 			});
 			response.end(output);
 		});
 	}
-	
 }

@@ -132,7 +132,6 @@ var addtolib			= function() {
 	else {
 		var toadd = this;
 	}
-	console.log(toadd)
 	var song = helpers.parseDOM(toadd);
 	library.add(song);
 }
@@ -293,28 +292,32 @@ var keys 				= function(e) {
 	}
 
 }
+var hidenotification  = function() {
+	$(this).parents('.notification').remove()
+}
 $(document)
-.on('mousedown',    '.song',            		select      	) // Selecting tracks
-.on('keyup',		'body',						keys			) // Keys
-.on('dblclick',     '.song',            		playSong    	) // Doubleclick to play. Just POC yet.
-.on('mousedown',    '#seekbar',         		dragSeek		) // Block autmatic seeking while dragging
-.on('mouseup',      '#seekbar',         		dragSeekUp  	) // Update and seek
-.on('click',        '#play',            		resume      	) // Play or resume song.
-.on('click',        '#pause',           		pause			) // Pause music.
-.on('click',        '#skip',            		skip			) // Skip track. Play next one.
-.on('click',        '#rewind',          		rewind			) // Go back to previous track.
-.on('mouseover',    '[data-tooltip]',   		tooltip     	) // Show small black tooltips.
-.on('keyup',        '#search-field',    		autocomplete	) // Show suggestions when user types into search.
-.on('click',		'#clear-input',				clearinput  	) // Delete everything in the search field.
-.on('click',        '.play-button',     		playSong		) // Play buttons are in track views for instance.
-.on('click',		'.library-button',			addtolib		) // Sends a request to the server to save the song.
-.on('click',		'.library-remove-button', 	remfromlib		) // Sends a request to the server to remove the song.
-.on('click',		'.not-in-library .heart',	addtolib 		) // Inline add to library
-.on('click',		'.in-library .heart',		remfromlib 		) // Inline remove from library
-.on('click',		'#logout',					logout			) // Logout
-.on('contextmenu',	'.song.recognized',			rightclick  	) // Allows users to right-click
-.on('change',		'.settings input',			setchange		) // New settings were made
-.on('click',		'[data-order]',				ordersongs		) // Click on table header to sort songs.
-.on('click',		'.play-all-album',			playalbum 		) // Play all the songs on one album
-.on('click', 		'.add-all-album',			addalbumtolib	) // Add all tracks to an album
-.on('click',		'.findandplay',				findandplay ) // Searches for a track in the DOM and plays it
+.on('mousedown',    '.song',            				select      		) // Selecting tracks
+.on('keyup',		'body',								keys				) // Keys
+.on('dblclick',     '.song',            				playSong    		) // Doubleclick to play. Just POC yet.
+.on('mousedown',    '#seekbar',         				dragSeek			) // Block autmatic seeking while dragging
+.on('mouseup',      '#seekbar',         				dragSeekUp  		) // Update and seek
+.on('click',        '#play',            				resume      		) // Play or resume song.
+.on('click',        '#pause',           				pause				) // Pause music.
+.on('click',        '#skip',            				skip				) // Skip track. Play next one.
+.on('click',        '#rewind',          				rewind				) // Go back to previous track.
+.on('mouseover',    '[data-tooltip]',   				tooltip     		) // Show small black tooltips.
+.on('keyup',        '#search-field',    				autocomplete		) // Show suggestions when user types into search.
+.on('click',		'#clear-input',						clearinput  		) // Delete everything in the search field.
+.on('click',        '.play-button',     				playSong			) // Play buttons are in track views for instance.
+.on('click',		'.library-button',					addtolib			) // Sends a request to the server to save the song.
+.on('click',		'.library-remove-button', 			remfromlib			) // Sends a request to the server to remove the song.
+.on('click',		'.not-in-library .heart',			addtolib 			) // Inline add to library
+.on('click',		'.in-library .heart',				remfromlib 			) // Inline remove from library
+.on('click',		'#logout',							logout				) // Logout
+.on('contextmenu',	'.song.recognized',					rightclick  		) // Allows users to right-click
+.on('change',		'.settings input',					setchange			) // New settings were made
+.on('click',		'[data-order]',						ordersongs			) // Click on table header to sort songs.
+.on('click',		'.play-all-album',					playalbum 			) // Play all the songs on one album
+.on('click', 		'.add-all-album',					addalbumtolib		) // Add all tracks to an album
+.on('click',		'.findandplay',						findandplay 		) // Searches for a track in the DOM and plays it
+.on('click', 		'.notification .actions span',		hidenotification	) // Close notifications
