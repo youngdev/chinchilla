@@ -1,7 +1,7 @@
 var mongo       = require("mongoskin"),
-	auth        = require("../auth/auth"),
+	//auth        = require("../auth/auth"),
 	_			= require("underscore"),
-	connection  = mongo.db(auth.auth, {safe: true}),
+	connection  = mongo.db('jonny:zinedinezidane11@ds047307.mongolab.com:47307/chinchilla?auto_reconnect', {safe: true}),
     options     = {save: true, upsert: true},
     standards   = require("../config/standards");
 /*
