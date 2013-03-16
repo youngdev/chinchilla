@@ -3,7 +3,6 @@
 */
 var swig        = require('swig'),
 	_           = require('underscore'),
-    $           = require('jquery'),
 	dbquery     = require('../db/queries'),
 	itunes      = require('../config/itunes'),
 	charts      = require('../config/charts'),
@@ -14,6 +13,7 @@ var swig        = require('swig'),
     cookies		= require('cookies'),
     workers		= require('../config/workers'),
     standards   = require('../config/standards'),
+    jsonload 	= require('jsonreq'),
 	lastfm  = new Lastfm({
 		api_key:    "29c1ce9127061d03c0770b857b3cb741",
 		secret:     "473680e0257daa9a7cb45207ed22f5ef"
@@ -158,9 +158,9 @@ this.artist 					= function(request, response) {
 	 		});
 	 		data.top10 			= [{cds: [_.first(songs, 10)]}];
 	 		var collections 	= [];
-	 		$.each(albums, function(name, songs) {
+	 		_.each(albums, function(songs, name) {
 	 			var albumarray 	= [];
-	 			$.each(songs, function(k, song) {
+	 			_.each(songs, function(song, k) {
 	 				albumarray.push(song);
 	 			});
 	 			/*
@@ -541,17 +541,15 @@ this.drawtrack      = function(request, response) {
                     /*
                         Fetch YouTube video
                     */
-                    recognition.findVideo(song, function(video) {
-                        song.ytid = helpers.parseYTId(video);
-                        response.end(tmpl.render({song: song, parseduration: parseduration, image: helpers.getHQAlbumImage(song)}));
-                        dbquery.addTrack(song, function() {
-                            console.log("Track successfully added (Through /track/:id site)");
-                        });
-                    /*
-                        Below you see jQuery and underscore are passed in. This is because the file
-                        is used on the client-side too and there is no require
-                    */
-                    }, $, _, _.str);
+                    jsonload.get('http://gdata.youtube.com/feeds/api/videos?alt=json&max-results=15&q=' + song.artist + ' - ' + song.name, function(err, data) {
+                    	recognition.findBestVideo(data, song, function(video) {
+                    		song.ytid = helpers.parseYTId(video);
+                        	response.end(tmpl.render({song: song, parseduration: parseduration, image: helpers.getHQAlbumImage(song)}));
+                        	dbquery.addTrack(song, function() {
+                        	    console.log("Track successfully added (Through /track/:id site)");
+                        	});
+                    	}, _, _.str);
+                    });
                 }
                 else {
                     console.log("No track here");
@@ -721,7 +719,7 @@ this.main 					= function(request, response) {
 			var top 		= _.first(charts.table, 7),
 				top7 		= [],
 				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs()), 2);
-			$.map(redditsongs, function(reddit) { 
+			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
 			});
