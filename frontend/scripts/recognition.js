@@ -98,61 +98,67 @@ recognition = {
         if (underscorestring != undefined) {
             _s = underscorestring;
         }
-        var songname = (song.title == undefined) ? song.name : song.title;
+        song.name = (song.title == undefined) ? song.name : song.title;
         $.ajax({
             url: "http://gdata.youtube.com/feeds/api/videos",
             data: {
                 alt: "json",
                 "max-results": 15,
-                q: song.artist + " - " + songname
+                q: song.artist + " - " + song.name
             },
             success: function (json) {
-                var filterVideos = function(videotitle) {
-                    var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid"];
-                    var filterout = false;
-                    $.each(filters, function(key, filter) {
-                        if (_s.include(videotitle.toLowerCase(), filter)) {
-                          // Filter covers, parodies and Chipmunk versions out
-                          filterout = true
-                        }
-                    })
-                    return filterout;
-                }
-                // Find the video most related to our video by duration.
-                var videos = json.feed.entry;
-                var videos = (_.filter(videos, function(video) {
-                    return (filterVideos(video.title.$t) === false)
-                }));
-                // Filter videos that are too short
-                var videos = (_.filter(videos, function(video) {
-                	return video.media$group.yt$duration.seconds > (song.duration/1000);
-                }));
-                // Filter videos that are more than 30 seconds too long.
-                var videos = _.filter(videos, function(video) {
-                    return (video.media$group.yt$duration.seconds) < ((song.duration/1000) + 30);
-                });
-                // Filter videos that contain 'live' in the description
-                var videos = _.filter(videos, function(video) {
-                    return !(_s.include((video.media$group.media$description.$t).toLowerCase(), 'live'));
-                });
-                // Give lyric videos a little levenshtein bonus
-                var videos = _.map(videos, function(video) {
-                    var lower = video.title.$t.toLowerCase();
-                    var index = lower.indexOf('lyric');
-                    video.title.$t = (index == -1) ? lower : (lower.substr(0, index));
-                    return video;
-                });
-                // Filter videos with bad rating and with rating disabled;
-                var videos = _.filter(videos, function(video) {
-                    return video.gd$rating && video.gd$rating.average > 2.5
-                });
-                // Get the closest video
-                var closestVideo = _.sortBy(videos, function (video) {
-                    return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ songname));
-                })[0];          
-                callback(closestVideo);
+              recognition.findBestVideo(json, song, function(video) {
+                callback(video);
+              }, _, _s);
             }
-        });
+          }
+        );
+    },
+    findBestVideo: function(json, song, callback, _, _s) {
+        var filterVideos = function(videotitle, callback) {
+             var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid"];
+             var filterout = false;
+             _.each(filters, function(filter, key) {
+                 if (_s.include(videotitle.toLowerCase(), filter)) {
+                   // Filter covers, parodies and Chipmunk versions out
+                   filterout = true
+                 }
+             })
+             return filterout;
+         }
+         // Find the video most related to our video by duration.
+         var videos = json.feed.entry;
+         var videos = (_.filter(videos, function(video) {
+             return (filterVideos(video.title.$t) === false)
+         }));
+         // Filter videos that are too short
+         var videos = (_.filter(videos, function(video) {
+           return video.media$group.yt$duration.seconds > (song.duration/1000);
+         }));
+         // Filter videos that are more than 30 seconds too long.
+         var videos = _.filter(videos, function(video) {
+             return (video.media$group.yt$duration.seconds) < ((song.duration/1000) + 30);
+         });
+         // Filter videos that contain 'live' in the description
+         var videos = _.filter(videos, function(video) {
+             return !(_s.include((video.media$group.media$description.$t).toLowerCase(), 'live'));
+         });
+         // Give lyric videos a little levenshtein bonus
+         var videos = _.map(videos, function(video) {
+             var lower = video.title.$t.toLowerCase();
+             var index = lower.indexOf('lyric');
+             video.title.$t = (index == -1) ? lower : (lower.substr(0, index));
+             return video;
+         });
+         // Filter videos with bad rating and with rating disabled;
+         var videos = _.filter(videos, function(video) {
+             return video.gd$rating && video.gd$rating.average > 2.5
+         });
+         // Get the closest video
+          var closestVideo = _.sortBy(videos, function (video) {
+              return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ song.name));
+          })[0];          
+          callback(closestVideo);
     },
     uploadTrack: function(track, video) {
     	var videoid = video.id.$t.substr(-11);

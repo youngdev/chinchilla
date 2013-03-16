@@ -1,7 +1,6 @@
 var clientID       = '212482748876564';
 var clientSecret   = 'f2bdb7700ef2d87a8c05b32ac31c013a';
 var redirect_uri   = (process.env.HOME == '/Users/jonny') ? 'http://localhost:5000/auth/facebook/token'  : 'http://tunechilla.com/auth/facebook/token';
-var $			   = require('jquery');
 var cookies		   = require('cookies');
 var fbapi		   = require('facebook-api');
 var helpers 	   = require('../frontend/scripts/helpers').helpers;
@@ -10,6 +9,7 @@ var _			   = require('underscore');
 var _s 			   = require('underscore.string');
 var standards	   = require('../config/standards');
 var sanitizer 	   = require('sanitizer');
+var ajax	 	   = require('request');
 this.login 				= function(request, response) {
     response.redirect('https://www.facebook.com/dialog/oauth?client_id=' + clientID + '&redirect_uri=' + redirect_uri);
 }
@@ -153,27 +153,41 @@ this.removeTrack		= function(song, user, callback) {
 	})
 }
 var exchange 			= function(code, request, response) {
-	$.ajax(
-		{
-			url: 'https://graph.facebook.com/oauth/access_token',
-			data: 
-				{
-					client_id: 		clientID,
-					redirect_uri: 	redirect_uri,
-					client_secret: 	clientSecret,
-					code: 			code
-				},
-			success: function(code)
-				{
-					var token 			= code.substr(code.indexOf("access_token=") + 13),
-						access_token	= token.substr(0, token.indexOf("&expires"));
-					getUserInfo(access_token, request, response);
-				},
-			error: function(a,status) {
-				response.end("Facebook error");
+	//$.ajax(
+	//	{
+	//		url: 'https://graph.facebook.com/oauth/access_token',
+	//		data: 
+	//			{
+	//				client_id: 		clientID,
+	//				redirect_uri: 	redirect_uri,
+	//				client_secret: 	clientSecret,
+	//				code: 			code
+	//			},
+	//		success: function(code)
+	//			{
+	//				var token 			= code.substr(code.indexOf("access_token=") + 13),
+	//					access_token	= token.substr(0, token.indexOf("&expires"));
+	//				getUserInfo(access_token, request, response);
+	//			},
+	//		error: function(a,status) {
+	//			response.end("Facebook error");
+	//		}
+	//	}
+	//);
+	ajax(
+		'https://graph.facebook.com/oauth/access_token?client_id=' + clientID + '&redirect_uri=' + redirect_uri + '&client_secret=' + clientSecret + '&code=' + code,
+		function(error, r, code) {
+			if (error) {
+				response.end("Facebook error")
+			}
+			else {
+				console.log("worked!");
+				var token 			= code.substr(code.indexOf("access_token=") + 13),
+					access_token	= token.substr(0, token.indexOf("&expires"));
+				getUserInfo(access_token, request, response);
 			}
 		}
-	)
+	);
 }
 var getUserInfo	 		= function(access_token, request, response) {
 	var client = fbapi.user(access_token);

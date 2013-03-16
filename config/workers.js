@@ -1,7 +1,7 @@
 var db 					= require("../db/queries"),
 	_					= require("underscore"),
 	itunes 				= require("../config/itunes"),
-	$ 					= require("jquery"),
+	json 				= require("jsonreq"),
 	helpers 			= require("../frontend/scripts/helpers").helpers
 var covers 				= [];
 var redditsongs 		= [];
@@ -12,7 +12,7 @@ var getAlbumCovers 		= function() {
 	});
 }
 var getRedditTracks 	= function() {
-	$.getJSON('http://www.reddit.com/r/music/top/.json?t=week', function(json) {
+	json.get('http://www.reddit.com/r/music/top/.json?t=week', function(err, json) {
 		redditsongs = [];
 		var songs = json.data.children;
 		var songs = _.filter(songs, function(song) { return song.data.domain == 'youtube.com'});
