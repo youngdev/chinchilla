@@ -13,7 +13,7 @@ var swig        = require('swig'),
     cookies		= require('cookies'),
     workers		= require('../config/workers'),
     standards   = require('../config/standards'),
-    jsonload 	= require('jsonreq'),
+	jsonload 	= require('jsonreq'),
 	lastfm  = new Lastfm({
 		api_key:    "29c1ce9127061d03c0770b857b3cb741",
 		secret:     "473680e0257daa9a7cb45207ed22f5ef"
