@@ -122,6 +122,51 @@ helpers = {
 		else 		{label = 'Unknown length'}
 		
 		return label;
+	},
+	albumRelevance: function(album, underscore) {
+		var _ = underscore;
+		var hidden = [
+			{
+				word: 'remix',
+				reason: 'This album only contains Remixes of one song:'
+			},
+			{
+				word: 'instrumental',
+				reason: 'This is is the Instrumental version of'
+			},
+			{
+				word: '- ep',
+				reason: 'This album may contain duplicate tracks:'
+			},
+			{
+				word: 'acoustic',
+				reason: 'This album is an acoustic version:'
+			},
+			{
+				word: 'itunes',
+				reason: 'This album is an itunes version:'
+			},
+			{
+				word: 'live',
+				reason: 'This is a live album:'
+			}
+		];
+		_.each(hidden, function(hide) {
+			if (((album.name+'').toLowerCase()).indexOf(hide.word) != -1) {
+				album.hidden = hide.reason;
+			}
+		});
+		return album
+	},
+	parseAlbumTitle: function(album) {
+		var prename             = album.name+'',
+			name                = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("(") -1),
+			parenthesisregex    = /\(([^()]+)\)/g,
+			inparenthesis       = prename.match(parenthesisregex),
+			withoutbrackets     = inparenthesis ? inparenthesis[0].substr(1, inparenthesis[0].length-2) : null;
+		album.name              = name;
+		album.subtitle          = withoutbrackets;
+		return album;
 	}
 };
 this.helpers = helpers;

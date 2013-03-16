@@ -19,46 +19,53 @@ recognition = {
 	queue: new EventedArray(recognitionAdditionHandler),
 	recognizeTrack: function(obj) {
 		var track = obj.track,
-			  cb	  = obj.cb
-		var song = helpers.parseDOM(track)
+			  cb	  = obj.cb;
+		var song = helpers.parseDOM(track);
 		recognition.findVideo(song, function(video) {
 			cb();
-			/*
-				Upload track to database!
-			*/
       var firsttrackinarray = (track.length != undefined && track.length != 0) ? track[0] : track;
-			recognition.uploadTrack(track, video)
-			var dom   = (firsttrackinarray instanceof HTMLElement) ? $(firsttrackinarray) : $(".song[data-id=" + firsttrackinarray.id + "]")[0];
-			//Mark it as recognized
-			console.log(dom);
-			$(dom).addClass("recognized")
-			//Unmark it as not recognized
-			.removeClass("not-recognized pending")
-			//Add YouTube ID to the dom
-			.attr("data-ytid", video.id.$t.substr(-11));
-      if ($(track).hasClass("wantstobeplayed")) {
-            $(track).removeClass("wantstobeplayed");
-            player.playSong($(track)[0]);
-      }
-			/*
-				If song is in an album
-			*/
-				var album = $(track).parents(".album");
-			/*
-				Checks if song is in a n album
-			*/
-			if (album.length != 0) {
-				/*
-					Number of tracks that are recognized
-					Album
-					Number of tracks total
-				*/
-				var recognizedcount = ($(track).parents(".album").find(".recognized")).length + 1,
-					tracks		= album.data("tracks");
-				if (recognizedcount == tracks) {
-					recognition.uploadAlbum(album[0])
-				}
-			}
+            var dom   = (firsttrackinarray instanceof HTMLElement) ? $(firsttrackinarray) : $(".song[data-id=" + firsttrackinarray.id + "]")[0];
+            if (video) {
+                recognition.uploadTrack(track, video);
+                /*
+                    Mark it as recognized
+                */
+                $(dom).addClass("recognized")
+                /* 
+                    Unmark it as not recognized
+                */
+                .removeClass("not-recognized pending")
+                /*
+                    Add YouTube ID to the dom
+                */
+                .attr("data-ytid", video.id.$t.substr(-11));
+                if ($(track).hasClass("wantstobeplayed")) {
+                      $(track).removeClass("wantstobeplayed");
+                      player.playSong($(track)[0]);
+                }
+                /*
+                    If song is in an album
+                */
+                    var album = $(track).parents(".album");
+                /*
+                    Checks if song is in a n album
+                */
+                if (album.length != 0) {
+                    /*
+                        Number of tracks that are recognized
+                        Album
+                        Number of tracks total
+                    */
+                    var recognizedcount = ($(track).parents(".album").find(".recognized")).length + 1,
+                        tracks      = album.data("tracks");
+                    if (recognizedcount == tracks) {
+                        recognition.uploadAlbum(album[0])
+                    }
+                }
+            }
+            else {
+                $(dom).addClass('no-video-found')
+            }
 		});
 	},
 	started: false,
@@ -101,28 +108,48 @@ recognition = {
             },
             success: function (json) {
                 var filterVideos = function(videotitle) {
-                    var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review"];
+                    var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid"];
                     var filterout = false;
                     $.each(filters, function(key, filter) {
                         if (_s.include(videotitle.toLowerCase(), filter)) {
-                        //Filter covers, parodies and Chipmunk versions out
-                        filterout = true
+                          // Filter covers, parodies and Chipmunk versions out
+                          filterout = true
                         }
                     })
                     return filterout;
                 }
-                //Find the video most related to our video by duration.
+                // Find the video most related to our video by duration.
                 var videos = json.feed.entry;
-                videos = (_.filter(videos, function(video) {
+                var videos = (_.filter(videos, function(video) {
                     return (filterVideos(video.title.$t) === false)
                 }));
-                //Filter videos that are too short
-                videos = (_.filter(videos, function(video) {
+                // Filter videos that are too short
+                var videos = (_.filter(videos, function(video) {
                 	return video.media$group.yt$duration.seconds > (song.duration/1000);
                 }));
-                    var closestVideo = _.sortBy(videos, function (video) {
-                        return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ songname));
-                    })[0];          
+                // Filter videos that are more than 30 seconds too long.
+                var videos = _.filter(videos, function(video) {
+                    return (video.media$group.yt$duration.seconds) < ((song.duration/1000) + 30);
+                });
+                // Filter videos that contain 'live' in the description
+                var videos = _.filter(videos, function(video) {
+                    return !(_s.include((video.media$group.media$description.$t).toLowerCase(), 'live'));
+                });
+                // Give lyric videos a little levenshtein bonus
+                var videos = _.map(videos, function(video) {
+                    var lower = video.title.$t.toLowerCase();
+                    var index = lower.indexOf('lyric');
+                    video.title.$t = (index == -1) ? lower : (lower.substr(0, index));
+                    return video;
+                });
+                // Filter videos with bad rating and with rating disabled;
+                var videos = _.filter(videos, function(video) {
+                    return video.gd$rating && video.gd$rating.average > 2.5
+                });
+                // Get the closest video
+                var closestVideo = _.sortBy(videos, function (video) {
+                    return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ songname));
+                })[0];          
                 callback(closestVideo);
             }
         });

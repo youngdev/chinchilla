@@ -157,6 +157,15 @@ var rightclick			= function(e) {
 	}
 	contextmenu(obj);
 }
+var playlistmenu 		= function(e) {
+	e.preventDefault();
+	var obj = {
+		top: e.pageY,
+		left: e.pageX,
+		playlist: e.currentTarget
+	}
+	contextmenu(obj);
+}
 var contextmenu 		= function(obj) {
 	/*
 		First, remove all the other contextmenus
@@ -174,17 +183,34 @@ var contextmenu 		= function(obj) {
 	/*
 		Remove the menu when you click on anything
 	*/
-	$('*').one('click', function() {
-		menu.remove()
+	$(document).one('click', function() {
+		menu.remove();
 	});
-	var song = obj.song;
-	/*
-		Fetch context menu
-	*/
-	socket.emit('get-contextmenu', {song: song, state: chinchilla});
-	socket.once('contextmenu', function(data) {
-		menu.html(data.html);
-	})
+	$(document).one('click', '.contextmenu-add-to-playlist', function(e) {
+		$(this).parents('.context-options').html(loader.spinner());
+		e.stopPropagation();
+		socket.emit('add-playlist-dialogue', {song: this.dataset.id, token: chinchilla.token});
+		socket.once('add-playlist-dialog-response', function(data) {
+			$('.context-options').html(data.html);
+		});
+	});
+	if (obj.song) {
+		var song = obj.song;
+		/*
+			Fetch context menu
+		*/
+		socket.emit('get-contextmenu', {song: song, state: chinchilla});
+		socket.once('contextmenu', function(data) {
+			menu.html(data.html);
+		});
+	}
+	else if (obj.playlist) {
+		var playlist = obj.playlist.dataset.navigate;
+		socket.emit('get-playlist-contextmenu', {playlist: playlist, state: chinchilla});
+		socket.once('playlist-contextmenu', function(data) {
+			menu.html(data.html);
+		})
+	}
 }
 var setchange			= function() {
 	var dom = $('.settings .setting');
@@ -292,11 +318,83 @@ var keys 				= function(e) {
 	}
 
 }
-var hidenotification  = function() {
+var hidenotification  	= function() {
 	$(this).parents('.notification').remove()
 }
+var warnexit 			= function() {
+	if (chinchilla.loggedin && chinchilla.settings.warn_before_leave) {
+		return 'You are leaving the page but the music is still playing. Do you really want to leave? (You can turn this notification off in the settings)';
+	}	
+}
+var showalbum 			= function() {
+	$(this).hide().next('.hidden-album-container').show();
+}
+var newplaylist 		= function() {
+	$(".new-playlist-input").show().find("input").val('').focus();
+	$('html').one('click', function() {
+		$(".new-playlist-input").hide().off();
+	});
+	$('.new-playlist-input').on('click', function(e) {
+		e.stopPropagation();
+	});
+	$('.new-playlist-input-field').on('keypress', submitplaylist);
+}
+var submitplaylist 		= function(e) {
+	if (e.keyCode == 13) {
+		$('.new-playlist-input-field').off();
+		socket.emit('add-playlist', {name: $('.new-playlist-input-field').val(), token: chinchilla.token});
+	}
+}
+var renameplaylist 		= function() {
+	var url = this.dataset.id,
+		name = this.dataset.name;
+	var playlist = $('#sidebar [data-navigate="' + url+ '"]');
+	var label = playlist.find('.pl-label').attr('contenteditable', true).focus();
+	$(label).on('keypress', function(e) {
+		if (e.keyCode == 13) {
+			$(label).off().removeAttr('contenteditable');
+			$('body').off();
+			socket.emit('rename-playlist', {oldname: url, newname: $(label).text(), token: chinchilla.token});
+			$(playlist).hide();
+		}
+	});
+
+	function selectElementContents(el) {
+	    var range = document.createRange();
+	    range.selectNodeContents(el);
+	    var sel = window.getSelection();
+	    sel.removeAllRanges();
+	    sel.addRange(range);
+	}
+	selectElementContents($(label)[0]);
+	$('body').one('click', function() {
+		$(label).off().removeAttr('contenteditable');
+		$(label).text(name);
+	});
+	$(label).on('click', function(e) {
+		e.stopPropagation();
+	});
+}
+var deleteplaylist 		= function() {
+	var url = this.dataset.id;
+	var playlist = $('#sidebar [data-navigate="' + url+ '"]');
+	socket.emit('delete-playlist', {url: url, token: chinchilla.token});
+}
+var suppressrenaming 	= function(e) {
+	e.stopPropagation();
+}
+var addsongtopl 		= function() {
+	var data = this.dataset;
+	data.token = chinchilla.token;
+	socket.emit('add-song-to-playlist', data);
+}
+var remsongfrompl 		= function() {
+	var data = this.dataset;
+	data.token = chinchilla.token;
+	socket.emit('remove-song-from-playlist', data);
+}
 $(document)
-.on('mousedown',    '.song',            				select      		) // Selecting tracks
+.on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
 .on('dblclick',     '.song',            				playSong    		) // Doubleclick to play. Just POC yet.
 .on('mousedown',    '#seekbar',         				dragSeek			) // Block autmatic seeking while dragging
@@ -315,9 +413,20 @@ $(document)
 .on('click',		'.in-library .heart',				remfromlib 			) // Inline remove from library
 .on('click',		'#logout',							logout				) // Logout
 .on('contextmenu',	'.song.recognized',					rightclick  		) // Allows users to right-click
+.on('contextmenu',	'.playlistmenuitem',				playlistmenu 		) // Gives options for playlists.
 .on('change',		'.settings input',					setchange			) // New settings were made
 .on('click',		'[data-order]',						ordersongs			) // Click on table header to sort songs.
 .on('click',		'.play-all-album',					playalbum 			) // Play all the songs on one album
 .on('click', 		'.add-all-album',					addalbumtolib		) // Add all tracks to an album
 .on('click',		'.findandplay',						findandplay 		) // Searches for a track in the DOM and plays it
 .on('click', 		'.notification .actions span',		hidenotification	) // Close notifications
+.on('click',		'.albumhidden-message',				showalbum 			) // Show albums that are only instrumentals or EPs
+.on('click',		'.add-new-playlist',				newplaylist 		) // New playlist
+.on('click',		'.rename-playlist-button',			renameplaylist 		) // Rename playlist
+.on('click', 		'.pl-label[contenteditable]',		suppressrenaming 	) // When you click on a playlist to rename, don't load the playlist
+.on('click', 		'.delete-playlist-button',			deleteplaylist 		) // Delete playlist.
+.on('click',		'.add-song-to-playlist-button', 	addsongtopl 		) // Add a song to a playlist 
+.on('click',		'.remove-song-from-playlist-button',remsongfrompl 		) // Remove song from playlist
+
+$(window)
+.on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)

@@ -22,6 +22,8 @@
 	<script src="/api/script/recognition"></script>
 	<script src="/api/script/swfobject"></script>
 	<script src="/api/script/library"></script>
+	<script src="/api/script/quantize"></script>
+	<script src="/api/script/color-thief"></script>
 	<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/api/styles/main">
 </head>
@@ -66,12 +68,23 @@
 			<div id="results-albums"></div>
 		</div>
 		<ul>
+			<h2>My music</h2>
+			<li data-navigate="/home"><a><img src="/api/svg/house/white">Home</a></li>
 			<li data-navigate="/library"><a><img src="/api/svg/library/white">Library</a></li>
-			<li data-navigate="/artist/7057812"><a><img src="/api/svg/artist/white">Example artist</a></li>
-			<li data-navigate="/album/571445253"><a><img src="/api/svg/album/white">Example album</a></li>
-            <li data-navigate="/track/180537968"><a><img src="/api/svg/song/white">Example song</a></li>
+			<h2>Playlists</h2>
+			<li class="add-new-playlist"><a><img src="/api/svg/plus/white">New playlist</a></li>
+			<div class="new-playlist-input">
+				<input type="text" class="new-playlist-input-field">
+			</div>
+			<div class="playlists-menu">
+				{% for playlist in collection.playlists %}
+					{% include templates.playlistmenuitem %}
+				{% endfor %}
+			</div>
+			<h2>Discover</h2>
 			<li data-navigate="/charts"><a><img src="/api/svg/star/white">Charts</a></li>
-			<li data-navigate="/about"><a><img src="/api/svg/info/white">About</a></li>
+			<!--- <li data-navigate="/about"><a><img src="/api/svg/info/white">About</a></li> -->
+			<h2>Tunechilla</h2>
 			<li data-navigate="/settings"><a><img src="/api/svg/settings/white">Settings</a></li>
 		</ul>
 		{% if user %}
@@ -95,8 +108,6 @@
 			function onYouTubePlayerReady(playerId) {
 				ytplayer = document.getElementById("myytplayer");
 				player.setUpEvents();
-
-
 				var shouldLoad = player.nowPlaying.get();
 				if (shouldLoad) {
 					player.playSong(shouldLoad, true);

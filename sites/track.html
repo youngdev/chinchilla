@@ -70,7 +70,7 @@
                 </div>
             </article>
         </div>
-        <div class="box">
+        <div class="box echonest">
             <header>
                 <p>Analysis by EchoNest</p>
             </header>
@@ -80,6 +80,10 @@
                     $.ajax({
                         url: "http://developer.echonest.com/api/v4/song/search?api_key=E12U4JDSGYU7F1SRE&format=jsonp&results=1&artist={{song.artist}}&title={{song.name}}",
                         success: function(json) {
+                        if (json.response.songs.length == 0) {
+                            $(".echonest").remove();
+                            return
+                        }
                         var songid = json.response.songs[0].id;
                         if (songid) {
                             $.getJSON("http://developer.echonest.com/api/v4/song/profile?api_key=FILDTEOIK2HBORODV&format=jsonp&id=" + songid + "&bucket=audio_summary&callback=?", function(json) {

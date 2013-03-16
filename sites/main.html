@@ -1,0 +1,53 @@
+<div class="home-container">
+	<div class="header">
+		{% if user %}
+			<h1>Welcome back!</h1>
+			<p>What will you listen to next?</p>
+		{% else %}
+			<h1>Welcome to Tunechilla...</h1>
+			<p>... a place where you can listen to all songs, <strong>completely free</strong> and unlimited.</p>
+		{% endif %}
+		<div class="home-covers">
+			{% for album in background %}
+				<img src="{{album.image}}">
+			{% endfor %}
+		</div>
+	</div>
+	<div class="home-body">
+		{% if user %}
+			<div class="box-wrapper">
+				<h3>Newest songs in your library</h3>
+				<div class="home-list-box">
+					{% for album in library %}
+						{% include templates.tracklist %}
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+			<div class="box-wrapper">
+				<h3>iTunes Charts</h3>
+				<div class="home-list-box">
+					{% for album in charts %}
+						{% include templates.tracklist %}
+					{% endfor %}
+				</div>
+			</div>
+			<div class="box-wrapper reddit-feature">
+				<h3>What's hot on Reddit?</h3>
+				{% for reddit in redditsongs %}
+				<div class="reddit-box recognized song{% if reddit.song.ytid %} recognized{% else %} not-recognized{% endif %}{% if reddit.inlib %} in-library {% else %} not-in-library{% endif %}" data-album="{{reddit.song.album}}" data-name="{{reddit.song.name}}" data-index="{{loop.index}}" data-duration="{{reddit.song.duration}}" data-albumid="{{reddit.song.albumid}}" data-artist="{{reddit.song.artist}}" data-artistid="{{reddit.song.artistid}}" data-image="{{reddit.song.image}}" data-id="{{reddit.song.id}}" data-explicit="{{reddit.song.explicit}}" data-genre="{{reddit.song.genre}}" data-numberinalbum="{{reddit.song.numberinalbum}}" data-cdinalbum="{{reddit.song.cdinalbum}}" data-tracks="{{reddit.song.tracks}}" data-cdcount="{{reddit.song.cdcount}}" data-preview="{{reddit.song.preview}}" data-release="{{reddit.song.release}}" {% if reddit.song.ytid %} data-ytid="{{reddit.song.ytid}}" {% endif %}>
+					<img src="{{reddit.hqimg}}">
+					<div class="reddit-image-actions">
+						<div class="heart"></div>
+						<div class="reddit-song-duration">{{parseduration(reddit.song.duration)}}</div>
+					</div>
+					<div class="reddit-info-box" data-navigate="/track/{{reddit.song.id}}">
+						<div class="reddit-song-name">{{reddit.song.name}}</div>
+						<div class="reddit-song-artist">{{reddit.song.artist}}</div>
+						<div class="reddit-song-upvotes">{{reddit.upvotes}} people upvoted this</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+	</div>
+</div>
