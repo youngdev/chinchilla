@@ -1,13 +1,9 @@
-{% if user %}
 <div class="coverstack nomargin">
 	{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
 </div>
-<h1 class="oncoverstack">Your library</h1>
+<h1 class="oncoverstack">{{playlist.name}}</h1>
 <div class="extendedtable">
 	<div class="album-tracks">
 		{% include templates.tracklist %}
 	</div>
 </div>
-{% else %}
-	{% include templates.login %}
-{% endif %}

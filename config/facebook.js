@@ -7,8 +7,9 @@ var fbapi		   = require('facebook-api');
 var helpers 	   = require('../frontend/scripts/helpers').helpers;
 var db			   = require('../db/queries');
 var _			   = require('underscore');
+var _s 			   = require('underscore.string');
 var standards	   = require('../config/standards');
-
+var sanitizer 	   = require('sanitizer');
 this.login 				= function(request, response) {
     response.redirect('https://www.facebook.com/dialog/oauth?client_id=' + clientID + '&redirect_uri=' + redirect_uri);
 }
@@ -53,6 +54,83 @@ this.addTrack			= function(song, user, callback) {
 		});
 	});
 	
+}
+this.addPlaylist 		= function(name, user, callback) {
+	db.getUserCollections(user, function(collections) {
+		if (name == '') {
+			callback({fail: 'You must enter a name.'});
+			return;
+		}
+		else {
+			var plname 		 = sanitizer.escape(name),
+				url 		 = '/u/' +user.username + '/p/' + _.slugify(name),
+				exists 		 = _.contains(_.pluck(collections.playlists, 'url'), url);
+			if (!exists) {
+				var playlist = {
+					name: plname,
+					url:  url
+				}
+				collections.playlists.unshift(playlist);
+				var dbpl = {
+					'owner': user.id,
+					'tracks': [],
+					'public': false,
+					'url': playlist.url,
+					'name': playlist.name
+				}
+				db.createPlaylist(dbpl, function() {
+					db.saveUserCollections(collections, function(collection) {
+						console.log('Didnt exist before. Added.', collection.playlists);
+						callback({fail: false}, playlist);
+					});
+				});
+				
+			}
+			else {
+				callback({fail: 'A playlist with the same name already exists.'});
+			}
+		}
+		
+	});
+}
+this.renamePlaylist 	= function(oldname, newname, user, callback) {
+	db.getUserCollections(user, function(collections) {
+		if (newname == '') {
+			callback({fail: 'You must enter a name.'});
+			return;
+		}
+		else {
+			var plname 	= sanitizer.escape(newname),
+				url 	= '/u/' +user.username + '/p/' + _.slugify(newname),
+				exists 	= _.contains(_.pluck(collections.playlists, 'url'), url);
+			if (!exists) {
+				collections.playlists = _.map(collections.playlists, function(playlist) { if (playlist.url == oldname) { playlist.name = newname; playlist.url = url;} return playlist});
+				db.updatePlaylist(oldname, newname, url, function(item) {
+					db.saveUserCollections(collections, function(collection) {
+						callback({fail: false}, {url: url, name: newname});
+					})
+				});
+			}	
+			else {
+				callback({fail: 'A playlist with the same name already exists.'})
+			}
+		}
+	})
+}
+this.deletePlaylist 	= function(url, user, callback) {
+	db.getUserCollections(user, function(collections) {
+		var before = collections.playlists.length;
+		collections.playlists = _.filter(collections.playlists, function(playlist) { return  playlist.url != url});
+		var after  = collections.playlists.length;
+		if (before > after) {
+			db.saveUserCollections(collections, function() {
+				db.removePlaylist(url, function(state) {
+					callback(state);
+				});
+			});
+		}
+		
+	});
 }
 this.addTracks 			= function(songs, user, callback) {
 	db.getUserCollections(user, function(collections) {
@@ -129,6 +207,27 @@ this.inlib				= function(song, token, callback) {
 					inlib: inlib,
 					starred: starred
 				});
+			});
+		}
+	});
+}
+this.ownspl 			= function(playlist, token, callback) {
+	db.getUser(token, function(user) {
+		if (user) {
+			db.getUserCollections(user, function(collections) {
+				var playlists 	= collections.playlists
+					ownspls 	= _.pluck(playlists, 'url'),
+					ownspl 		= _.contains(ownspls, playlist);
+					callback(ownspl)
+			});
+		}
+	});
+}
+this.getUserPlaylists 	= function(token, callback) {
+	db.getUser(token, function(user) {
+		if (user) {
+			db.getPlaylistsFromUserId(user.id, function(playlists) {
+				callback(playlists);
 			});
 		}
 	});

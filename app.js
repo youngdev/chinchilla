@@ -20,15 +20,18 @@ console.log("App started on port", port);
 /*
 	These are the routes, they control what is sent to the user
 */
-app.get('/',                            views.mainview          );
-app.get('/artist/:id',                  views.mainview          );
-app.get('/charts',                      views.mainview          );
-app.get('/album/:id',                   views.mainview          );
-app.get('/about',                       views.mainview          );
-app.get('/track/:id',                   views.mainview          );
-app.get('/register',                    views.mainview          );
-app.get('/library',                     views.mainview          );
-app.get('/settings',                    views.mainview          ); 
+app.get('/',                            views.wrapper          );
+app.get('/home',                        views.wrapper          );
+app.get('/artist/:id',                  views.wrapper          );
+app.get('/new-artist/:id',              views.wrapper          );
+app.get('/charts',                      views.wrapper          );
+app.get('/u/:username/p/:playlist',     views.wrapper          );
+app.get('/album/:id',                   views.wrapper          );
+app.get('/about',                       views.wrapper          );
+app.get('/track/:id',                   views.wrapper          );
+app.get('/register',                    views.wrapper          );
+app.get('/library',                     views.wrapper          );
+app.get('/settings',                    views.wrapper          ); 
 
 /*
     Backend routes
@@ -36,15 +39,17 @@ app.get('/settings',                    views.mainview          );
 app.get('/api/script/:scriptname',      scripts.get             );
 app.get('/api/styles/:filename',        styles.get              );
 app.get('/api/artist/:id',              views.drawartist        );
+app.get('/api/new-artist/:id',          views.artist            );
 app.get('/api/charts',                  views.charts            );
 app.get('/api/album/:album',            views.drawalbum         );
 app.get('/api/i/:filename',             styles.images.get       );
 app.get('/api/svg/:filename',           styles.svg.get          );
 app.get('/api/svg/:filename/:color',    styles.svg.getColor     );
+app.get('/api/main',                    views.main              );
 app.get('/api/error/:code',             views.error             );
 app.get('/api/about',                   views.about             );
 app.get('/api/track/:id',               views.drawtrack         );
-app.get('/api/registration',            views.registration      );
+app.get('/api/u/:username/p/:playlist', views.playlist          );
 app.get('/api/library',                 views.library           );
 app.get('/api/settings',                views.settings          );
 

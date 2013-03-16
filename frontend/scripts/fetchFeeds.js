@@ -32,6 +32,31 @@ views = {
 			})
 		}
 	},
+	newartist: {
+		load: function(artist) {
+			$.ajax({
+				url: "/api/new-artist/" + artist,
+				dataType: "html",
+				success: function(data) {
+					$("#view").html(data);
+					_.each($(".song.not-recognized"), function(song) {
+						recognition.queue.push(song);
+					});
+				}
+			})
+		}
+	},
+	playlist: {
+		load: function(url) {
+			$.ajax({
+				url: '/api' + url,
+				dataType: 'html',
+				success: function(data) {
+					$('#view').html(data);
+				}
+			})
+		}
+	},
 	album: {
 		load: function(id) {
 			$.ajax({
@@ -128,8 +153,23 @@ views = {
 					$("#view").html(data);
 					views.loadingindicator.hide();
 				},
-				errors: function() {
+				error: function() {
 					errors.draw(4040);
+				}
+			})
+		}
+	},
+	main: {
+		get: function() {
+			$.ajax({
+				url: "/api/main",
+				dataType: "html",
+				success: function(data) {
+					$("#view").html(data);
+					views.loadingindicator.hide();
+				},
+				error: function() {
+					errors.draw(404);
 				}
 			})
 		}

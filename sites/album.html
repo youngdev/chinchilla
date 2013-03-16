@@ -1,9 +1,9 @@
 {% if album %}
-	<div data-id="{{album.id}}" data-tracks="{{album.tracks}}" class="album" data-resource="https://itunes.apple.com/lookup?id={{album.id}}&entity=song&limit=200" data-artist="{{album.artist}}" data-release="{{album.release}}" data-image="{{album.image}}" data-artistid="{{album.artistid}}" data-explicit="{{album.explicit}}" data-name="{{album.name}}" {% if !fromserver %} data-fetch {% endif %}>
+	<div data-id="{{album.id}}" data-tracks="{{album.tracks}}" class="album" data-resource="https://itunes.apple.com/lookup?id={{album.id}}&entity=song&limit=200" data-artist="{{album.artist}}" data-release="{{album.release}}" data-image="{{album.image}}"  data-name="{{album.name}}" {% if !fromserver %} data-fetch {% endif %}>
 		<div class="album-header">
 			<img src="{{ album.image }}" title="{{ album.name }}" class="album-cover">
 			<div class="album-name" title="{{album.name}}">{{ album.name }}</div>
-			<div class="album-releaseyear">{{album.release}}{%  if album.subtitle%} • {{album.subtitle}}{% endif %}</div>
+			<div class="album-releaseyear">{{parseyear(album.release)}}{%  if album.subtitle%} • {{album.subtitle}}{% endif %}</div>
 		</div>
 		<div class="album-actions">
 			<div class="play-all-album album-action-button"><img src="/api/svg/play" class="icon-16"><div class="album-action-button-label">Play all</div></div>
@@ -16,7 +16,7 @@
 			<div class="album-total-length">{{album.tracks}} tracks{% if album.hours %} - {{parsehours(album.hours)}}{% endif %}</div>
 		</div>
 		<div class="album-tracks">
-			{% include tracklist %}
+			{% include templates.tracklist %}
 		</div>
 	</div>
 {% else %}

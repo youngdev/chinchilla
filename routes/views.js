@@ -19,45 +19,185 @@ var swig        = require('swig'),
 		secret:     "473680e0257daa9a7cb45207ed22f5ef"
 	}),
     views   = this;
+
 /*
     Underscore config
 */
 _.str = require('underscore.string');
 _.mixin(_.str.exports());
 _.str.include('Underscore.string', 'string');
+
 /*
 	This is the current directory without the "/routes" at the end, so basically the parent directory
 */
 var dirup = __dirname.substr(0, __dirname.length - 7);
+
 /*
     Function for displaying duration correctly
 */
-var	parseduration 	= helpers.parsetime
-var parsehours 		= helpers.parsehours
-var parsetext 		= helpers.parsetext
+var	parseduration 	= helpers.parsetime,
+	parsehours 		= helpers.parsehours,
+	parsetext 		= helpers.parsetext,
+	parseyear 		= helpers.parseyear;
+
 /*
     View paths
 */
 var artisttemplate      =   dirup + '/sites/artist.html',
     albumtemplate       =   dirup + '/sites/album.html',
     tracktemplate       =   dirup + '/sites/track.html';
-//Proposed new syntax!
+
+/*
+	Proposed new syntax!
+*/
 var templates = {
     registration:           dirup + '/sites/registration.html',
     newuser:                dirup + '/sites/new-user.html',
-    mainview: 							dirup + '/frontend/index.html',
-    library: 								dirup + '/sites/library.html',
-    tracklist: 							dirup + '/sites/tracklist.html',
-    settings: 							dirup + '/sites/settings.html', 
+    wrapper: 				dirup + '/frontend/index.html',
+    library: 				dirup + '/sites/library.html',
+    tracklist: 				dirup + '/sites/tracklist.html',
+    settings: 				dirup + '/sites/settings.html',
+    main: 					dirup + '/sites/main.html',
+    login: 					dirup + '/sites/login.html',
+    artist: 				dirup + '/sites/new-artist.html',
+    album: 					dirup + '/sites/album.html',
+    playlistmenuitem: 		dirup + '/sites/playlistmenuitem.html',
+    playlist: 				dirup + '/sites/playlist.html'
 };
-var parser = {
-	duration: parseduration,
-	hours: parsehours
-}
+
 /*
     Routes
 */
 this.lastloop = null;
+this.artist 					= function(request, response) {
+	var id 						= request.params.id,
+	 	data 					= {
+	 		type: 'artist',
+	 		parsehours: 	parsehours,
+	 		parseduration: 	parseduration,
+	 		parsetext: 		parsetext,
+	 		parseyear: 		parseyear,
+	 		templates: 		templates
+	 	},
+	 	tmpl 					= swig.compileFile(templates.artist),
+	 	afterUserFetch 			= function(user) {
+	 		data.user 			= user;
+	 		dbquery.getArtist(id, afterArtistFetch)
+	 	},
+	 	afterArtistFetch 		= function(artistarray) {
+	 		var artist 			= artistarray.length === 0 ? null : artistarray[0];
+	 		if (!artist) {
+	 			iTunesQuery(id, evaluateiTunesQuery);
+	 		}
+	 		else {
+	 			data.artist 	= artist;
+	 			afterArtistIsAvailable();
+	 		}
+	 	},
+	 	iTunesQuery 			= function(id) {
+	 		itunes.lookup(id, {entity: 'musicArtist'}, evaluateiTunesQuery)
+	 	},
+	 	evaluateiTunesQuery		= function(res) {
+	 		var results = res.results;
+	 		if (results.length == 0) {
+				views.error({params: {code: 499}}, response);
+	 		}
+	 		else {
+	 			var result 		= res.results[0];
+	 			data.artist 	= {
+	 					name: 	result.artistName,
+	 					id: 	result.artistId,
+	 					genre: 	result.primaryGenreName
+	 				};
+	 				getAllArtistTracks(id);
+	 		}
+	 	},
+	 	getAllArtistTracks 		= function(id) {
+	 		itunes.lookup(id, {entity: "song", limit: 1000}, afterAllArtistTracks)
+	 	},
+	 	afterAllArtistTracks 	= function(res) {
+	 		var songs 			= res.results,
+	 			artist 			= songs.splice(0,1),
+	 			tracks 			= _.map(songs, function(song) { return itunes.remap(song) }),
+	 			ids 			= _.pluck(tracks, 'id');
+	 		data.artist.ids  	= ids;
+	 		afterSongListIsReceived(tracks);
+	 		dbquery.addArtist(data.artist);
+	 		dbquery.addTracksBulk(tracks);
+	 	},
+	 	afterArtistIsAvailable 	= function() {
+	 		dbquery.getSongsByIdList(data.artist.ids, afterSongListIsReceived);
+	 	},
+	 	afterSongListIsReceived	= function(songs) {
+	 		/*
+				Create an object where we can save all albums to.
+				Example: {45435345: *album*, 432423432: *album*}
+	 		*/
+	 		var albums 			= {};
+	 		if (data.user.loggedin) {
+	 			var songs 			= _.map(songs, function(song) { song.inlib = _.contains(data.user.collections.library, song.id); return song; });
+	 		}
+	 		
+	 		/*
+				Assign each song to an album
+	 		*/
+	 		_.each(songs, function(song) {
+	 			/*
+					Remove undefined songs
+	 			*/
+	 			if (song != undefined) {
+	 				/*
+						If this is the first track in an album,
+	 				*/
+	 				if (!albums[song.albumid]) {
+	 					albums[song.albumid] = [];
+	 				}
+	 				albums[song.albumid].push(song);
+	 			}
+	 			
+	 		});
+	 		data.top10 			= [{cds: [_.first(songs, 10)]}];
+	 		var collections 	= [];
+	 		$.each(albums, function(name, songs) {
+	 			var albumarray 	= [];
+	 			$.each(songs, function(k, song) {
+	 				albumarray.push(song);
+	 			});
+	 			/*
+					Sort by track number
+	 			*/
+	 			var albumarray 	= _.sortBy(albumarray, function(song) { return song.numberinalbum });
+	 			/*
+					Group by CD
+	 			*/
+	 			var albumarray  = _.values(_.groupBy(albumarray, function(song) { return song.cdinalbum }));
+	 			var albuminfo 	= {
+	 				cds: 		albumarray,
+	 				id: 		songs[0].albumid,
+	 				tracks: 	songs.length,
+	 				artist: 	songs[0].artist,
+	 				release: 	songs[0].release,
+	 				image: 		songs[0].image,
+	 				name: 		songs[0].album,
+	 				hours: 		_.reduce(_.pluck(songs, 'duration'), function(memo, num) {return memo + num}, 0)
+	 			}
+	 			var albuminfo 	= helpers.albumRelevance(albuminfo, _);
+	 			collections.push(albuminfo);
+	 		});
+	 		var collections 	= _.sortBy(collections, function(album) { return album.release }).reverse();
+	 		var collections 	= _.filter(collections, function(album) { return album.tracks > 3 });
+	 		var collections 	= _.map(collections, function(album) { return helpers.parseAlbumTitle(album) });
+	 		var collections 	= _.uniq(collections, false, function(album) { return album.name });
+	 		data.coverstack		= _.pluck(collections, 'image');
+	 		data.albums 		= collections;
+	 		render();
+	 	},
+	 	render 					= function() {
+	 		response.end(tmpl.render(data));
+	 	}
+ 	facebook.getLibraryFromRequest(request, afterUserFetch);
+
+};
 this.drawartist     = function(request, response) {
 	/*
 		Define custom parameters
@@ -244,6 +384,7 @@ this.drawartist     = function(request, response) {
 							albumtemplate:      albumtemplate,
 							tracklist:          templates.tracklist,
 							parseduration:      parseduration,
+							templates: 			templates,
 							parsehours: 		parsehours,
 							parsetext: 			parsetext,
 							fromserver:         true,
@@ -265,7 +406,7 @@ this.drawartist     = function(request, response) {
 			
 		});
 		})
-};
+};		
 this.drawalbum      = function(request, response) {
 	/*
 		Load template
@@ -287,6 +428,7 @@ this.drawalbum      = function(request, response) {
 			*/
 			if (albuminfo) {
 				dbquery.getTracksFromAlbum(albuminfo.id, function(items) {
+					var items = _.uniq(items, false, function(song) {return song.id});
 					/*
 						Get number of CD's
 						Make array with n empty arrays. n = cdcount
@@ -316,8 +458,8 @@ this.drawalbum      = function(request, response) {
 						discs.push(disc);
 					});
 					albuminfo.cds = discs;
+					albuminfo.release += '';
 					albuminfo.hours = totallength;
-	
 					var output = tmpl.render({
 						album: 			albuminfo,
 						tracklist: 		templates.tracklist,
@@ -327,7 +469,9 @@ this.drawalbum      = function(request, response) {
 						background: 	_.shuffle(_.first(workers.returnAlbumCovers(), 30)),
 						parsehours: 	parsehours,
 						parsetext: 		parsetext,
+						parseyear: 		parseyear,
 						user: 			userdata,
+						templates: 		templates,
 						type: 			'album'
 					});
 					/*
@@ -431,16 +575,31 @@ this.drawtrack      = function(request, response) {
         	});
         }
     });};
-this.mainview       = function(request, response) {
-	var tmpl 	= swig.compileFile(templates.mainview);
-	var cookie 	= new cookies(request, response);
-	var token   = cookie.get('token')
-	dbquery.getUser(token, function(user) {
-		var output  = tmpl.render({
-			user: user
-		});
-		response.end(output);
-	})};
+this.wrapper       	= function(request, response) {
+	var tmpl 	= swig.compileFile(templates.wrapper),
+		cookie 	= new cookies(request, response),
+		token   = cookie.get('token'),
+		data 	= {},
+		afterUserFetch = function(user) {
+			data.user = user;
+			if (user) {
+				facebook.getLibraryFromRequest(request, afterLibraryFetched);
+			}
+			else {
+				render();
+			}
+		},
+		afterLibraryFetched = function(user) {
+			data.collection = user.collections;
+			render();
+		},
+ 		render 	= function() {
+ 			var output  = tmpl.render(data);
+ 			response.end(output);
+ 		};
+ 	data.templates = templates;
+	dbquery.getUser(token, afterUserFetch);
+}
 this.charts         = function(request, response) {
 	facebook.getLibraryFromRequest(request, function(userdata) {
 		var tmpl        = swig.compileFile(dirup + "/sites/charts.html"),
@@ -448,10 +607,13 @@ this.charts         = function(request, response) {
 			table       = charts.table,
 			songs 		= [];
 		_.each(table, function(song) {
-			if (userdata.loggedin) {
-				song.inlib = (userdata && _.contains(userdata.collections.library, song.id));
+			if (song != undefined) {
+				if (userdata.loggedin) {
+					song.inlib = (userdata && _.contains(userdata.collections.library, song.id));
+				}
+				songs.push(song);
 			}
-			songs.push(song);
+			
 		});
 		var	output      = tmpl.render({
 				album:              {cds: [songs]},
@@ -470,11 +632,14 @@ this.error          = function(request, response) {
 	var tmpl        = swig.compileFile(dirup + "/sites/error.html"),
 		error       = request.params.code,
 		messages = {
-			404: "We couldn't find that. If this problem persists, please contact the support!", 
+			404: "We couldn't find that page.", 
 			499: "It seems like this artist doesn't exist. ",
 			498: "Whoops... this album doesn't seem to exist. ",
             497: "Sorry... this track doesn't seem to exist.",
-            501: "The Track ID can only contain numbers, so there is no music here :("
+            501: "The Track ID can only contain numbers, so there is no music here :(",
+            502: "This playlist doesn't seem to exist.",
+            503: "This playlist is private, but you are not logged in.",
+            504: "This playlist is private. Please ask the crator of the playlist to make it public."
 		},
 		message     = messages[error],
 		phrase      = message !== undefined ? message : "Super fail: Not only that something didn't work, we also don't know what this error code means.",
@@ -495,7 +660,7 @@ this.library		= function(request, response) {
 					var tracks = [];
 					_.each(songs, function(song) {
 						song.inlib = true;
-						tracks.push(song);
+						tracks.unshift(song);
 					});
 					var output  = tmpl.render({
 						user: user,
@@ -513,15 +678,135 @@ this.library		= function(request, response) {
 			});
 		}
 		else {
-			var output = tmpl.render({user: user});
+			var output = tmpl.render({user: user, templates: templates});
 			response.end(output);
 		}
 	});
-}
-this.registration   = function(request, response) {
-    response.sendfile(templates.registration);
 };
-this.settings		= function(request, response) {
+this.main 					= function(request, response) {
+	var tmpl = swig.compileFile(templates.main),
+		data = {
+			templates: templates, 
+			background: _.shuffle(_.first(workers.returnAlbumCovers(), 40)),
+			type: 'home',
+			parseduration: parseduration,
+			parsetext: parsetext,
+			parsehours: parsehours
+		},
+		afterlogin 			= function(user) {
+			data.user 		= user;
+			if (user) {
+				data.user.loggedin = true;
+				dbquery.getUserCollections(user, afterCollection)
+			}
+			else {
+				buildcharts();
+			}
+		},
+		afterCollection 	= function(collection) {
+			var library 	= collection.library,
+				first7 		= _.last(library, 7).reverse();
+			data.inlibrary  = library;
+			dbquery.getSongsByIdList(first7, afterIdList);
+		},
+		afterIdList			= function(songs) {
+			/*
+				Add inlib to all songs
+			*/
+			var songs 		= _.map(songs, function(song) {song.inlib = true; return song;});
+			data.library 	= [{cds: [songs]}];
+			buildcharts();
+		},
+		buildcharts			= function() {
+			var top 		= _.first(charts.table, 7),
+				top7 		= [],
+				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs()), 2);
+			$.map(redditsongs, function(reddit) { 
+				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
+				return reddit; 
+			});
+			_.each(top, function(song) {
+				song.inlib 	= (data.user && _.contains(data.inlibrary, song.id));
+				top7.push(song);
+			});
+			data.redditsongs= redditsongs;
+			data.charts 	= [{cds: [top7]}];
+			render();
+		}
+		render 				= function() {
+			var output 		= tmpl.render(data);
+			response.end(output);
+		}
+	facebook.checkLoginState(request, afterlogin);
+};
+this.playlist 				= function(request, response) {
+	var tmpl 				= swig.compileFile(templates.playlist),
+	cookie = new cookies(request, response),
+	token = cookie.get('token'),
+	data 					= {
+		templates: 				templates,
+		parseduration: 			parseduration,
+		parsetext: 				parsetext,
+		showartistalbum: 		true
+	},
+	afterUserFetched 		= function(user) {
+		if (user) {
+			data.user = user;
+			dbquery.getUserCollections(user, afterLibraryFetched)
+		}
+		else {
+			afterLibraryFetched();
+		}
+	},
+	afterLibraryFetched 	= function(lib) {
+		var playlist 		= '/u/' + request.params.username + '/p/' + request.params.playlist;
+		dbquery.getPlaylist(playlist, afterPlaylistFetched);
+	},
+	afterPlaylistFetched 	= function(playlist) {
+		/*
+			No playlist exists
+		*/
+		if (!playlist) {
+			views.error({params: {code: 502}}, response);
+			return;
+		}
+		data.playlist = playlist;	
+		/*
+			Playlist is private, but not logged in
+		*/
+		if (!data.user && !playlist['public']) {
+			views.error({params: {code: 503}}, response);
+			return;
+		}
+		/*
+			Playlist is private, but doesn't belong the user
+		*/
+		if ((data.user.id != playlist.owner) && !playlist['public']) {
+			views.error({params: {code: 504}}, response);
+			return;
+		}
+		var tracks = playlist.tracks;
+		if (tracks.length == 0) {
+			data.album = {cds: []};
+			render();
+		}
+		else {
+			dbquery.getSongsByIdList(tracks, afterTracksFetched);
+		}
+	},
+	afterTracksFetched 		= function(tracks) {
+		_.map(tracks, function(track) { track.inlib = true; return track; })
+		data.album = {cds: [tracks]};
+		data.coverstack = _.first(_.pluck(tracks, 'image'), 10);
+		render();
+	},
+	render 					= function() {
+		var output  		= tmpl.render(data);
+		response.end(output);
+	}
+	dbquery.getUser(token, afterUserFetched)
+}
+this.settings				= function(request, response) {
 	var tmpl = swig.compileFile(templates.settings),
 		cookie = new cookies(request, response),
 		token = cookie.get('token');
@@ -535,7 +820,6 @@ this.settings		= function(request, response) {
 			*/
 			var settings = [];
 			_.each(standards.settings, function(setting, key) {
-				console.log(setting);
 				var stg = _.where(user.settings, {key: setting.key});
 				if (stg.length !== 0) {
 					settings.push(stg[0])

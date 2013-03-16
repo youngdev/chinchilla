@@ -3,7 +3,7 @@ html, body {
 	font-family: "Helvetica Neue", "Arial";
 	padding: 0;
 	margin: 0;
-	overflow: hidden;
+	overflow-x: hidden;
 }
 .tooltip {
 	position: absolute;
@@ -13,12 +13,19 @@ html, body {
 	font-size: 0.8em;
 	padding: 8px;
 }
+input, [contenteditable] {
+	-webkit-user-select: auto;
+	-moz-user-select: auto;
+	-ms-user-select: auto;
+	user-select: auto;
+	cursor: text;
+}
 #browsetable {
 	table {
-	background: -webkit-linear-gradient(top, transparent 50%, #c5c5c5 50%);
-	background: -moz-linear-gradient(top, transparent 50%, #c5c5c5 50%);
-	background: -ms-linear-gradient(top, transparent 50%, #c5c5c5 50%);
-	background: linear-gradient(top, transparent 50%, #c5c5c5 50%);
+	background: -webkit-linear-gradient(top, rgb(220, 220, 220) 50%, #c5c5c5 50%);
+	background: -moz-linear-gradient(top, rgb(220, 220, 220) 50%, #c5c5c5 50%);
+	background: -ms-linear-gradient(top, rgb(220, 220, 220) 50%, #c5c5c5 50%);
+	background: linear-gradient(top, rgb(220, 220, 220) 50%, #c5c5c5 50%);
 	background-size: 50px 50px;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -48,13 +55,16 @@ html, body {
 
 			}
 			td.inline-actions {
+				padding: 0;
+				position: relative;
 				.heart {
 					height: 12px;
 					width: 12px;
-					position: absolute;
-					margin-top: -5px;
-					margin-left: 20px;
+					position: relative;
+					top: 6px;
+					margin-left: 25px;
 					-webkit-transition: 0.3s;
+					position: absolute;
 				}
 			}
 			td:first-child, th:first-child {
@@ -109,29 +119,8 @@ html, body {
 				-moz-transform: scale(1,1);
 			}
 		}
-		tr.song.in-library {
-			.inline-actions {
-				.heart {
-					background: url(/api/svg/heart);
-					background-size: 12px 12px;
-				}
-			}
-		}
-		tr.song.in-library.animated {
-			.inline-actions {
-				.heart {
-					-webkit-animation: zoom 0.3s;
-					-moz-animation: zoom 0.3s;
-				}
-			}
-		}
-		tr.song.not-in-library {
-			.inline-actions {
-				.heart {
-					background: url(/api/svg/heart/white);
-					background-size: 12px 12px;
-				}
-			}
+		tr.no-video-found {
+			opacity: 0.3;
 		}
 		/*
 			Extended layout needs different styles!
@@ -140,8 +129,8 @@ html, body {
 			td:first-child:after {
 				content: url(/api/i/check) no-repeat;
 				opacity: 0.15;
-				position: absolute;
 				margin-top: -5px;
+				padding-left: 5px;
 
 			}
 		}
@@ -467,6 +456,13 @@ html, body {
 	height: ~"-webkit-calc(100% - 100px)";
 	height: ~"-moz-calc(100% - 100px)";
 	height: ~"-ms-calc(100% - 100px)";
+	h2 {
+		margin-top: 5px;
+		margin-bottom: 2px;
+		font-size: 0.9em;
+		text-transform: uppercase;
+		padding-left: 10px;
+	}
 	ul {
 		font-size: 0.7em;
 		padding-left: 0;
@@ -497,14 +493,7 @@ html, body {
 		margin-top: 10px;
 		padding: 4px;
 		padding-left: 0;
-		-webkit-user-select: auto;
-		-moz-user-select: auto;
-		-ms-user-select: auto;
-		cursor: text;
 		color: rgba(255,255,255,0.7);
-		-moz-user-select: auto;
-	    -ms-user-select: auto;
-		user-select: auto;
 	}
 	#clear-input {
 		position: absolute;
@@ -524,6 +513,33 @@ html, body {
 			padding-right: 129px;
 			padding-left: 1px;
 		}
+	}
+	.new-playlist-input {
+		display: none;
+		padding-left: 15px;
+		margin-top: 2px;
+		height: 26px;
+		background: rgba(0,0,0,0.3);
+		input {
+			background: transparent;
+			border: none;
+			outline: none;
+			color: white;
+			padding: 4px;
+			padding-left: 16px;
+			font-family: 'Helvetica Neue', Arial;
+		}
+	}
+	.playlists-menu {
+		.playlist-addition-failed {
+			padding-left: 15px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			padding-right: 15px;
+		}
+	}
+	.pl-label {
+		white-space: nowrap;
 	}
 	#search-results {
 		padding-top: 10px;
@@ -598,8 +614,14 @@ html, body {
 			cursor: pointer;
 		}
 	}
+	[contenteditable] {
+		background: white;
+		color: black;
+		outline: none;
+	}
 }
 #view {
+	overflow-x: hidden;
 	.box {
 		header {
 			background: rgba(0,0,0,0.1);
@@ -643,8 +665,7 @@ html, body {
 			margin-left: 0px;
 			height: 100%;
 			min-width: 10%;
-		}
-		img:last-child {
+			opacity: 0.3;
 		}
 	}
 	h1.oncoverstack {
@@ -691,11 +712,114 @@ html, body {
 		*/
 		#browsetable;
 	}
+	.home-container {
+		h1 {
+			margin-top: 40px;
+		}
+		h1, p {
+			font-family: 'Helvetica Neue';
+			font-weight: 200;
+			width: 90%;
+			text-align: center;
+			color: white;
+		}
+		p {
+			position: relative;
+			font-weight: 100;
+			letter-spacing: 0.1em;
+		}
+		.header {
+			width: 110%;
+			height: 200px;
+			background: rgba(0,0,0,0.90);
+			background: -webkit-radial-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.9));
+			top: 0;
+			left: 0;
+			position: absolute;
+			overflow: hidden;
+		}
+		.home-body {
+			margin-top: 200px;
+			padding: 10px 40px;
+
+			.home-list-box {
+				border: 1px solid rgba(0,0,0,0.2);
+				max-height: 210px;
+				width: 550px;
+				overflow-y: scroll;
+			}
+			.home-list-box::-webkit-scrollbar {
+				display: none;
+			}
+			h3 {
+				font-weight: 500;
+				margin-bottom: 10px;
+				padding-top: 5px;
+				font-size: 1.1em;
+				opacity: 0.8;
+			}
+			.box-wrapper {
+				width: 550px;
+				float: left;
+				margin: 10px;
+			}
+		}
+		.home-covers {
+			position: absolute;
+			top: 0;
+			img {
+				float: left;
+				max-width: 5%;
+				min-height: 100px;
+				min-width: 80px;
+				opacity: 0.15;
+			}
+		}
+	}
+	.albumhidden {
+		.albumhidden-message {
+			padding: 10px;
+			color: rgba(0,0,0,0.5);
+			font-size: 0.8em;
+			border: 1px solid rgba(0,0,0,0.2);
+			margin-bottom: 20px;
+			background: #f0f0f0;
+			cursor: pointer;
+		}
+		.albumhidden-message:hover {
+			background: rgb(230,230,230);
+		}
+		.hidden-album-container {
+			display: none;
+		}
+		margin-right: 8px;
+	}
+	.top10-wrapper {
+		background: rgba(0,0,0,0.1);
+		position: relative;
+		margin-left: -10px;
+		margin-right: -10px;
+		padding-bottom: 10px;
+		padding-top: 5px;
+		border-bottom: 1px solid rgba(0,0,0,0.1);
+		h2 {
+			position: relative;
+			left: 50%;
+			width: 700px;
+			margin-left: -350px;
+			color: rgba(0,0,0,0.8);
+			padding-top: 10px;
+		}
+	}
+	.top10 {
+		border: 1px solid rgba(0,0,0,0.2);
+	}
 	.album-page {
 		.album {
 			width: 70%;
 			position: relative;
 			margin-left: 15%;
+			overflow: hidden;
 		}
 		.album-page-header {
 			width: 100%;
@@ -735,7 +859,7 @@ html, body {
 	}
 	.album {
 		border: 1px solid rgba(0,0,0,0.2);
-		margin-bottom: 5px;
+		margin-bottom: 20px;
 		width: 100%;
 		box-shadow: 0 0 5px rgba(0,0,0,0.1);
 
@@ -744,7 +868,7 @@ html, body {
 				float: left;
 				height: 75px;
 				width: 75px;
-				margin-right: 10px;
+				margin-right: 15px;
 			}
 			height: 75px;
 			background: rgba(0,0,0,0.8);
@@ -757,17 +881,14 @@ html, body {
 				width: ~"-moz-calc(100% - 180px)";
 				width: ~"-ms-calc(100% - 180px)";
 				overflow: hidden;
-				position: absolute;
+				position: relative;
 				text-overflow: ellipsis;
 				white-space: nowrap;
-				left: 90px;
 
 			}
 			.album-releaseyear {
 				opacity: 0.6;
-				position: absolute;
-				left: 90px;
-				margin-top: 35px;
+				position: relative;
 			}
 			.album-tracks-count {
 				float: right;
@@ -867,9 +988,6 @@ html, body {
 		margin-left: -10px; 
 		margin-right: -10px;
 	}
-	.noheader {
-		border: 1px solid rgba(0,0,0,0.2);
-	}
 	.error {
 		a {
 			color: rgba(0,0,0,0.3);
@@ -923,49 +1041,14 @@ html, body {
 	h2 + * {
 		clear: left;
 	}
-	.artist-container {
-		width: 100%;
-		clear: both;
-		padding-top: 20px;		
-		.album-list {
-			position: relative;
-			margin-right: 10px;
-			padding-bottom: 10px;
-		}
-		.artist-album-container {
-		}
-		.album-tracklist {
-			position: relative;
-			table {
-				border: 1px solid #b9b9b9;
-				tr {
-					th {
-						border-bottom: 1px solid rgb(150, 150, 150);
-					}
-					th:first-child {
-						position: relative;
-					}
-				}
-			}
-			#browsetable
-		}
-		.album-refresh-message {
-			font-size: 0.8em;
-		}
+	.artist-page .album, .albumhidden, .top10 {
+		max-width: 700px;
+		left: 50%;
+		position: relative;
+		margin-left: -350px;
 	}
-	.artist-container > tbody > tr{
-		display: -webkit-box;
-		display: -moz-box;
-		display: -ms-flexbox;
-		display: -webkit-flex;
-		display: flex;
-		max-width: 1200px;
-		@media all and (min-width: 1400px) {
-			margin-left: ~"-webkit-calc((100% - 1200px)/2)";
-			margin-left: ~"-moz-calc((100% - 1200px)/2)";
-			margin-left: ~"-ms-calc((100% - 1200px)/2)";
-			margin-left: ~"calc((100% - 1200px)/2)";
-		}
+	.album-list {
+		margin-top: 20px;
 	}
 	.song.selected {
 		background: -webkit-linear-gradient(top, darken(#5B9FDC, 8%), darken(#1F79C2, 12%)) !important;
@@ -1190,11 +1273,18 @@ html, body {
 		}
 		border-bottom: 1px solid rgba(0,0,0,0.2);
 	}
+	.playlist-context-tip {
+		min-height: 45px;
+		h1, h2 {
+			left: 20px;
+		}
+	}
 	.context-options {
 		margin-top: 5px;
 		margin-bottom: 5px;
 		div {
 			padding: 8px;
+			padding-left: 20px;
 			font-size: 0.8em;
 			img {
 				width: 16px;
@@ -1219,6 +1309,31 @@ html, body {
 		padding-left: 10px;
 		border-top: 1px solid rgba(0,0,0,0.1);
 		opacity: 0.6;
+	}
+	.context-options .loading-indicator {
+		padding: 0 !important;
+		position: relative !important;
+		margin-top: 35px;
+		margin-bottom: 40px;
+	}
+	.in-playlist::before {
+		content: '';
+		padding-left: 16px;
+		margin-right: 8px;
+		background: url(/api/svg/check);
+		background-size: 16px 16px;
+		opacity: 0.5;
+		position: relative;
+	}
+	.not-in-playlist::before {
+		content: '';
+		padding-left: 24px;
+	}
+	.no-playlists-message {
+		font-style: italic;
+		padding: 16px;
+		font-size: 0.8em;
+		opacity: 0.3;
 	}
 }
 .settings {
@@ -1267,7 +1382,6 @@ html, body {
 	right: 0;
 	top: 0;
 	width: 350px;
-	height: 100%;
 	z-index: 2;
 	.notification {
 		-webkit-animation: slideright 0.6s;
@@ -1296,7 +1410,10 @@ html, body {
 		p {
 			white-space: nowrap;
 			overflow: hidden;
+			opacity: 0.7;
+			margin-top: 2px;
 			text-overflow: ellipsis;
+			margin-bottom: 20px;
 		}
 		.actions {
 			border-top: 1px solid rgba(255,255,255,0.02);
@@ -1311,6 +1428,117 @@ html, body {
 				text-decoration: underline;
 				cursor: pointer;
 			}
+		}
+	}
+}
+.reddit-feature {
+	width: 424px !important;
+	clear: left;
+}
+.reddit-box {
+	width: 202px;
+	float: left;
+	margin-right: 10px;
+	cursor: pointer;
+	background: rgb(235,235,235);
+	border: 1px solid rgba(0,0,0,0.2);
+	.reddit-song-name {
+		font-size: 0.9em;
+		font-weight: bold;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+	.reddit-song-artist {
+		font-size: 0.8em;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+	.reddit-song-upvotes {
+		font-size: 0.8em;
+		opacity: 0.4;
+	}
+	img {
+		left: 50%;
+		position: relative;
+		margin-left: -100px;
+	}
+	.reddit-info-box {
+		padding: 15px;
+		padding-top: 15px;
+		background: rgb(220, 220, 220);
+		border-top: 1px solid rgba(0,0,0,0.2);
+		margin-top: -3px;
+	}
+	.reddit-image-actions {
+		-webkit-transition: 0.3s opacity;
+		opacity: 0;
+		width: 100%;
+		height: 30px;
+		margin-top: -33px;
+		background: rgba(0,0,0,0.7);
+		position: relative;
+		padding: 8px;
+	}
+	.reddit-song-duration {
+		float: right;
+		position: relative;
+		margin-top: -14px;
+		color: white;
+		font-size: 0.75em;
+		font-weight: bold;
+	}
+}
+.reddit-box:hover {
+	.reddit-image-actions {
+		opacity: 1;
+	}
+}
+.reddit-info-box:hover {
+	background: rgb(225, 225, 225);
+}
+.reddit-info-box *, .reddit-info-box {
+	cursor: pointer;
+}
+.song.in-library {
+	.reddit-image-actions {
+		.heart {
+			background: url(/api/svg/heart);
+			background-size: 14px 14px;
+			width: 14px;
+			height: 14px;
+			position: relative;
+		}
+	}
+		
+	.inline-actions {
+		.heart {
+			background: url(/api/svg/heart);
+			background-size: 12px 12px;
+		}
+	}
+}
+.song.in-library.animated {
+	.heart {
+		-webkit-animation: zoom 0.3s;
+		-moz-animation: zoom 0.3s;
+	}
+}
+.song.not-in-library {
+	.reddit-image-actions {
+		.heart {
+			background: url(/api/svg/heart/white);
+			background-size: 14px 14px;
+			width: 14px;
+			height: 14px;
+			position: relative;
+		}
+	}	
+	.inline-actions {
+		.heart {
+			background: url(/api/svg/heart/white);
+			background-size: 12px 12px;
 		}
 	}
 }

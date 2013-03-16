@@ -1,11 +1,6 @@
 search = {
 	calls: [],
 	autocomplete: function(query) {
-		$.each(search.calls, function(key, call) 
-			{
-				call.abort();
-			}
-		)
 		search.calls = [];
 		var types = {
 			artist: {

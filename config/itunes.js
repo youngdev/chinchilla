@@ -37,20 +37,20 @@ exports.lookup = function(id, options, callback) {
 exports.remap = function (track) {
    return {
         name: track.trackName,
-		duration: track.trackTimeMillis,
-		album: track.collectionName,
-		albumid: track.collectionId,
-		artistid: track.artistId,
-		artist: track.artistName,
+		    duration: track.trackTimeMillis,
+		    album: track.collectionName,
+		    albumid: track.collectionId,
+		    artistid: track.artistId,
+		    artist: track.artistName,
         image: track.artworkUrl100,
         id: track.trackId,
-		explicit: track.trackExplicitness == "explicit" ? true : false,
-		genre: track.primaryGenreName,
-		numberinalbum: track.trackNumber,
-		cdinalbum: track.discNumber,
-		tracks: track.trackCount,
-		cdcount: track.discCount,
-		preview: track.previewUrl,
-		release: track.releaseDate
+		    explicit: track.trackExplicitness == "explicit" ? true : false,
+		    genre: track.primaryGenreName,
+		    numberinalbum: track.trackNumber,
+		    cdinalbum: track.discNumber,
+		    tracks: track.trackCount,
+		    cdcount: track.discCount,
+		    preview: track.previewUrl,
+		    release: track.releaseDate
 	};
 }

@@ -8,7 +8,8 @@
 var fs 		= require('fs'),
 	db 		= require('../db/queries'),
 	fb 		= require('../config/facebook'),
-	swig 	= require('swig');
+	swig 	= require('swig'),
+	_ 		= require('underscore');
 /*
 	Specifies the parent directory path in a string.
 */
@@ -16,6 +17,10 @@ var dirup = __dirname.substr(0, __dirname.length - 7);
 var notificationtemplates = {
 	track_added: 	swig.compileFile(dirup + '/sites/notifications/track-added.html'),
 	track_removed: 	swig.compileFile(dirup + '/sites/notifications/track-removed.html')
+}
+var menutemplates 		  = {
+	playlist: 		swig.compileFile(dirup + '/sites/playlistmenuitem.html'),
+	playlistdialog: swig.compileFile(dirup + '/sites/add-playlist-dialog.html')
 }
 this.connection = function (socket) {
 		socket.emit('connected', {"message": "You are now connected to the socket.io server."});
@@ -99,21 +104,120 @@ this.connection = function (socket) {
 		socket.on('get-contextmenu',	function (data) {
 			var tmpl 	= swig.compileFile(dirup + '/sites/contextmenu.html');
 			var state 	= data.state;
-			var render = function() {
+			var render	= function() {
 				var output 	= tmpl.render(data);
 				socket.emit('contextmenu', {html: output});
 			}
 			if (state.loggedin) {
 				fb.inlib(data.song, data.state.token, function(incollection) {
 					data.incollection = incollection;
-					render()
+					render();
 				});
 			}
 			else {
-				render()
+				render();
 			}
 		});
-		socket.on('update-settings', 	function (data) {
+		socket.on('get-playlist-contextmenu',	function (data) {
+			var tmpl 	= swig.compileFile(dirup + '/sites/playlist-contextmenu.html');
+			var state 	= data.state;
+			var render	= function() {
+				var output = tmpl.render(data);
+				socket.emit('playlist-contextmenu', {html: output});
+			}
+			fb.ownspl(data.playlist, data.state.token, function(ownspl) {
+				data.owns = ownspl;
+				db.getPlaylist(data.playlist, function(playlist) {
+					data.playlist = playlist;
+					render();
+				});
+			});
+		});
+		socket.on('add-playlist-dialogue', 		function (data) {
+			fb.getUserPlaylists(data.token, function(playlists) {
+				var playlists = _.map(playlists, function(playlist) { 
+					playlist.inpl = (_.contains(playlist.tracks, parseFloat(data.song))); 
+					console.log(playlist);
+					return playlist; 
+				});
+				var output = menutemplates.playlistdialog.render({playlists: playlists, songid: data.song});
+				socket.emit('add-playlist-dialog-response', {html: output});
+			});
+		});
+		socket.on('rename-playlist',			function (data) {
+			var afterUserFetched = function(user) {
+				if (user) {
+					fb.renamePlaylist(data.oldname, data.newname, user, afterPlaylistRenameEvaluated)
+				}
+			}
+			var afterPlaylistRenameEvaluated = function(state, playlist) {
+				if (!state.fail) {
+					var div = menutemplates.playlist.render({playlist: playlist});
+					socket.emit('playlist-renamed', div)
+				}
+				else {
+					socket.emit('playlist-renamed-failed', state.fail);
+				}
+			}
+			db.getUser(data.token, afterUserFetched);
+		});
+		socket.on('delete-playlist', 			function (data) {
+			var afterUserFetched = function(user) {
+				if (user) {
+					fb.deletePlaylist(data.url, user, afterPlaylistDeletionEvaluated);
+				}
+			}
+			var afterPlaylistDeletionEvaluated = function(state) {
+				if (!state.fail) {
+					socket.emit('playlist-removed', {url: data.url});
+				}
+			}
+			db.getUser(data.token, afterUserFetched);
+		});
+		socket.on('add-playlist', 				function (data) {
+			var afterUserFetched = function(user) {
+				if (user) {
+					fb.addPlaylist(data.name, user, afterPlaylistCreationEvaluated)
+				}
+				else {
+					socket.emit('playlist-addition-failed', 'You need to be logged in to create playlists.');
+				}
+			}
+			var afterPlaylistCreationEvaluated = function(state, playlist) {
+				if (!state.fail) {
+					var div = menutemplates.playlist.render({playlist: playlist});
+					socket.emit('playlist-added', div);
+				}
+				else {
+					socket.emit('playlist-addition-failed', state.fail);
+				}
+				
+			}			
+			db.getUser(data.token, afterUserFetched);
+		});
+		socket.on('add-song-to-playlist', 		function (data) {
+			db.getUser(data.token, function(user) {
+				db.getPlaylistByUrl(data.url, function(playlist) {
+					if (playlist) {
+						playlist.tracks.push(parseFloat(data.songid));
+						db.savePlaylist(playlist);
+					}
+				});
+			});
+		});
+		socket.on('remove-song-from-playlist', 	function (data) {
+			db.getUser(data.token, function(user) {
+				db.getPlaylistByUrl(data.url, function(playlist) {
+					if (playlist) {
+						playlist.tracks = _.reject(playlist.tracks, function(song) {return song == parseFloat(data.songid)});
+						console.log(playlist);
+						db.savePlaylist(playlist);
+						socket.emit('song-removed-from-playlist', data);
+					}
+				});
+			});
+		});
+		socket.on('update-settings', 			function (data) {
 			db.updateSettings(data, function() {
 				socket.emit('settings-saved');
 			});

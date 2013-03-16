@@ -1,30 +1,36 @@
 routes = {
-	'/artist/:id':          function(match) {
-		views.artist.load(match[1]);
-	},
-	'/charts':              function(match) {
+	'/charts':              	function(match) {
 		views.charts.load();
 	},
-	'/album/:id':           function(match) {
+	'/album/:id':           	function(match) {
 		views.album.load(match[1]);
 	},
-	'/about':               function(match) {
+	'/about':               	function(match) {
 		views.about.load();
 	},
-    '/track/:id':           function(match) {
+    '/track/:id':           	function(match) {
         views.track.load(match[1]);
     },
-    '/register':        	function(match) {
+    '/register':        		function(match) {
         registration.facebook.load();
     },
-    '/library': 			function(match) {
+    '/library': 				function(match) {
     	views.library.get(match[1]);
-    },
-    'settings': 			function(match) {
+    },	
+    'settings': 				function(match) {
     	views.settings.get();
     },
-	'/':                    function(match) {
-
+	'/home':                	function(match) {
+		views.main.get();
+	},
+	'/artist/:id': 				function(match) {
+		views.newartist.load(match[1]);
+	},
+	'/u/:name/p/:name': 		function(match) {
+		views.playlist.load(match[0]);
+	},
+	'/': 						function(match) {
+		views.main.get();
 	}
 };
 $(document)
@@ -38,9 +44,14 @@ $(document)
 	navigation.to(pathname);
 });
 var showSpinner = function() {
-	var spinner = '<div class="loading-indicator"><div class="spinner"></div></div>';
+	var spinner = loader.spinner();
 	$("#view").html(spinner);
 };
+loader = {
+	spinner: function() {
+		return '<div class="loading-indicator"><div class="spinner"></div></div>';
+	}
+}
 navigation = {
 	to: function(path, prevent) {
 		$.each(routes, function (route, callback) {

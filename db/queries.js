@@ -67,7 +67,7 @@ this.getAlbums 				= function(artistid, callback) 	{
 		"genre": "Hip Hop/Rap",
 		"listens": 0,
 		"ytid": "fsdfs-fssSfs" //Optional!
-}
+	}
 */
 this.getTracks      		= function(artist, callback) 	{
 	connection.collection("tracks").find({"artist": artist}).toArray(function(err, items) {
@@ -107,7 +107,6 @@ this.getTracksFromAlbum 	= function(albumid, callback) 	{
 };
 this.addTrack				= function(track, callback) 	{
 	//TODO: This could overwrite previous listens.
-	track.listens = 0;
 	connection.collection("tracks").update({id: track.id}, track, options, function(err) {
 		if (err) {
 			console.log(err);
@@ -117,6 +116,14 @@ this.addTrack				= function(track, callback) 	{
 		}
 	});
 };
+this.addTracksBulk 			= function(tracks, callback)	{
+	console.log("Trax", tracks)
+	connection.collection("tracks").insert(tracks, options, function(err) {
+		if (!err && callback) {
+			callback();
+		}
+	});
+}
 this.addAlbum				= function(album, callback) 	{
 	connection.collection("albums").update({id: album.id}, album, options, function(err) {
 		if (err) {
@@ -129,7 +136,7 @@ this.addAlbum				= function(album, callback) 	{
 };
 this.addArtist				= function(artist, callback) 	{
 	connection.collection("artists").update({id: artist.id}, artist, options, function(err) {
-		if (!err) {
+		if (!err && callback) {
 			callback();
 		}
 	});
@@ -148,7 +155,18 @@ this.getSongsByIdList		= function(ids, callback) 		{
 	});
 	connection.collection("tracks").find({$or: queries}).toArray(function(err, items) {
 		if (!err) {
-			callback(items);
+			/*
+				Sort by time added
+
+			*/
+			var songs = [];
+			_.each(ids, function(id) {
+				var song = _.find(items, function(item) { return item.id == id });
+				if (song) {
+					songs.push(song);
+				}
+			});
+			callback(songs);
 		}
 	})
 }
@@ -219,4 +237,45 @@ this.getAlbumCovers			= function(limit, callback) 	{
 			callback(items)
 		}
 	})
+}
+this.createPlaylist 		= function(playlist, callback) 	{
+	connection.collection("playlists").insert(playlist, options, function(err) {
+		if (!err && callback) {
+			callback();
+		}
+	})
+}
+this.getPlaylist 			= function(playlist, callback) 	{
+	connection.collection("playlists").findOne({'url': playlist}, function(err, item) {
+		if (!err && callback) {
+			callback(item);
+		} 
+	})
+}
+this.updatePlaylist 		= function(oldname, name, url, callback) {
+	connection.collection("playlists").update({'url': oldname}, {$set: {url: url, name: name}}, function(err, item) {
+		if (!err && callback) {
+			callback(item);
+		}
+	})
+}
+this.removePlaylist 		= function(url, callback) {
+	connection.collection("playlists").remove({url: url}, options, function(err, item) {
+		if (!err && callback) {
+			callback({fail: false});
+		}
+	});
+}
+this.getPlaylistsFromUserId = function(id, callback) {
+	connection.collection("playlists").find({owner: id}).toArray(function(err, items) {
+		callback(items);
+	});
+}
+this.getPlaylistByUrl 		= function(url, callback) {
+	connection.collection("playlists").findOne({url: url}, function(err, item) {
+		callback(item);
+	});
+}
+this.savePlaylist 			= function(playlist, callback) {
+	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks}}, function(err, item) {});
 }
