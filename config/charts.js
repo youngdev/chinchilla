@@ -23,7 +23,7 @@ this.update = function() {
 				pureids.push(id);
 			});
 			db.getSongsByQuery(songids, function(items) {
-				console.log(items.length);
+				console.log(items.length, " of 100 songs collected");
 				if (items.length < limit) {
 					var dbtracks = [];
 					_.each(items, function(item) {

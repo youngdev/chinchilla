@@ -151,16 +151,16 @@ var clearinput 			= function() {
 var rightclick			= function(e) {
 	e.preventDefault()
 	var obj = {
-		top:  e.pageY,
-		left: e.pageX,
-		song: helpers.parseDOM(e.currentTarget)
+		song: helpers.parseDOM(e.currentTarget),
+		e: e,
+		left: e.pageX
 	}
 	contextmenu(obj);
 }
 var playlistmenu 		= function(e) {
 	e.preventDefault();
 	var obj = {
-		top: e.pageY,
+		e: e,
 		left: e.pageX,
 		playlist: e.currentTarget
 	}
@@ -174,27 +174,40 @@ var contextmenu 		= function(obj) {
 	/*
 		Build a placeholder for the contextmenu
 	*/
+	var placeToAppend = obj.song ? '#view' : '#sidebar'
+	var scrollHeight = $(placeToAppend)[0].scrollHeight;
+	console.log(scrollHeight);
+	console.log(obj.e)
+	var offsets = {
+		top:  obj.e.pageY,
+		left: obj.left,
+		bottom: document.height - obj.e.pageY
+	}
+	console.log("scrollHeight", scrollHeight, "OffsetY", obj.e.pageY, "scrollTop", $(placeToAppend).scrollTop())
+	var pos = (obj.e.pageY < document.height/2) ? offsets.top : offsets.bottom;
+	var toporbottom = (obj.e.pageY < (document.height/2)) ? 'top' : 'bottom'
 	var menu = $('<div>', {
 		class: 'contextmenu',
 	}).css({
-		top: 	obj.top,
-		left: 	obj.left
-	}).html('<div class="loading-indicator"><div class="spinner"></div></div>').appendTo('body');
+		left: 	offsets.left
+	})
+	.css(toporbottom, pos).
+	html('<div class="loading-indicator"><div class="spinner"></div></div>').appendTo(placeToAppend);
 	/*
 		Remove the menu when you click on anything
 	*/
 	$(document).one('click', function() {
 		menu.remove();
 	});
-	$(document).one('click', '.contextmenu-add-to-playlist', function(e) {
-		$(this).parents('.context-options').html(loader.spinner());
-		e.stopPropagation();
-		socket.emit('add-playlist-dialogue', {song: this.dataset.id, token: chinchilla.token});
-		socket.once('add-playlist-dialog-response', function(data) {
-			$('.context-options').html(data.html);
-		});
-	});
 	if (obj.song) {
+		$(document).one('click', '.contextmenu-add-to-playlist', function(e) {
+			$(this).parents('.context-options').html(loader.spinner());
+			e.stopPropagation();
+			socket.emit('add-playlist-dialogue', {song: this.dataset.id, token: chinchilla.token});
+			socket.once('add-playlist-dialog-response', function(data) {
+				$('.context-options').html(data.html);
+			});
+		});
 		var song = obj.song;
 		/*
 			Fetch context menu
@@ -412,7 +425,7 @@ $(document)
 .on('click',		'.not-in-library .heart',			addtolib 			) // Inline add to library
 .on('click',		'.in-library .heart',				remfromlib 			) // Inline remove from library
 .on('click',		'#logout',							logout				) // Logout
-.on('contextmenu',	'.song.recognized',					rightclick  		) // Allows users to right-click
+.on('contextmenu',	'.song.recognized, .queue-song',		rightclick  		) // Allows users to right-click
 .on('contextmenu',	'.playlistmenuitem',				playlistmenu 		) // Gives options for playlists.
 .on('change',		'.settings input',					setchange			) // New settings were made
 .on('click',		'[data-order]',						ordersongs			) // Click on table header to sort songs.

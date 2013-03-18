@@ -449,12 +449,9 @@ input,
   top: 0;
   left: 0;
   height: 100%;
+  padding-top: 100px;
   background: #333;
   color: #aaa;
-  top: 100px;
-  height: -webkit-calc(100% - 100px);
-  height: -moz-calc(100% - 100px);
-  height: -ms-calc(100% - 100px);
 }
 #sidebar .menuselected {
   background: rgba(255, 255, 255, 0.1);
@@ -474,6 +471,10 @@ input,
   padding-top: 3px;
   padding-bottom: 3px;
   padding-left: 15px;
+  padding-right: 5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 #sidebar ul li img {
   height: 12px;
@@ -503,7 +504,7 @@ input,
   display: none;
   left: 182px;
   font-size: 0.7em;
-  top: 14px;
+  top: 114px;
   cursor: pointer;
 }
 #sidebar h1 {
@@ -916,6 +917,15 @@ input,
   padding-top: 5px;
   font-size: 1.1em;
   opacity: 0.8;
+}
+#view .home-container .home-body h3 .main-link {
+  font-size: 0.6em;
+  margin-left: 5px;
+  opacity: 0.6;
+}
+#view .home-container .home-body h3 .main-link:hover {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  cursor: pointer;
 }
 #view .home-container .home-body .box-wrapper {
   width: 550px;
@@ -1369,7 +1379,8 @@ input,
 }
 .contextmenu {
   overflow: hidden;
-  position: absolute;
+  position: fixed;
+  z-index: 2;
   width: 250px;
   min-height: 100px;
   background: white;
@@ -1394,22 +1405,28 @@ input,
 .contextmenu .context-tip h1,
 .contextmenu .context-tip h2 {
   font-family: Arial;
+  text-transform: none !important;
   left: 68px;
-  font-size: 0.7em;
+  font-size: 0.7em !important;
   font-weight: 300;
-  position: absolute;
+  position: absolute !important;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   width: 176px;
+  height: 12px !important;
+  color: black !important;
 }
 .contextmenu .context-tip h1 {
   top: 0;
   font-weight: bold;
 }
 .contextmenu .context-tip h2 {
-  top: 12px;
+  top: 18px;
   opacity: 0.6;
+}
+.contextmenu .context-tip a {
+  color: black !important;
 }
 .contextmenu .context-tip a:hover {
   text-decoration: underline;
@@ -1421,6 +1438,8 @@ input,
 .contextmenu .playlist-context-tip h1,
 .contextmenu .playlist-context-tip h2 {
   left: 20px;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
 }
 .contextmenu .context-options {
   margin-top: 5px;
@@ -1430,6 +1449,11 @@ input,
   padding: 8px;
   padding-left: 20px;
   font-size: 0.8em;
+  color: black;
+  white-space: nowrap;
+  padding-right: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .contextmenu .context-options div img {
   width: 16px;
@@ -1572,7 +1596,7 @@ input,
   cursor: pointer;
 }
 .reddit-feature {
-  width: 424px !important;
+  width: 848px !important;
   clear: left;
 }
 .reddit-box {
