@@ -116,7 +116,7 @@ recognition = {
     },
     findBestVideo: function(json, song, callback, _, _s) {
         var filterVideos = function(videotitle, callback) {
-             var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid"];
+             var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid", "dance"];
              var filterout = false;
              _.each(filters, function(filter, key) {
                  if (_s.include(videotitle.toLowerCase(), filter)) {
@@ -133,7 +133,7 @@ recognition = {
          }));
          // Filter videos that are too short
          var videos = (_.filter(videos, function(video) {
-           return video.media$group.yt$duration.seconds > (song.duration/1000);
+           return video.media$group.yt$duration.seconds > ((song.duration/1000) - 10);
          }));
          // Filter videos that are more than 30 seconds too long.
          var videos = _.filter(videos, function(video) {

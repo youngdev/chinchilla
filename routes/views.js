@@ -81,6 +81,7 @@ this.artist 					= function(request, response) {
 	 	},
 	 	tmpl 					= swig.compileFile(templates.artist),
 	 	afterUserFetch 			= function(user) {
+	 		console.log("User fetched");
 	 		data.user 			= user;
 	 		dbquery.getArtist(id, afterArtistFetch)
 	 	},
@@ -126,9 +127,11 @@ this.artist 					= function(request, response) {
 	 		dbquery.addTracksBulk(tracks);
 	 	},
 	 	afterArtistIsAvailable 	= function() {
-	 		dbquery.getSongsByIdList(data.artist.ids, afterSongListIsReceived);
+	 		console.log("Artist fetched")
+	 		dbquery.getSongsByArtistId(data.artist.id, afterSongListIsReceived);
 	 	},
 	 	afterSongListIsReceived	= function(songs) {
+	 		console.log("Songs fetched");
 	 		/*
 				Create an object where we can save all albums to.
 				Example: {45435345: *album*, 432423432: *album*}
@@ -163,6 +166,7 @@ this.artist 					= function(request, response) {
 	 			_.each(songs, function(song, k) {
 	 				albumarray.push(song);
 	 			});
+	 			var albumarray = _.uniq(albumarray, false, function(song) { return song.id });
 	 			/*
 					Sort by track number
 	 			*/
@@ -718,7 +722,7 @@ this.main 					= function(request, response) {
 		buildcharts			= function() {
 			var top 		= _.first(charts.table, 7),
 				top7 		= [],
-				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs()), 2);
+				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs()), 4);
 			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
@@ -756,7 +760,10 @@ this.playlist 				= function(request, response) {
 			afterLibraryFetched();
 		}
 	},
-	afterLibraryFetched 	= function(lib) {
+	afterLibraryFetched 	= function(collections) {
+		if (data.user) {
+			data.library = collections.library;
+		}
 		var playlist 		= '/u/' + request.params.username + '/p/' + request.params.playlist;
 		dbquery.getPlaylist(playlist, afterPlaylistFetched);
 	},
@@ -779,7 +786,7 @@ this.playlist 				= function(request, response) {
 		/*
 			Playlist is private, but doesn't belong the user
 		*/
-		if ((data.user.id != playlist.owner) && !playlist['public']) {
+		if ((data.user && data.user.id != playlist.owner) && !playlist['public']) {
 			views.error({params: {code: 504}}, response);
 			return;
 		}
@@ -793,7 +800,9 @@ this.playlist 				= function(request, response) {
 		}
 	},
 	afterTracksFetched 		= function(tracks) {
-		_.map(tracks, function(track) { track.inlib = true; return track; })
+		if (data.user) {
+			_.map(tracks, function(track) { track.inlib = _.contains(data.library, track.id); return track; })
+		}
 		data.album = {cds: [tracks]};
 		data.coverstack = _.first(_.pluck(tracks, 'image'), 10);
 		render();

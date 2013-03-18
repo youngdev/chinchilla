@@ -243,7 +243,6 @@ album = {
 						var divs = [];
 						var buildAlbum = function() {
 							var album = sortedAlbums[i];
-							console.log(album);
 							templates.buildElement({
 								template:   "album",
 								parameters: {album: {

@@ -186,10 +186,10 @@ player.drawQueue	= function() {
 			The result will be the exact same object, but every key has a data- prefix
 			so we can pass that in the jQuery DOM object.
 		*/
-		var remappedSong = {'data-tooltip': '<strong>' + song.name + '</strong><br>' + song.artist}
+		var remappedSong = {'data-tooltip': '<strong>' + song.name + '</strong><br>' + song.artist, 'class': 'queue-song'}
 		$.each(song, function(k,v) {
 			remappedSong["data-" + k] = v;
-		})
+		});
 		//TODO: Clean this mess up.
 		var div = $("<div>", remappedSong).css({"margin-right": (10-key*10)});
 		var transform = ("rotateY(" + (key*6).toString() + "deg) scale(" + (1-(key*0.02)).toString() + "," + (1-(key*0.02)).toString() + ")")

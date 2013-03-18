@@ -76,6 +76,13 @@ this.getTracks      		= function(artist, callback) 	{
         }
 	});
 };
+this.getSongsByArtistId 	= function(artistid, callback) {
+	connection.collection("tracks").find({"artistid": artistid}).toArray(function(err, items) {
+		if (!err) {
+			callback(items);
+		}
+	});
+}
 this.getSingleTrack 		= function (id, callback) 		{
     connection.collection("tracks").find({"id": parseFloat(id)}).toArray(function(err, item) {
         if (!err) {
@@ -117,7 +124,6 @@ this.addTrack				= function(track, callback) 	{
 	});
 };
 this.addTracksBulk 			= function(tracks, callback)	{
-	console.log("Trax", tracks)
 	connection.collection("tracks").insert(tracks, options, function(err) {
 		if (!err && callback) {
 			callback();

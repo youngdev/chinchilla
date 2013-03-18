@@ -137,7 +137,6 @@ this.connection = function (socket) {
 			fb.getUserPlaylists(data.token, function(playlists) {
 				var playlists = _.map(playlists, function(playlist) { 
 					playlist.inpl = (_.contains(playlist.tracks, parseFloat(data.song))); 
-					console.log(playlist);
 					return playlist; 
 				});
 				var output = menutemplates.playlistdialog.render({playlists: playlists, songid: data.song});
@@ -210,7 +209,6 @@ this.connection = function (socket) {
 				db.getPlaylistByUrl(data.url, function(playlist) {
 					if (playlist) {
 						playlist.tracks = _.reject(playlist.tracks, function(song) {return song == parseFloat(data.songid)});
-						console.log(playlist);
 						db.savePlaylist(playlist);
 						socket.emit('song-removed-from-playlist', data);
 					}

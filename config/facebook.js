@@ -138,7 +138,6 @@ this.addTracks 			= function(songs, user, callback) {
 			collections.library.push(parseFloat(song.id));
 			collections.library = _.uniq(collections.library);
 		});
-		console.log(collections)
 		db.saveUserCollections(collections, function(collection) {
 			callback(collection);
 		})

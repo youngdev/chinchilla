@@ -450,12 +450,9 @@ input, [contenteditable] {
 	top: 0;
 	left: 0;
 	height: 100%;
+	padding-top: 100px;
 	background: #333;
 	color: #aaa;
-	top: 100px;
-	height: ~"-webkit-calc(100% - 100px)";
-	height: ~"-moz-calc(100% - 100px)";
-	height: ~"-ms-calc(100% - 100px)";
 	h2 {
 		margin-top: 5px;
 		margin-bottom: 2px;
@@ -470,6 +467,10 @@ input, [contenteditable] {
 			padding-top: 3px;
 			padding-bottom: 3px;
 			padding-left: 15px;
+			padding-right: 5px;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
 			img {
 				height: 12px;
 				margin-right: 5px;
@@ -500,7 +501,7 @@ input, [contenteditable] {
 		display: none;
 		left: 182px;
 		font-size: 0.7em;
-		top: 14px;
+		top: 114px;
 		cursor: pointer;
 	}
 	h1 {
@@ -757,6 +758,15 @@ input, [contenteditable] {
 				padding-top: 5px;
 				font-size: 1.1em;
 				opacity: 0.8;
+				.main-link {
+					font-size: 0.6em;
+					margin-left: 5px;
+					opacity: 0.6;
+				}
+				.main-link:hover {
+					border-bottom: 1px solid rgba(0,0,0,0.6);
+					cursor: pointer;
+				}
 			}
 			.box-wrapper {
 				width: 550px;
@@ -1231,7 +1241,8 @@ input, [contenteditable] {
 }
 .contextmenu {
 	overflow: hidden;
-	position: absolute;
+	position: fixed;
+	z-index: 2;
 	width: 250px;
 	min-height: 100px;
 	.basic;
@@ -1250,22 +1261,28 @@ input, [contenteditable] {
 		}
 		h1, h2 {
 			font-family: Arial;
+			text-transform: none !important;
 			left: 68px;
-			font-size: 0.7em;
+			font-size: 0.7em !important;
 			font-weight: 300;
-			position: absolute;
+			position: absolute !important;
 			overflow: hidden;
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			width: 176px;
+			height: 12px !important;
+			color: black !important;
 		}
 		h1 {
 			top: 0;
 			font-weight: bold;
 		}
 		h2 {
-			top: 12px;
+			top: 18px;
 			opacity: 0.6;
+		}
+		a {
+			color: black !important;
 		}
 		a:hover {
 			text-decoration: underline;
@@ -1277,6 +1294,8 @@ input, [contenteditable] {
 		min-height: 45px;
 		h1, h2 {
 			left: 20px;
+			padding-left: 0 !important;
+			margin-left: 0 !important;
 		}
 	}
 	.context-options {
@@ -1286,6 +1305,11 @@ input, [contenteditable] {
 			padding: 8px;
 			padding-left: 20px;
 			font-size: 0.8em;
+			color: black;
+			white-space: nowrap;
+			padding-right: 10px;
+			overflow: hidden;
+			text-overflow: ellipsis;
 			img {
 				width: 16px;
 				height: 16px;
@@ -1432,7 +1456,7 @@ input, [contenteditable] {
 	}
 }
 .reddit-feature {
-	width: 424px !important;
+	width: 848px !important;
 	clear: left;
 }
 .reddit-box {
