@@ -1,0 +1,15 @@
+<div class="dropdown">
+	{% if owns %}
+		<div data-id="{{playlist.url}}" class="dropdownoption make-playlist-public {% if playlist.public %} dropdown-check {% else %} dropdown-no-check {% endif %}">Public</div>
+		<div data-id="{{playlist.url}}" class="dropdownoption make-playlist-private {% if !playlist.public %} dropdown-check {% else %} dropdown-no-check {% endif %}">Private</div>
+		<div class="hr"></div>
+		<div class="dropdownoption make-playlist-newest-at-top {% if playlist.newestattop %} dropdown-check {% else %} dropdown-no-check {% endif %}">Newest at top</div>
+		<div class="dropdownoption make-playlist-newest-at-bottom {% if !playlist.newestattop %} dropdown-check {% else %} dropdown-no-check {% endif %}">Newest at bottom</div>
+	{% endif %}
+	
+	{% if !owns %}
+		<div class="footnote">
+			Everybody can see this playlist. Just copy the URL and send it to your friends!
+		</div>
+	{% endif %}
+</div>

@@ -10,6 +10,7 @@ var fs 		= require('fs'),
 	fb 		= require('../config/facebook'),
 	swig 	= require('swig'),
 	_ 		= require('underscore');
+	helpers = require('../frontend/scripts/helpers').helpers;
 /*
 	Specifies the parent directory path in a string.
 */
@@ -22,13 +23,16 @@ var menutemplates 		  = {
 	playlist: 		swig.compileFile(dirup + '/sites/playlistmenuitem.html'),
 	playlistdialog: swig.compileFile(dirup + '/sites/add-playlist-dialog.html')
 }
+var musictemplates 		  = {
+	track: 			swig.compileFile(dirup + '/sites/song.html')
+}
 this.connection = function (socket) {
 		socket.emit('connected', {"message": "You are now connected to the socket.io server."});
 		/*
 			Send a confirmation for a successful connect to a user.
 			This is triggered on every site visit.
 		*/
-		socket.on('load-template', 		function (data) {
+		socket.on('load-template', 				function (data) {
 			/*
 				Templates are HTML strings with place holders that are used on the client-side and on the server-side.
 				This automates the process of keeping both versions up to date.
@@ -50,7 +54,7 @@ this.connection = function (socket) {
 				}
 			});   
 		});
-		socket.on('new-track', 			function (data) {
+		socket.on('new-track', 					function (data) {
 			var track = data;
 			/*
 				Add a element where we can store the play count.
@@ -60,26 +64,35 @@ this.connection = function (socket) {
 				console.log("Track added successfully.");
 			});
 		});
-		socket.on('new-album', 			function (data) {
+		socket.on('new-album', 					function (data) {
 			var album = data;
 			db.addAlbum(album, function() {
 				console.log("Album added successfully.");
 			});
 		});
-		socket.on('add-track',			function (data) {
+		socket.on('add-track',					function (data) {
+			var tmpl = musictemplates.track;
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.addTrack(data.song, user, function(collection) {
 						db.getSingleTrack(data.song.id, function(song) {
-							data.song = song[0];
+							data.song 				= song[0];
+							data.song.inlib 		= true;
+							data.type 				= 'library';
+							data.showartistalbum 	= true;
+							data.cd 				= [data.song];
+							data.user 				= user;
+							data.parsetext 			= helpers.parsetext;
+							data.parseduration 		= helpers.parsetime;
 							var notification = notificationtemplates.track_added.render({data: data});
-							socket.emit('track-added', notification);
+							var div = tmpl.render(data);
+							socket.emit('track-added', {notification: notification, song: div, position: 'top'});
 						});
 					});
 				}
 			});
 		});
-		socket.on('add-tracks', 		function (data) {
+		socket.on('add-tracks', 				function (data) {
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.addTracks(data.songs, user, function(collection) {
@@ -88,20 +101,20 @@ this.connection = function (socket) {
 				}
 			})
 		});
-		socket.on('remove-track', 		function (data) {
+		socket.on('remove-track', 				function (data) {
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.removeTrack(data.song, user, function(collection) {
 						db.getSingleTrack(data.song.id, function(song) {
 							data.song = song[0];
 							var notification = notificationtemplates.track_removed.render({data: data});
-							socket.emit('track-removed', notification);
+							socket.emit('track-removed', {notification: notification});
 						});
 					})
 				}
 			})
 		});
-		socket.on('get-contextmenu',	function (data) {
+		socket.on('get-contextmenu',			function (data) {
 			var tmpl 	= swig.compileFile(dirup + '/sites/contextmenu.html');
 			var state 	= data.state;
 			var render	= function() {
@@ -142,6 +155,56 @@ this.connection = function (socket) {
 				var output = menutemplates.playlistdialog.render({playlists: playlists, songid: data.song});
 				socket.emit('add-playlist-dialog-response', {html: output});
 			});
+		});
+		socket.on('get-playlist-options',		function (data) {
+			var tmpl 	= swig.compileFile(dirup + '/sites/playlist-options.html');
+			var render 	= function() {
+				var output = tmpl.render(data);
+				socket.emit('playlist-options', {html: output});
+			}
+			var checkPlaylistOwner = function() {
+				if (data.token) {
+					fb.ownspl(data.playlist, data.token, afterPlaylistOwnerChecked);
+				}
+				else {
+					getPlaylist();
+				}
+			}
+			var afterPlaylistOwnerChecked = function(ownspl) {
+				data.owns = ownspl;
+				getPlaylist();
+			}
+			var getPlaylist = function() {
+				db.getPlaylist(data.playlist, function(playlist) {
+					data.playlist = playlist;
+					render();
+				});
+			}
+			checkPlaylistOwner();
+		});
+		socket.on('change-playlist-privacy', 	function (data) {
+			if (data.token) {
+				fb.ownspl(data.playlist, data.token, function (ownspl) {
+					if (ownspl) {
+						db.getPlaylist(data.playlist, function(playlist) {
+							playlist['public'] = data['public'] == true ? true : false;
+							db.savePlaylist(playlist);
+						});
+					}
+				});
+			}
+		});
+		socket.on('change-playlist-order', 		function (data) {
+			if (data.token) {
+				fb.ownspl(data.playlist, data.token, function (ownspl) {
+					if (ownspl) {
+						db.getPlaylist(data.playlist, function(playlist) {
+							playlist.newestattop = data.newestattop;
+							db.savePlaylist(playlist);
+						});
+					}
+				});
+			}
 		});
 		socket.on('rename-playlist',			function (data) {
 			var afterUserFetched = function(user) {
@@ -195,12 +258,28 @@ this.connection = function (socket) {
 			db.getUser(data.token, afterUserFetched);
 		});
 		socket.on('add-song-to-playlist', 		function (data) {
+			var tmpl = musictemplates.track;
 			db.getUser(data.token, function(user) {
-				db.getPlaylistByUrl(data.url, function(playlist) {
-					if (playlist) {
-						playlist.tracks.push(parseFloat(data.songid));
-						db.savePlaylist(playlist);
-					}
+				db.getUserCollections(user, function(collections) {
+					var userplaylists = _.pluck(collections.playlists, 'url');
+					db.getPlaylistByUrl(data.url, function(playlist) {
+						if (playlist && _.include(userplaylists, data.url)) {
+							playlist.tracks.push(parseFloat(data.songid));
+							db.savePlaylist(playlist);
+							db.getSingleTrack(data.songid, function(song) {
+								data.song 				= song[0];
+								data.song.inlib 		= _.include(collections.library, data.songid);
+								data.type 				= 'playlist';
+								data.showartistalbum	= true;
+								data.cd 				= [data.song];
+								data.user 				= user;
+								data.parsetext 			= helpers.parsetext;
+								data.parseduration		= helpers.parsetime;
+								var output = tmpl.render(data);
+								socket.emit('playlist-song-added', {song: output, position: playlist.newestattop ? 'top' : 'bottom', view: data.url, trackcount: playlist.tracks.length, lengthdifference: data.song.duration});
+							});
+						}
+					});
 				});
 			});
 		});
@@ -210,7 +289,9 @@ this.connection = function (socket) {
 					if (playlist) {
 						playlist.tracks = _.reject(playlist.tracks, function(song) {return song == parseFloat(data.songid)});
 						db.savePlaylist(playlist);
-						socket.emit('song-removed-from-playlist', data);
+						db.getSingleTrack(data.songid, function(song) {
+							socket.emit('playlist-song-removed', {songid: data.songid, view: data.url, trackcount: playlist.tracks.length, lengthdifference: (0 - song[0].duration)});
+						});
 					}
 				});
 			});

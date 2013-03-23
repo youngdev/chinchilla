@@ -24,8 +24,11 @@ var select      = function(e)   {
 	/*
 		Deselect all the other songs.
 	*/
-	$(".song.selected").removeClass("selected");
-	$(this).addClass("selected");
+	if (e.button == 0) {
+		$(".song.selected").removeClass("selected");
+		$(this).addClass("selected");
+	}
+	
 };
 window.playSong = function(e)    {
 		/*
@@ -176,8 +179,6 @@ var contextmenu 		= function(obj) {
 	*/
 	var placeToAppend = obj.song ? '#view' : '#sidebar'
 	var scrollHeight = $(placeToAppend)[0].scrollHeight;
-	console.log(scrollHeight);
-	console.log(obj.e)
 	var offsets = {
 		top:  obj.e.pageY,
 		left: obj.left,
@@ -265,7 +266,7 @@ var ordersongs			= function() {
 	/*
 		Add new songs
 	*/
-	$.each(sorted, function(k, song) {  table.append(song) });
+	$.each(sorted, function(k, song) {  table.append(song) }  );
 }
 var playalbum 			= function() {
 	var album 		= $(this).parents('.album');
@@ -346,6 +347,7 @@ var newplaylist 		= function() {
 	$(".new-playlist-input").show().find("input").val('').focus();
 	$('html').one('click', function() {
 		$(".new-playlist-input").hide().off();
+		$('.new-playlist-input-field').off();
 	});
 	$('.new-playlist-input').on('click', function(e) {
 		e.stopPropagation();
@@ -406,6 +408,43 @@ var remsongfrompl 		= function() {
 	data.token = chinchilla.token;
 	socket.emit('remove-song-from-playlist', data);
 }
+var pldropdown 			= function() {
+	$('.playlist-options-dropdown').toggle();
+	if ($('.playlist-options-dropdown').is(':visible')) {
+		$('body').one('click contextmenu', function() {
+			$(".playlist-options-dropdown").hide();
+		});
+		$('.playlist-options-dropdown').html(loader.spinner());
+		socket.emit('get-playlist-options', {playlist: $('#view').attr('data-route'), token: chinchilla.token });
+		socket.once('playlist-options', function(data) {
+			$('.playlist-options-dropdown').html(data.html);
+		});
+	}
+}
+var mkplpublic 				= function() {
+	var playlist 	= $('#view').attr('data-route');
+	var label 		= $('.playlist-privacy')
+	label.find('span').text('Public');
+	label.find('img').attr('src', '/api/svg/public');
+	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': true});
+}
+var mkplprivate 			= function() {
+	var playlist 	= $('#view').attr('data-route');
+	var label 		= $('.playlist-privacy');
+	label.find('span').text('Private');
+	label.find('img').attr('src', '/api/svg/lock');
+	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': false});
+}
+var mkplnwattop 			= function() {
+	var playlist 	= $('#view').attr('data-route');
+	var label 		= $('.playlist-privacy');
+	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': true});
+}
+var mkplnwatbottom 			= function() {
+	var playlist 	= $('#view').attr('data-route');
+	var label 		= $('.playlist-privacy');
+	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': false});
+}
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -425,7 +464,7 @@ $(document)
 .on('click',		'.not-in-library .heart',			addtolib 			) // Inline add to library
 .on('click',		'.in-library .heart',				remfromlib 			) // Inline remove from library
 .on('click',		'#logout',							logout				) // Logout
-.on('contextmenu',	'.song.recognized, .queue-song',		rightclick  		) // Allows users to right-click
+.on('contextmenu',	'.song.recognized, .queue-song',	rightclick  		) // Allows users to right-click
 .on('contextmenu',	'.playlistmenuitem',				playlistmenu 		) // Gives options for playlists.
 .on('change',		'.settings input',					setchange			) // New settings were made
 .on('click',		'[data-order]',						ordersongs			) // Click on table header to sort songs.
@@ -440,6 +479,11 @@ $(document)
 .on('click', 		'.delete-playlist-button',			deleteplaylist 		) // Delete playlist.
 .on('click',		'.add-song-to-playlist-button', 	addsongtopl 		) // Add a song to a playlist 
 .on('click',		'.remove-song-from-playlist-button',remsongfrompl 		) // Remove song from playlist
+.on('click', 		'.playlist-privacy',		 		pldropdown 			) // click to reveal privacy options
+.on('click', 		'.make-playlist-public', 			mkplpublic 			) // Contextmenu option to make playlist public
+.on('click', 		'.make-playlist-private',			mkplprivate 		) // Contextmenu option to make playlist private
+.on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
+.on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
 
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)

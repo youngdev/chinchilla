@@ -8,7 +8,6 @@
 				<table>
 					<tr>
 						<th data-value="menu"></th>
-						<th data-value="index" data-order></th>
 						<th data-value="name" data-order>Name</th>
 						{% if showartistalbum %} 
 						<th data-value="artist" data-order>Artist</th>
@@ -16,22 +15,7 @@
 						{% endif %}
 						<th data-value="duration" data-order>Length</th>
 					</tr>
-					{% for track in cd %}
-					<tr class="song{% if track.ytid %} recognized{% else %} not-recognized{% endif %}{% if track.inlib %} in-library {% else %} not-in-library{% endif %}" data-album="{{track.album}}" data-name="{{track.name}}" data-index="{{loop.index}}" data-duration="{{track.duration}}" data-albumid="{{track.albumid}}" data-artist="{{track.artist}}" data-artistid="{{track.artistid}}" data-image="{{track.image}}" data-id="{{track.id}}" data-explicit="{{track.explicit}}" data-genre="{{track.genre}}" data-numberinalbum="{{track.numberinalbum}}" data-cdinalbum="{{track.cdinalbum}}" data-tracks="{{track.tracks}}" data-cdcount="{{track.cdcount}}" data-preview="{{track.preview}}" data-release="{{track.release}}" {% if track.ytid %} data-ytid="{{track.ytid}}" {% endif %}>
-						<td class="inline-actions">
-							{% if user %}
-							<div class="heart"></div>
-							{% endif %}
-						</td>
-						<td>{{loop.index}}</td>
-						<td>{% if type == 'home' %} {{parsetext(track.artist)}} - {% endif %} {{parsetext(track.name)}}</td>
-						{% if showartistalbum %} 
-							<td><a data-navigate="/artist/{{track.artistid}}">{{track.artist}}</a></td>
-							<td><a data-navigate="/album/{{track.albumid}}">{{parsetext(track.album)}}</a></td>
-						{% endif %}
-						<td>{{parseduration(track.duration)}}</td>
-					</tr>
-					{% endfor %}
+						{% include templates.song %}
 				</table>
 			</div>
 		{% endfor %}
