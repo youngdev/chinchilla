@@ -283,5 +283,5 @@ this.getPlaylistByUrl 		= function(url, callback) {
 	});
 }
 this.savePlaylist 			= function(playlist, callback) {
-	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks}}, function(err, item) {});
+	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks, 'public': playlist['public'], newestattop: playlist.newestattop}}, function(err, item) {});
 }

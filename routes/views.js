@@ -62,7 +62,8 @@ var templates = {
     artist: 				dirup + '/sites/new-artist.html',
     album: 					dirup + '/sites/album.html',
     playlistmenuitem: 		dirup + '/sites/playlistmenuitem.html',
-    playlist: 				dirup + '/sites/playlist.html'
+    playlist: 				dirup + '/sites/playlist.html',
+    song: 					dirup + '/sites/song.html'
 };
 
 /*
@@ -110,7 +111,7 @@ this.artist 					= function(request, response) {
 	 					id: 	result.artistId,
 	 					genre: 	result.primaryGenreName
 	 				};
-	 				getAllArtistTracks(id);
+	 			getAllArtistTracks(id);
 	 		}
 	 	},
 	 	getAllArtistTracks 		= function(id) {
@@ -127,11 +128,9 @@ this.artist 					= function(request, response) {
 	 		dbquery.addTracksBulk(tracks);
 	 	},
 	 	afterArtistIsAvailable 	= function() {
-	 		console.log("Artist fetched")
 	 		dbquery.getSongsByArtistId(data.artist.id, afterSongListIsReceived);
 	 	},
 	 	afterSongListIsReceived	= function(songs) {
-	 		console.log("Songs fetched");
 	 		/*
 				Create an object where we can save all albums to.
 				Example: {45435345: *album*, 432423432: *album*}
@@ -159,7 +158,13 @@ this.artist 					= function(request, response) {
 	 			}
 	 			
 	 		});
-	 		data.top10 			= [{cds: [_.first(songs, 10)]}];
+	 		var sortedPopularityList = _.first(data.artist.ids, 10);
+	 		console.log(sortedPopularityList);
+	 		var top10 = _.map(sortedPopularityList, function(id) {
+	 			return _.first(_.where(songs, {id: id}));
+	 		});
+	 		console.log(top10);
+	 		data.top10 			= [{cds: [top10]}];
 	 		var collections 	= [];
 	 		_.each(albums, function(songs, name) {
 	 			var albumarray 	= [];
@@ -192,7 +197,7 @@ this.artist 					= function(request, response) {
 	 		var collections 	= _.filter(collections, function(album) { return album.tracks > 3 });
 	 		var collections 	= _.map(collections, function(album) { return helpers.parseAlbumTitle(album) });
 	 		var collections 	= _.uniq(collections, false, function(album) { return album.name });
-	 		data.coverstack		= _.pluck(collections, 'image');
+	 		data.coverstack		= _.first(_.pluck(collections, 'image'), 10);
 	 		data.albums 		= collections;
 	 		render();
 	 	},
@@ -576,7 +581,8 @@ this.drawtrack      = function(request, response) {
         		}
         	});
         }
-    });};
+    });
+};
 this.wrapper       	= function(request, response) {
 	var tmpl 	= swig.compileFile(templates.wrapper),
 		cookie 	= new cookies(request, response),
@@ -605,7 +611,6 @@ this.wrapper       	= function(request, response) {
 this.charts         = function(request, response) {
 	facebook.getLibraryFromRequest(request, function(userdata) {
 		var tmpl        = swig.compileFile(dirup + "/sites/charts.html"),
-			tracklist   = dirup + "/sites/tracklist.html",
 			table       = charts.table,
 			songs 		= [];
 		_.each(table, function(song) {
@@ -619,15 +624,15 @@ this.charts         = function(request, response) {
 		});
 		var	output      = tmpl.render({
 				album:              {cds: [songs]},
-				tracklist:          tracklist,
 				parseduration:      parseduration,
 				parsetext: 			parsetext,
 				showartistalbum:    true,
 				coverstack:         _.first(table, 10),
 				user: 				userdata,
-				type: 				'charts'
+				type: 				'charts',
+				templates: 			templates
 			});
-			response.end(output);
+		response.end(output);
 	});
 };
 this.error          = function(request, response) {
@@ -727,6 +732,7 @@ this.main 					= function(request, response) {
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
 			});
+			var top 		= _.compact(top);
 			_.each(top, function(song) {
 				song.inlib 	= (data.user && _.contains(data.inlibrary, song.id));
 				top7.push(song);
@@ -803,7 +809,13 @@ this.playlist 				= function(request, response) {
 		if (data.user) {
 			_.map(tracks, function(track) { track.inlib = _.contains(data.library, track.id); return track; })
 		}
+		if (data.playlist.newestattop) {
+			tracks.reverse();
+		}
 		data.album = {cds: [tracks]};
+		data.playlist.rawduration = _.reduce(tracks, function(a, b) { return a + b.duration }, 0)
+		data.playlist.duration = helpers.parsehours(data.playlist.rawduration);
+		data.playlist.trackcount = tracks.length;
 		data.coverstack = _.first(_.pluck(tracks, 'image'), 10);
 		render();
 	},

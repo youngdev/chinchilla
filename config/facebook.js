@@ -76,7 +76,8 @@ this.addPlaylist 		= function(name, user, callback) {
 					'tracks': [],
 					'public': false,
 					'url': playlist.url,
-					'name': playlist.name
+					'name': playlist.name,
+					'newestattop': false
 				}
 				db.createPlaylist(dbpl, function() {
 					db.saveUserCollections(collections, function(collection) {

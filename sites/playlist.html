@@ -2,6 +2,25 @@
 	{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
 </div>
 <h1 class="oncoverstack">{{playlist.name}}</h1>
+<div class="playlistdescription">
+	{% if playlist.public %}
+	<p class="playlist-privacy playlist-public">
+		<img src="/api/svg/public"><span>Public</span>
+	</p>
+	{% else %}
+	<p class="playlist-privacy playlist-private">
+		<img src="/api/svg/lock" class="lock-icon"><span>Private</span>
+	</p>
+	{% endif %}
+	<div class="playlist-options-dropdown"></div>
+	<p class="playlist-info">
+	  {% if playlist.trackcount %}
+		<span class="playlist-trackcount">{{playlist.trackcount}}</span> <span class="playlist-plural-singular-tracks">{% if playlist.trackcount == 1 %}track{% else %}tracks{% endif %}</span> - <span data-duration="{{playlist.rawduration}}" class="playlist-duration">{{playlist.duration}}</span>
+	  {% else %}
+		<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span> - <span data-duration="0" class="playlist-duration">0 minutes</span>
+	  {% endif %}
+	</p>
+</div>
 <div class="extendedtable">
 	<div class="album-tracks">
 		{% include templates.tracklist %}
