@@ -156,7 +156,10 @@ helpers = {
 				album.hidden = hide.reason;
 			}
 		});
-		return album
+		if (album.tracks > 30) {
+			album.hidden = 'This album is very long (' + album.tracks + ' tracks):'
+		}
+		return album;
 	},
 	parseAlbumTitle: function(album) {
 		var prename             = album.name+'',

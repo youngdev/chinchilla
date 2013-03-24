@@ -1,0 +1,18 @@
+<div class="coverstack nomargin">
+	{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+</div>
+<h1 class="oncoverstack">Reddit songs</h1>
+<div class="coverstack-description">
+	<p>Reddit is a community where you can submit content and upvote/downvote it. The most upvoted tracks from last week are presented here.</p>
+	<p><a href="http://reddit.com" target="_blank">http://reddit.com</a></p>
+</div>
+<div class="reddit-page">
+	{% for genre in music %}
+		<div class="reddit-page-box">
+			<h2>{{genre.name}}</h2>
+			{% for reddit in genre.songs %}
+				{% include templates.redditbox %}
+			{% endfor %}
+		</div>
+	{% endfor %}
+</div>
