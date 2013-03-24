@@ -15,7 +15,7 @@ routes = {
         registration.facebook.load();
     },
     '/library': 				function(match) {
-    	views.library.get(match[1]);
+    	views.library.load(match[1]);
     },	
     'settings': 				function(match) {
     	views.settings.get();
@@ -28,6 +28,9 @@ routes = {
 	},
 	'/u/:name/p/:name': 		function(match) {
 		views.playlist.load(match[0]);
+	},
+	'/reddit': 					function(match) {
+		views.reddit.load();
 	},
 	'/': 						function(match) {
 		views.main.get();

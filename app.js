@@ -20,18 +20,19 @@ console.log("App started on port", port);
 /*
 	These are the routes, they control what is sent to the user
 */
-app.get('/',                            views.wrapper          );
-app.get('/home',                        views.wrapper          );
-app.get('/artist/:id',                  views.wrapper          );
-app.get('/new-artist/:id',              views.wrapper          );
-app.get('/charts',                      views.wrapper          );
-app.get('/u/:username/p/:playlist',     views.wrapper          );
-app.get('/album/:id',                   views.wrapper          );
-app.get('/about',                       views.wrapper          );
-app.get('/track/:id',                   views.wrapper          );
-app.get('/register',                    views.wrapper          );
-app.get('/library',                     views.wrapper          );
-app.get('/settings',                    views.wrapper          ); 
+app.get('/',                            views.wrapper           );
+app.get('/home',                        views.wrapper           );
+app.get('/artist/:id',                  views.wrapper           );
+app.get('/new-artist/:id',              views.wrapper           );
+app.get('/charts',                      views.wrapper           );
+app.get('/u/:username/p/:playlist',     views.wrapper           );
+app.get('/album/:id',                   views.wrapper           );
+app.get('/about',                       views.wrapper           );
+app.get('/track/:id',                   views.wrapper           );
+app.get('/register',                    views.wrapper           );
+app.get('/library',                     views.wrapper           );
+app.get('/settings',                    views.wrapper           );
+app.get('/reddit',                      views.wrapper           ); 
 
 /*
     Backend routes
@@ -52,6 +53,7 @@ app.get('/api/track/:id',               views.drawtrack         );
 app.get('/api/u/:username/p/:playlist', views.playlist          );
 app.get('/api/library',                 views.library           );
 app.get('/api/settings',                views.settings          );
+app.get('/api/reddit',                  views.reddit            );
 
 /*
     Auth routes

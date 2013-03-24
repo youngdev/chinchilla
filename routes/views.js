@@ -1,24 +1,24 @@
 /*
 	Require the Swig module for templating.
 */
-var swig        = require('swig'),
-	_           = require('underscore'),
-	dbquery     = require('../db/queries'),
-	itunes      = require('../config/itunes'),
-	charts      = require('../config/charts'),
-	Lastfm      = require('lastfmapi'),
-	helpers     = require('../frontend/scripts/helpers').helpers,
-    recognition = require('../frontend/scripts/recognition').recognition,
-    facebook	= require('../config/facebook'),
-    cookies		= require('cookies'),
-    workers		= require('../config/workers'),
-    standards   = require('../config/standards'),
-	jsonload 	= require('jsonreq'),
-	lastfm  = new Lastfm({
-		api_key:    "29c1ce9127061d03c0770b857b3cb741",
-		secret:     "473680e0257daa9a7cb45207ed22f5ef"
+var swig        = 			require('swig'),
+	_           = 			require('underscore'),
+	dbquery     = 			require('../db/queries'),
+	itunes      = 			require('../config/itunes'),
+	charts      = 			require('../config/charts'),
+	Lastfm      = 			require('lastfmapi'),
+	helpers     = 			require('../frontend/scripts/helpers').helpers,
+    recognition = 			require('../frontend/scripts/recognition').recognition,
+    facebook	= 			require('../config/facebook'),
+    cookies		= 			require('cookies'),
+    workers		= 			require('../config/workers'),
+    standards   = 			require('../config/standards'),
+	jsonload 	= 			require('jsonreq'),
+	lastfm  	= 			new Lastfm({
+		api_key:    			"29c1ce9127061d03c0770b857b3cb741",
+		secret:     			"473680e0257daa9a7cb45207ed22f5ef"
 	}),
-    views   = this;
+    views   	= 			this;
 
 /*
     Underscore config
@@ -35,22 +35,15 @@ var dirup = __dirname.substr(0, __dirname.length - 7);
 /*
     Function for displaying duration correctly
 */
-var	parseduration 	= helpers.parsetime,
-	parsehours 		= helpers.parsehours,
-	parsetext 		= helpers.parsetext,
-	parseyear 		= helpers.parseyear;
-
+var	parseduration 	= 		helpers.parsetime,
+	parsehours 		= 		helpers.parsehours,
+	parsetext 		= 		helpers.parsetext,
+	parseyear 		= 		helpers.parseyear;
+		
 /*
-    View paths
+	Views
 */
-var artisttemplate      =   dirup + '/sites/artist.html',
-    albumtemplate       =   dirup + '/sites/album.html',
-    tracktemplate       =   dirup + '/sites/track.html';
-
-/*
-	Proposed new syntax!
-*/
-var templates = {
+var templates 		= 		{
     registration:           dirup + '/sites/registration.html',
     newuser:                dirup + '/sites/new-user.html',
     wrapper: 				dirup + '/frontend/index.html',
@@ -63,7 +56,10 @@ var templates = {
     album: 					dirup + '/sites/album.html',
     playlistmenuitem: 		dirup + '/sites/playlistmenuitem.html',
     playlist: 				dirup + '/sites/playlist.html',
-    song: 					dirup + '/sites/song.html'
+    song: 					dirup + '/sites/song.html',
+    redditbox: 				dirup + '/sites/reddit-box.html',
+    track: 					dirup + '/sites/track.html',
+    reddit: 				dirup + '/sites/reddit.html'
 };
 
 /*
@@ -159,11 +155,9 @@ this.artist 					= function(request, response) {
 	 			
 	 		});
 	 		var sortedPopularityList = _.first(data.artist.ids, 10);
-	 		console.log(sortedPopularityList);
 	 		var top10 = _.map(sortedPopularityList, function(id) {
 	 			return _.first(_.where(songs, {id: id}));
 	 		});
-	 		console.log(top10);
 	 		data.top10 			= [{cds: [top10]}];
 	 		var collections 	= [];
 	 		_.each(albums, function(songs, name) {
@@ -220,7 +214,7 @@ this.drawartist     = function(request, response) {
 			/*
 				Get the HTML template and call "compile"
 			*/
-			var tmpl = swig.compileFile(artisttemplate);
+			var tmpl = swig.compileFile(templates.artist);
 			/*
 				If nothing found, return null
 			*/
@@ -390,7 +384,7 @@ this.drawartist     = function(request, response) {
 							albums:             albums,
 							//Not really the album... but for the tracklist template
 							album:              {cds: [songlistright]},
-							albumtemplate:      albumtemplate,
+							albumtemplate:      templates.album,
 							tracklist:          templates.tracklist,
 							parseduration:      parseduration,
 							templates: 			templates,
@@ -473,7 +467,7 @@ this.drawalbum      = function(request, response) {
 						album: 			albuminfo,
 						tracklist: 		templates.tracklist,
 						parseduration: 	parseduration,
-						albumhtml: 		albumtemplate,
+						albumhtml: 		templates.album,
 						hqimage: 		helpers.getHQAlbumImage(albuminfo),
 						background: 	_.shuffle(_.first(workers.returnAlbumCovers(), 30)),
 						parsehours: 	parsehours,
@@ -531,7 +525,7 @@ this.drawalbum      = function(request, response) {
 	});
 };
 this.drawtrack      = function(request, response) {
-    var tmpl            = swig.compileFile(tracktemplate),
+    var tmpl            = swig.compileFile(templates.track),
         onlynumbers     = new RegExp('^[0-9]+$'),
         trackid         = request.params.id,
         /*
@@ -710,8 +704,8 @@ this.main 					= function(request, response) {
 				buildcharts();
 			}
 		},
-		afterCollection 	= function(collection) {
-			var library 	= collection.library,
+		afterCollection 	= function(collections) {
+			var library 	= collections.library,
 				first7 		= _.last(library, 7).reverse();
 			data.inlibrary  = library;
 			dbquery.getSongsByIdList(first7, afterIdList);
@@ -727,7 +721,7 @@ this.main 					= function(request, response) {
 		buildcharts			= function() {
 			var top 		= _.first(charts.table, 7),
 				top7 		= [],
-				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs()), 4);
+				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 6);
 			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
@@ -747,6 +741,50 @@ this.main 					= function(request, response) {
 		}
 	facebook.checkLoginState(request, afterlogin);
 };
+this.reddit 				= function(request, response) {
+	var tmpl = swig.compileFile(templates.reddit),
+		subreddits = workers.returnSubreddits(),
+		data = {
+			templates: templates,
+			type: 'reddit',
+			parseduration: parseduration,
+			parsehours: parsehours,
+			parsetext: parsetext,
+			music: []
+		},
+		afterlogin			= function(user) {
+			data.user 		= user;
+			if (user) {
+				data.user.loggedin = true;
+				dbquery.getUserCollections(user, afterCollection);
+			}
+			else {
+				buildPage()
+			}
+		},
+		afterCollection		= function(collections) {
+			data.library = collections.library;
+			buildPage();
+		}
+		buildPage 			= function() {
+			_.each(subreddits, function(subreddit) {
+				var songs = _.first(workers.returnRedditSongs(subreddit), 6);
+				if (data.user) {
+					var songs = _.map(songs, function(song) { song.inlib = _.contains(data.library, song.song.id); return song; });
+				}
+				data.music.push({songs: songs, name: subreddit});
+			});
+			var arrays = _.pluck(data.music, 'songs'),
+				tracksonly = _.pluck(_.reduceRight(arrays, function(a, b) { return a.concat(b); }, []), 'song');
+			data.coverstack = _.first(_.pluck(tracksonly, 'image'), 10);
+			render();
+		},
+		render 				= function() {
+			var output = tmpl.render(data);
+			response.end(output);
+		}
+	facebook.checkLoginState(request, afterlogin);	
+}
 this.playlist 				= function(request, response) {
 	var tmpl 				= swig.compileFile(templates.playlist),
 	cookie = new cookies(request, response),

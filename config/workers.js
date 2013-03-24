@@ -4,32 +4,51 @@ var db 					= require("../db/queries"),
 	json 				= require("jsonreq"),
 	helpers 			= require("../frontend/scripts/helpers").helpers
 var covers 				= [];
-var redditsongs 		= [];
+var subreddits 			= [
+	'/r/music',
+	'/r/country',
+	'/r/DubStep',
+	'/r/punk',
+	'/r/metal',
+	'/r/trance',
+	'/r/ElectronicMusic',
+	'/r/classicalmusic',
+	'/r/AlternativeRock',
+	'/r/Blues',
+	'/r/house',
+	'/r/gamemusic',
+	'/r/jazz',
+].sort();
+var redditsongs 		= {};
 var getAlbumCovers 		= function() {
 	db.getAlbumCovers(100, function(items) {
 		covers 			= _.shuffle(items);
 		setTimeout(getAlbumCovers, 86400000);
 	});
 }
-var getRedditTracks 	= function() {
-	json.get('http://www.reddit.com/r/music/top/.json?t=week', function(err, json) {
-		redditsongs = [];
+var getRedditTracks 	= function(subreddit) {
+	json.get('http://www.reddit.com' + subreddit + '/search.json?q=site%3Ayoutube.com&restrict_sr=on&sort=top&t=week', function(err, json) {
+		redditsongs[subreddit] = [];
 		var songs = json.data.children;
-		var songs = _.filter(songs, function(song) { return song.data.domain == 'youtube.com'});
-		var songs = _.filter(songs, function(song) { return song.data.title.indexOf(" - ") != -1});
+		var songs = _.filter(songs, function (song) { return song.data.domain == 'youtube.com'});
+		//var songs = _.filter(songs, function (song) { return song.data.title.indexOf(" - ") != -1});
+		var songs = _.filter(songs, function (song) { return song.data.media });
 		var i = 0; var max  = songs.length-1;
 		function lookupitunes(song) {
-			itunes.search(song.data.title, {entity: 'song', limit: 1}, function(json) {
+			var title = song.data.title;
+			var title = (title.indexOf('(') != -1) ? title.substr(0, title.indexOf('(')) : title;
+			var title = (title.indexOf('[') != -1) ? title.substr(0, title.indexOf('[')) : title;
+			itunes.search(title, {entity: 'song', limit: 1}, function(json) {
 				if (json.results.length != 0) {
 					var dbsong = itunes.remap(json.results[0]);
 					dbsong.ytid = song.data.media.oembed.url.substr(-11);
-					redditsongs.push({
+					redditsongs[subreddit].push({
 						song: dbsong,
 						upvotes: song.data.score,
 						hqimg: helpers.getHQAlbumImage(dbsong, 200)
 					});
 					db.addTrack(dbsong, function() {
-						console.log("Track added through /r/music. ")
+						console.log("Track added through " + subreddit + ". ")
 					})
 					i++;
 					if (i != max) {
@@ -47,14 +66,19 @@ var getRedditTracks 	= function() {
 			});
 		}
 		lookupitunes(songs[i]);
-		setTimeout(getRedditTracks, 3600000);
+		setTimeout(function() { getRedditTrack(subreddit) }, 3600000);
 	});
 }
 this.returnAlbumCovers	= function() {
 	return covers;
 }
-this.returnRedditSongs 	= function() {
-	return redditsongs;
+this.returnRedditSongs 	= function(subreddit) {
+	return redditsongs[subreddit];
+}
+this.returnSubreddits 	= function() {
+	return subreddits;
 }
 getAlbumCovers();
-getRedditTracks();
+_.each(subreddits, function(subreddit) {
+	getRedditTracks(subreddit);
+});

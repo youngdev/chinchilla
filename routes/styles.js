@@ -40,7 +40,9 @@ this.svg = {
 					response.end(data);
 				}
 				else {
+					var data = data.replace(/fill="black"/, '');
 					var data = data.replace(/fill="#000000"/, '');
+					var data = data.replace(/fill:#010101/, '')
 					var data = data.replace(/fill="none"/g,	'');
 					var data = data.replace(/fill="red"/g, '');
 					var data = data.replace(/flood-color='red'/, "flood-color='black'");

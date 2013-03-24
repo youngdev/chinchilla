@@ -129,7 +129,7 @@ views = {
 		}
 	},
 	library: {
-		get: function() {
+		load: function() {
 			$.ajax({
 				url: "/api/library",
 				dataType: "html",
@@ -142,6 +142,22 @@ views = {
 					errors.draw(404);
 				}
 			});
+		}
+	},
+	reddit: {
+		load: function() {
+			$.ajax({
+				url: "/api/reddit",
+				dataType: "html",
+				success: function(data) {
+					var view = $("#view");
+					view.html(data);
+					views.loadingindicator.hide();
+				},
+				error: function() {
+					errors.draw(404);
+				}
+			})
 		}
 	},
 	settings: {

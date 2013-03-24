@@ -718,6 +718,25 @@ input, [contenteditable] {
 			-webkit-transform: rotate(-5deg);
 		}
 	}
+	.coverstack-description {
+		position: absolute;
+		top: 60px;
+		left: 175px;
+		color: rgba(0,0,0,0.5);
+		a {
+			color: black;
+			text-decoration: none;
+		}
+		a:hover {
+			border-bottom: 1px solid black;
+			cursor: pointer;
+		}
+		p {
+			margin-top: 3px;
+			margin-bottom: 3px;
+		}
+		font-size: 0.9em;
+	}
 	h1.oncoverstack {
 		position: absolute;
 		left: 170px;
@@ -795,7 +814,6 @@ input, [contenteditable] {
 			.home-list-box {
 				border: 1px solid rgba(0,0,0,0.2);
 				max-height: 210px;
-				width: 550px;
 				overflow-y: scroll;
 			}
 			.home-list-box::-webkit-scrollbar {
@@ -1498,12 +1516,12 @@ input, [contenteditable] {
 	}
 }
 .reddit-feature {
-	width: 848px !important;
 	clear: left;
+	margin: 10px;
 }
 .reddit-box {
 	width: 202px;
-	float: left;
+	display: inline-block ;
 	margin-right: 10px;
 	cursor: pointer;
 	background: rgb(235,235,235);
@@ -1529,12 +1547,14 @@ input, [contenteditable] {
 		left: 50%;
 		position: relative;
 		margin-left: -100px;
+		height: 200px;
+		width: 200px;
+		border-bottom: 1px solid rgba(0,0,0,0.2);
 	}
 	.reddit-info-box {
 		padding: 15px;
 		padding-top: 15px;
-		background: rgb(220, 220, 220);
-		border-top: 1px solid rgba(0,0,0,0.2);
+		background: rgb(250, 250, 250);
 		margin-top: -3px;
 	}
 	.reddit-image-actions {
@@ -1542,15 +1562,16 @@ input, [contenteditable] {
 		opacity: 0;
 		width: 100%;
 		height: 30px;
-		margin-top: -33px;
+		margin-top: -34px;
 		background: rgba(0,0,0,0.7);
 		position: relative;
 		padding: 8px;
 	}
 	.reddit-song-duration {
 		float: right;
-		position: relative;
-		margin-top: -14px;
+		position: absolute;
+		right: 10px;
+		top: 8px;
 		color: white;
 		font-size: 0.75em;
 		font-weight: bold;
@@ -1562,7 +1583,7 @@ input, [contenteditable] {
 	}
 }
 .reddit-info-box:hover {
-	background: rgb(225, 225, 225);
+	background: rgb(255, 255, 255);
 }
 .reddit-info-box *, .reddit-info-box {
 	cursor: pointer;
@@ -1708,4 +1729,25 @@ input, [contenteditable] {
 	background: rgba(0,0,0,0.1);
 	margin-top: 3px;
 	margin-bottom: 3px;
+}
+.reddit-page-box {
+	clear: left;
+	white-space: nowrap;
+	height: 345px;
+	overflow: hidden;
+	padding-left: 30px;
+	padding-right: 30px;
+	margin-left: -10px;
+	margin-right: -10px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	h2 {
+		color: rgba(0,0,0,0.8) !important;
+		padding-top: 10px;
+	}
+}
+.reddit-page-box:nth-child(2n) {
+	background: rgba(0,0,0,0.05);
+}
+.reddit-page {
 }
