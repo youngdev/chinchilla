@@ -66,7 +66,7 @@ var getRedditTracks 	= function(subreddit) {
 			});
 		}
 		lookupitunes(songs[i]);
-		setTimeout(function() { getRedditTrack(subreddit) }, 3600000);
+		setTimeout(function() { getRedditTracks(subreddit) }, 3600000);
 	});
 }
 this.returnAlbumCovers	= function() {

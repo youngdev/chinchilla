@@ -28,6 +28,7 @@ routes = {
 	},
 	'/u/:name/p/:name': 		function(match) {
 		views.playlist.load(match[0]);
+		console.log(match)
 	},
 	'/reddit': 					function(match) {
 		views.reddit.load();
@@ -41,7 +42,7 @@ $(document)
 	var pathname            = window.location.pathname;
 	navigation.to(pathname);
 })
-.on('click', '[data-navigate]', function(e) {
+.on('mousedown', '[data-navigate]', function(e) {
 	var pathname            = $(this).attr('data-navigate');
 	e.preventDefault();
 	navigation.to(pathname);
@@ -58,7 +59,7 @@ loader = {
 navigation = {
 	to: function(path, prevent) {
 		$.each(routes, function (route, callback) {
-			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z-]+)').replace(/:[id]+/g, '([\\d]+)')),
+			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
 			if ((match && match != '/') || (match == '/' && path == '/')) {
 				callback(match);
