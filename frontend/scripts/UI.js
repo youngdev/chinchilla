@@ -64,12 +64,22 @@ var cmdSelect           = function(obj) {
 	$(obj).toggleClass("selected");
 };
 var dragSeek			= function(obj) {
+	var width = 224
 	player.automaticseekblocked = true;
-};
-var dragSeekUp			= function(obj) {
-	player.automaticseekblocked = false;
-	var seek = $("#seekbar").val()/100;
-	player.seek(seek*ytplayer.getDuration());
+	var mousemove = function (e) {
+		var position = e.pageX
+		$('#seek-progress').css('width', (position/width)*100 + "%");
+	}
+	$(document).on('mousemove', mousemove);
+	$(document).one('mouseup', function (e) {
+		$(document).off('mousemove');
+		var position = e.pageX
+		if (position > 224) {
+			var position = 224
+		}
+		player.seek((position/width)*ytplayer.getDuration());
+		player.automaticseekblocked = false;
+	})
 };
 var resume				= function(obj) {
 	player.play();
@@ -184,7 +194,6 @@ var contextmenu 		= function(obj) {
 		left: obj.left,
 		bottom: document.height - obj.e.pageY
 	}
-	console.log("scrollHeight", scrollHeight, "OffsetY", obj.e.pageY, "scrollTop", $(placeToAppend).scrollTop())
 	var pos = (obj.e.pageY < document.height/2) ? offsets.top : offsets.bottom;
 	var toporbottom = (obj.e.pageY < (document.height/2)) ? 'top' : 'bottom'
 	var menu = $('<div>', {
@@ -449,8 +458,7 @@ $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
 .on('dblclick',     '.song',            				playSong    		) // Doubleclick to play. Just POC yet.
-.on('mousedown',    '#seekbar',         				dragSeek			) // Block autmatic seeking while dragging
-.on('mouseup',      '#seekbar',         				dragSeekUp  		) // Update and seek
+.on('mousedown',    '#seek-bar',         				dragSeek			) // Block autmatic seeking while dragging
 .on('click',        '#play',            				resume      		) // Play or resume song.
 .on('click',        '#pause',           				pause				) // Pause music.
 .on('click',        '#skip',            				skip				) // Skip track. Play next one.

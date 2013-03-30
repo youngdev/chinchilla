@@ -19,7 +19,12 @@ exports.search = function(query, options, callback) {
   }
 
   request("http://itunes.apple.com/search?country=us" + optionsString + "&term=" + encodeURIComponent(query), function(err, response, body) {
-    callback( JSON.parse(body) )
+    if (body != undefined) {
+        callback( JSON.parse(body) );
+    }
+    else {
+      callback(null);
+    }
   })
 
 }
@@ -31,7 +36,12 @@ exports.lookup = function(id, options, callback) {
   }
 
   request("http://itunes.apple.com/lookup?country=us" + optionsString + "&id=" + encodeURIComponent(parseFloat(id)), function(err, response, body) {
-    callback( JSON.parse(body) )
+    if (body != undefined) {
+        callback( JSON.parse(body) );
+    }
+    else {
+      callback(null);
+    }
   })
 }
 exports.remap = function (track) {

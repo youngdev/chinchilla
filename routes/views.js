@@ -158,6 +158,7 @@ this.artist 					= function(request, response) {
 	 		var top10 = _.map(sortedPopularityList, function(id) {
 	 			return _.first(_.where(songs, {id: id}));
 	 		});
+	 		var top10 = _.compact(top10);
 	 		data.top10 			= [{cds: [top10]}];
 	 		var collections 	= [];
 	 		_.each(albums, function(songs, name) {
@@ -173,16 +174,16 @@ this.artist 					= function(request, response) {
 	 			/*
 					Group by CD
 	 			*/
-	 			var albumarray  = _.values(_.groupBy(albumarray, function(song) { return song.cdinalbum }));
+	 			var cds  = _.values(_.groupBy(albumarray, function(song) { return song.cdinalbum }));
 	 			var albuminfo 	= {
-	 				cds: 		albumarray,
-	 				id: 		songs[0].albumid,
-	 				tracks: 	songs.length,
-	 				artist: 	songs[0].artist,
-	 				release: 	songs[0].release,
-	 				image: 		songs[0].image,
-	 				name: 		songs[0].album,
-	 				hours: 		_.reduce(_.pluck(songs, 'duration'), function(memo, num) {return memo + num}, 0)
+	 				cds: 		cds,
+	 				id: 		albumarray[0].albumid,
+	 				tracks: 	albumarray.length,
+	 				artist: 	albumarray[0].artist,
+	 				release: 	albumarray[0].release,
+	 				image: 		albumarray[0].image,
+	 				name: 		albumarray[0].album,
+	 				hours: 		_.reduce(_.pluck(albumarray, 'duration'), function(memo, num) {return memo + num}, 0)
 	 			}
 	 			var albuminfo 	= helpers.albumRelevance(albuminfo, _);
 	 			collections.push(albuminfo);
@@ -809,6 +810,7 @@ this.playlist 				= function(request, response) {
 			data.library = collections.library;
 		}
 		var playlist 		= '/u/' + request.params.username + '/p/' + request.params.playlist;
+		console.log(playlist)
 		dbquery.getPlaylist(playlist, afterPlaylistFetched);
 	},
 	afterPlaylistFetched 	= function(playlist) {
@@ -836,7 +838,7 @@ this.playlist 				= function(request, response) {
 		}
 		var tracks = playlist.tracks;
 		if (tracks.length == 0) {
-			data.album = {cds: []};
+			data.album = {cds: [[]]};
 			render();
 		}
 		else {
@@ -872,27 +874,29 @@ this.settings				= function(request, response) {
 	}
 	else {
 		dbquery.getUser(token, function(user) {
-			/*
-				Add new settings/remove deprecated settings
-			*/
-			var settings = [];
-			_.each(standards.settings, function(setting, key) {
-				var stg = _.where(user.settings, {key: setting.key});
-				if (stg.length !== 0) {
-					settings.push(stg[0])
-				}
-				else {
-					settings.push(setting)
-				}
-			});
-			user.settings = settings;
-			/*
-				Render settings
-			*/
-			var output = tmpl.render({
-				user: user
-			});
-			response.end(output);
+			if (user) {
+				/*
+					Add new settings/remove deprecated settings
+				*/
+				var settings = [];
+				_.each(standards.settings, function(setting, key) {
+						var stg = user ? _.where(user.settings, {key: setting.key}) : [];
+					if (stg.length !== 0) {
+						settings.push(stg[0])
+					}
+					else {
+						settings.push(setting)
+					}
+				});
+				user.settings = settings;
+				/*
+					Render settings
+				*/
+				var output = tmpl.render({
+					user: user
+				});
+				response.end(output);
+			}
 		});
 	}
 }

@@ -38,6 +38,8 @@ socket.on('tracks-added', function(songsadded) {
 });
 socket.on('track-removed', function (data) {
 	notifications.create(data.notification);
+	var view = $('[data-route="/library"]')
+	var song = view.find('[data-id="' + data.id + '"]').remove();
 });
 
 socket.on('playlist-added', pladded);
@@ -49,7 +51,6 @@ socket.on('playlist-removed', function (data) {
 	$("#sidebar [data-navigate='" + data.url + "']").remove();
 });
 socket.on('playlist-song-removed', function (data) {
-	console.log(data);
 	var view = $('[data-route="' + data.view + '"]');
 	view.find('[data-id="' + data.songid + '"]').remove();
 	var trackcountlabel = view.find('.playlist-trackcount');
@@ -60,13 +61,14 @@ socket.on('playlist-song-removed', function (data) {
 	$(pldurationlabel).text(helpers.parsehours(newduration)).attr('data-duration', newduration);
 	$(trackslabel).text(data.trackslabel == 1 ? 'track' : 'tracks');
 });
+
 socket.on('playlist-song-added', function (data) {
 	var view = $('[data-route="' + data.view + '"]')
 	var table = view.find('tbody');
 	var trackcountlabel = view.find('.playlist-trackcount');
 	var pldurationlabel = view.find('.playlist-duration');
 	var trackslabel 	= view.find('.playlist-plural-singular-tracks');
-	if (data.position == 'top') {
+	if (data.position == 'top' && (table.find('.song').length != 0)) {
 		table.find('.song').eq(0).before(data.song);
 	}
 	else {

@@ -44,7 +44,7 @@ player.nowPlaying = {
 		$("#track-title a").text(song.name);
 		$("#track-artist a").text(song.artist);
 		$("#track-album a").text(song.album);
-		$("#track-cover img").attr("src", song.image);
+		$("#nowplaying-image").attr("src", helpers.getHQAlbumImage(song, 225))
 		var queue1    = player.queue1.get(),
 			queue2    = player.queue2.get(),
 			queue     = queue1.concat(queue2),
@@ -135,12 +135,14 @@ player.setUpEvents = function() {
 			$("#time-right").text(parsedduration);
 			$("#time-left").text(parsedcurrent);
 			var percent = (current/duration)*100;
+			var val;
 			if (!player.automaticseekblocked && percent) {
-				$("#seekbar").val(percent);
+				var val = percent
 			}
 			if (percent == NaN) {
-				$("#seekbar").val(0);
+				var val = 0
 			}
+			$("#seek-progress").css("width", val + "%");
 		setTimeout(timeUpdate, 250)
 	}
 	timeUpdate()
@@ -191,9 +193,8 @@ player.drawQueue	= function() {
 			remappedSong["data-" + k] = v;
 		});
 		//TODO: Clean this mess up.
-		var div = $("<div>", remappedSong).css({"margin-right": (10-key*10)});
-		var transform = ("rotateY(" + (key*6).toString() + "deg) scale(" + (1-(key*0.02)).toString() + "," + (1-(key*0.02)).toString() + ")")
-		var img = $("<img>", {src: song.image}).appendTo(div).css({"-webkit-transform": transform});
+		var div = $("<div>", remappedSong);
+		var img = $("<img>", {src: song.image}).appendTo(div);
 		div.appendTo("#queue");
 	})
 }

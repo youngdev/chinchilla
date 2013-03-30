@@ -16,6 +16,7 @@
 	<script src="/api/script/templates"></script>
 	<script src="/api/script/player"></script>
 	<script src="/api/script/search"></script>
+	<script src="/api/script/import"></script>
 	<script src="/api/script/UI"></script>
 	<script src="/api/script/errors"></script>
 	<script src="/api/script/recognition"></script>
@@ -25,35 +26,36 @@
 	<link rel="stylesheet" href="/api/styles/main">
 </head>
 <body>
-	<div id="player" class="loading-player">
-		<div id="player-controls">
-			<div id="rewind">
-				<div class="arrow-left"></div>
-				<div class="arrow-left"></div>
-			</div>
-			<div id="play">
-				<div class="arrow-right"></div>
-			</div>
-			<div id="pause">
-				<div class="vertical-bar"></div>
-				<div class="vertical-bar"></div>
-			</div>
-			<div id="skip">
-				<div class="arrow-right"></div>
-				<div class="arrow-right"></div>
-			</div>
-		</div>
-		<div id="player-center">
-			<p id="track-title"><a></a></p>
-			<p id="track-artist"><a></a></p>
-			<p id="track-album"><a></a></p>
-			<div id="time-left">0:00</div>
-			<input type="range" id="seekbar" min="0" max="100" value="0">
-			<div id="time-right">0:00</div>
-		</div>
-		<div id="queue"></div>
-	</div>
 	<div id="sidebar">
+		<div id="sidebar-player">
+			<div id="queue"></div>
+			<img src="" width='224' height='224' id='nowplaying-image'>
+			<div id="seek-bar">
+				<div id="seek-progress"></div>
+			</div>
+			<div id="player-controls">
+				<div id="rewind">
+					<div class="arrow-left"></div>
+					<div class="arrow-left"></div>
+				</div>
+				<div id="play">
+					<div class="arrow-right"></div>
+				</div>
+				<div id="pause">
+					<div class="vertical-bar"></div>
+					<div class="vertical-bar"></div>
+				</div>
+				<div id="skip">
+					<div class="arrow-right"></div>
+					<div class="arrow-right"></div>
+				</div>
+			</div>
+		</div>
+		<div id="time-left">0:00</div>
+		<div id="time-right">0:00</div>
+		<p class="nowplaying-info" id="track-title"><a></a></p>
+		<p class="nowplaying-info" id="track-artist"><a></a></p>
+		<p class="nowplaying-info" id="track-album"><a></a></p>
 		<input type="text" id="search-field" placeholder="Search for songs or artists">
 		<div id="clear-input">x</div>
 		<div id="search-results">
@@ -66,10 +68,10 @@
 		</div>
 		<ul>
 			<h2>My music</h2>
-			<li data-navigate="/home"><a><img src="/api/svg/house/white">Home</a></li>
-			<li data-navigate="/library"><a><img src="/api/svg/library/white">Library</a></li>
+			<li data-navigate="/home"><a><img src="/api/svg/house">Home</a></li>
+			<li data-navigate="/library"><a><img src="/api/svg/music">Library</a></li>
 			<h2>Playlists</h2>
-			<li class="add-new-playlist"><a><img src="/api/svg/plus/white">New playlist</a></li>
+			<li class="add-new-playlist"><a><img src="/api/svg/plus">New playlist</a></li>
 			<div class="new-playlist-input">
 				<input type="text" class="new-playlist-input-field">
 			</div>
@@ -79,11 +81,11 @@
 				{% endfor %}
 			</div>
 			<h2>Discover</h2>
-			<li data-navigate="/charts"><a><img src="/api/svg/star/white">Charts</a></li>
-			<li data-navigate="/reddit"><a><img src="/api/svg/upvote/white">Reddit</a></li>
-			<!--- <li data-navigate="/about"><a><img src="/api/svg/info/white">About</a></li> -->
+			<li data-navigate="/charts"><a><img src="/api/svg/star">Charts</a></li>
+			<li data-navigate="/reddit"><a><img src="/api/svg/upvote">Reddit</a></li>
+			<!--- <li data-navigate="/about"><a><img src="/api/svg/info">About</a></li> -->
 			<h2>Tunechilla</h2>
-			<li data-navigate="/settings"><a><img src="/api/svg/settings/white">Settings</a></li>
+			<li data-navigate="/settings"><a><img src="/api/svg/settings">Settings</a></li>
 		</ul>
 		{% if user %}
 		<div id="signed-in">
@@ -98,6 +100,14 @@
 		<div class="loading-indicator">
 			<div class="spinner"></div>
 		</div>
+	</div>
+	<div id="dropfiles">
+
+	</div>
+	<div id="dropfilescontent">
+		<h1>Drop your music here</h1>
+		<p>You can drag MP3 files or Spotify music.</p>
+		<p>Your music will be added to your library.</p>
 	</div>
 	<div id="ytplayer" style="opacity: 0; position: absolute; z-index: -3; top: -3000px">
 		<div id="ytapiplayer">

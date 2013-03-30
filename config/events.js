@@ -8,6 +8,7 @@
 var fs 		= require('fs'),
 	db 		= require('../db/queries'),
 	fb 		= require('../config/facebook'),
+	itunes 	= require('../config/itunes'),
 	swig 	= require('swig'),
 	_ 		= require('underscore');
 	helpers = require('../frontend/scripts/helpers').helpers;
@@ -62,6 +63,7 @@ this.connection = function (socket) {
 			track.listens = 0;
 			db.addTrack(track, function() {
 				console.log("Track added successfully.");
+				socket.emit('track-uploaded', track.id)
 			});
 		});
 		socket.on('new-album', 					function (data) {
@@ -108,7 +110,7 @@ this.connection = function (socket) {
 						db.getSingleTrack(data.song.id, function(song) {
 							data.song = song[0];
 							var notification = notificationtemplates.track_removed.render({data: data});
-							socket.emit('track-removed', {notification: notification});
+							socket.emit('track-removed', {notification: notification, id: data.song.id});
 						});
 					})
 				}
@@ -299,6 +301,20 @@ this.connection = function (socket) {
 		socket.on('update-settings', 			function (data) {
 			db.updateSettings(data, function() {
 				socket.emit('settings-saved');
+			});
+		});
+		socket.on('request-track-info',			function (data) {
+			var query = _.clean(data.name) + ' ' + _.clean(data.artist)
+			itunes.search(query, {entity: 'song', limit: 3}, function (json) {
+				// ERROR_HANDLING
+				var track = _.first(json.results);
+				if (track) {
+					var song  = itunes.remap(track); 
+					socket.emit('receive-track-info', {song: song});
+				}
+				else {
+					socket.emit('receive-track-info', {error: 404})
+				}
 			});
 		});
 };
