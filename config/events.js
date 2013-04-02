@@ -61,6 +61,7 @@ this.connection = function (socket) {
 				Add a element where we can store the play count.
 			*/
 			track.listens = 0;
+			track.id = parseFloat(track.id)
 			db.addTrack(track, function() {
 				console.log("Track added successfully.");
 				socket.emit('track-uploaded', track.id)
@@ -120,6 +121,7 @@ this.connection = function (socket) {
 			var tmpl 	= swig.compileFile(dirup + '/sites/contextmenu.html');
 			var state 	= data.state;
 			var render	= function() {
+				data.song.image = helpers.getHQAlbumImage(data.song, 225);
 				var output 	= tmpl.render(data);
 				socket.emit('contextmenu', {html: output});
 			}
@@ -265,7 +267,7 @@ this.connection = function (socket) {
 				db.getUserCollections(user, function(collections) {
 					var userplaylists = _.pluck(collections.playlists, 'url');
 					db.getPlaylistByUrl(data.url, function(playlist) {
-						if (playlist && _.include(userplaylists, data.url)) {
+						if (playlist && _.include(userplaylists, data.url) && !_.include(playlist.tracks, data.songid)) {
 							playlist.tracks.push(parseFloat(data.songid));
 							db.savePlaylist(playlist);
 							db.getSingleTrack(data.songid, function(song) {

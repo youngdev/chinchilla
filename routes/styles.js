@@ -31,8 +31,17 @@ this.svg = {
 		response.sendfile(dirup + "/frontend/svg/" + filename + ".svg");
 	},
 	getColor: function(request, response) {
+		var filename 	= request.params.filename,
+			color 		= request.params.color,
+			allowed 	= ['white', 'blue', 'black'];
+		if (!_.contains(allowed, color)) { response.end('not allowed!'); return;};
+		var colors 		= {
+			white: '#FFFFFF',
+			blue: '#4183ef',
+			black: '#000'
+		}
+		var color 		= colors[color];  
 		response.setHeader("Content-Type", "image/svg+xml");
-		var filename = request.params.filename;
 		if (filename == 'heart') {filename = 'heart-white'}
 		fs.readFile(dirup + "/frontend/svg/" + filename + ".svg", 'utf8', function(err, data) {
 			if (!err) {
@@ -46,10 +55,10 @@ this.svg = {
 					var data = data.replace(/fill="none"/g,	'');
 					var data = data.replace(/fill="red"/g, '');
 					var data = data.replace(/flood-color='red'/, "flood-color='black'");
-					var data = data.replace(/<polygon/g, 	'<polygon fill="white"');
-					var data = data.replace(/<path/g,		'<path fill="white"');
-					var data = data.replace(/<ellipse/g,	'<ellipse fill="white"');
-					var data = data.replace(/<circle/g, 		'<circle fill="white"');
+					var data = data.replace(/<polygon/g, 	'<polygon fill="' + color + '"');
+					var data = data.replace(/<path/g,		'<path fill="' + color + '"');
+					var data = data.replace(/<ellipse/g,	'<ellipse fill="' + color + '"');
+					var data = data.replace(/<circle/g, 		'<circle fill="' + color + '"');
 					response.end(data);
 				}
 				

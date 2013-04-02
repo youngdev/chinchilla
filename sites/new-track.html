@@ -1,0 +1,56 @@
+<div class="song-page-full">
+	<div class="song-page-container">
+		<div class="song-page-shadow"></div>
+		<section class="song-page-header">
+			<section class="song-page-header-info">
+				<section class="song-page-header-info-top">
+					{% if user %}
+						<div class="song{% if song.ytid %} recognized{% else %} not-recognized{% endif %}{% if inlib %} in-library {% else %} not-in-library{% endif %}" data-album="{{song.album}}" data-name="{{song.name}}" data-index="{{loop.index}}" data-duration="{{song.duration}}" data-albumid="{{song.albumid}}" data-artist="{{song.artist}}" data-artistid="{{song.artistid}}" data-image="{{song.image}}" data-id="{{song.id}}" data-explicit="{{song.explicit}}" data-genre="{{song.genre}}" data-numberinalbum="{{song.numberinalbum}}" data-cdinalbum="{{song.cdinalbum}}" data-tracks="{{song.tracks}}" data-cdcount="{{song.cdcount}}" data-preview="{{song.preview}}" data-release="{{song.release}}" {% if song.ytid %} data-ytid="{{song.ytid}}" {% endif %}>
+							<div class="song-page-heart-action">
+								<div class="heart"></div>
+							</div>
+						</div>
+						
+					{% endif %}
+					<div class="song-page-title">{{song.name}}</div>
+					<div class="song-page-subtitle" data-navigate="/artist/{{song.artistid}}">{{song.artist}}</div>
+					<div class="song-page-header-info-table">
+						<table>
+							<tr><td>Length</td><td>{{parseduration(song.duration)}}</td></tr>
+							<tr data-navigate="/album/{{song.albumid}}"><td>Album</td><td>{{song.album}}</td></tr>
+							<tr><td>Genre</td><td>{{song.genre}}</td></tr>
+							<tr><td>Explicit</td><td>{% if song.explicit %} Yes {% else %} No {% endif %}</td></tr>
+						</table>
+					</div>
+				</section>
+			</section>
+			<section class="song-page-header-cover">
+				<img src="{{hqcover}}">
+			</section>
+		</section>
+		<section class="song-page-actions">
+			<section class="song-page-actions-left">
+				<div class="song-page-title">Playlists</div>
+				<div class="song-page-playlist-container">
+					{% if playlists %}
+						{% for playlist in playlists %}
+							<div data-url="{{playlist.url}}" data-songid="{{song.id}}" class="song-page-playlist {% if !playlist.containssong %}add-song-to-playlist-button not-in-playlist {% else %} remove-song-from-playlist-button in-playlist contains-song {% endif %}">
+								<img src="/api/svg/playlist" class="song-page-playlist-icon">
+								<div class="song-page-playlist-title">{{playlist.name}}</div>
+								<div class="song-page-playlist-tracks"><span class="song-page-playlist-trackcount">{{playlist.tracks.length}}</span> songs</div>
+								<img class="song-page-playlist-check" src="/api/svg/check/white">
+							</div>
+						{% endfor %}
+					{% else %}
+					<p class="no-playlists-available">You have no playlists.</p>
+					{% endif %}
+				</div>
+			</section>
+			<section class="song-page-actions-right">
+				<a href="http://youtube.com/watch?v={{song.ytid}}" target="_blank"><div>Watch on YouTube</div></a>
+				<a href="https://itunes.apple.com/us/album/album/id{{song.albumid}}?i={{song.id}}" target="_blank"><div>Buy on iTunes</div></a>
+				<a href="http://www.filsh.net/?url=http://youtube.com/watch?v={{song.ytid}}" target="_blank"><div>Download with filsh.net</div></a>
+			</section>
+		</section>
+	</div>
+</div>

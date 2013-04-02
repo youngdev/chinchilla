@@ -54,6 +54,8 @@ socket.on('playlist-song-removed', function (data) {
 	var view = $('[data-route="' + data.view + '"]');
 	view.find('[data-id="' + data.songid + '"]').remove();
 	var trackcountlabel = view.find('.playlist-trackcount');
+	console.log(data.view);
+	var trackcountlabel2 = $("[data-url='" + data.view + "']").addClass("add-song-to-playlist-button not-in-playlist").removeClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	var pldurationlabel = view.find('.playlist-duration');
 	var trackslabel 	= view.find('.playlist-plural-singular-tracks');
 	$(trackcountlabel).text(data.trackcount);
@@ -67,6 +69,8 @@ socket.on('playlist-song-added', function (data) {
 	var table = view.find('tbody');
 	var trackcountlabel = view.find('.playlist-trackcount');
 	var pldurationlabel = view.find('.playlist-duration');
+	console.log(data.view);
+	var trackcountlabel2 = $("[data-url='" + data.view + "']").removeClass("add-song-to-playlist-button not-in-playlist").addClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	var trackslabel 	= view.find('.playlist-plural-singular-tracks');
 	if (data.position == 'top' && (table.find('.song').length != 0)) {
 		table.find('.song').eq(0).before(data.song);

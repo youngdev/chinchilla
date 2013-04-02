@@ -59,6 +59,7 @@ var templates 		= 		{
     song: 					dirup + '/sites/song.html',
     redditbox: 				dirup + '/sites/reddit-box.html',
     track: 					dirup + '/sites/track.html',
+    newtrack: 				dirup + '/sites/new-track.html',
     reddit: 				dirup + '/sites/reddit.html'
 };
 
@@ -78,7 +79,6 @@ this.artist 					= function(request, response) {
 	 	},
 	 	tmpl 					= swig.compileFile(templates.artist),
 	 	afterUserFetch 			= function(user) {
-	 		console.log("User fetched");
 	 		data.user 			= user;
 	 		dbquery.getArtist(id, afterArtistFetch)
 	 	},
@@ -201,215 +201,6 @@ this.artist 					= function(request, response) {
 	 	}
  	facebook.getLibraryFromRequest(request, afterUserFetch);
 
-};
-this.drawartist     = function(request, response) {
-	/*
-		Define custom parameters
-	*/
-	var artistid = request.params.id;
-	facebook.getLibraryFromRequest(request, function(userdata) {
-		/*
-			Query database for artist informations
-		*/
-		dbquery.getArtist(artistid, function(artistarray) {
-			/*
-				Get the HTML template and call "compile"
-			*/
-			var tmpl = swig.compileFile(templates.artist);
-			/*
-				If nothing found, return null
-			*/
-			var artistinfo = artistarray.length === 0 ? null : artistarray[0];
-			/*
-				If null, add to the database
-			*/
-			if (artistinfo === null && views.lastloop != artistid) {
-				itunes.lookup(artistid, {entity: "musicArtist"}, function(res) {
-					if (res.results.length !== 0) {
-						var firstResult = res.results[0];
-						var a = {
-							name: firstResult.artistName,
-							id: firstResult.artistId,
-							genre: firstResult.primaryGenreName
-						};
-						dbquery.addArtist(a, function() {
-							views.lastloop = artistid;
-							/*
-								Loop: Be careful!
-							*/
-							views.drawartist(request, response);
-						});
-					}
-					else {
-						views.error({params: {code: 499}}, response);
-					}
-				});
-			}
-			else if (artistinfo !== null) {
-				var artist = artistinfo.name;
-
-				if (artistinfo.lastfm === undefined) {
-					lastfm.artist.getInfo(
-						{
-							artist: artist
-						}, 
-						function(err, data) {
-							if (!err) {
-								var lfmdata = {
-									image:      _.last(data.image)["#text"],
-									mbid:       data.mbid
-								};
-								artistinfo.lastfm = lfmdata;
-								dbquery.updateArtist(artistinfo);
-							}
-						}
-					);
-				}
-				/*
-					Db query for albums
-				*/
-				dbquery.getAlbums(artistid, function(albumarray) {
-					/*
-						If no albums were found, return null
-					*/
-					var albumsinfo = albumarray.length === 0 ? null : albumarray;
-					/*
-						Handle duplicates: Filter them out and show them as extra options.
-					*/
-					if (albumsinfo) {
-						albumsinfo = _.uniq(albumsinfo, false, function(album) {
-							var prename = album.name+'', // Some albums are not strings, they are numbers! wtf...
-		                        name = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("("));
-							return _.str.slugify(name);
-						});
-					}
-					/*
-						Get songs for each album from MongoDB
-					*/
-					var albums = [];
-					if (albumsinfo) {
-						var getAlbumTracks = function() {
-							var cds = [];
-							var album = albumsinfo[j];
-							dbquery.getTracksFromAlbum(album.id, function(items) {
-								/*
-									Get number of CD's
-									Make array with n empty arrays. n = cdcount
-									Add tracks to correct CD
-									Sort album tracks
-								*/
-								if (items[0] === undefined) {
-									console.log("Error: No items in album! Left album out. Album id:", album.id);
-									//response.end("Server error.");
-									return;
-								}
-								var cdcount = items[0].cdcount,
-									totallength = 0;
-								for (i=0;i<cdcount;i++) {
-									cds.push([]);
-								}
-								/*
-									Add a class to tracks that are in the library
-								*/
-								_.each(items, function(track) {
-									if (userdata.loggedin) {
-										track.inlib = (userdata &&_.contains(userdata.collections.library, track.id));
-									}
-									cds[track.cdinalbum-1].push(track);
-									totallength += track.duration;
-								});
-								var discs = [];
-								/*	Sort the tracks by their number*/
-								_.each(cds, function(cd) {
-									var disc = _.sortBy(cd, function(track) {return track.numberinalbum});
-									discs.push(disc);
-								});
-								album.cds = discs;
-								album.hours = totallength;
-								albums.push(album);
-							});
-							j++;
-							if (j == albumcount) {
-								return;
-							}
-							else {
-								getAlbumTracks();
-							}
-						}
-						var j           = 0,
-							albumcount  = albumsinfo.length;
-						getAlbumTracks();
-					}
-					/*
-						Parse () in album titles
-					*/
-					var newAlbumsArray = [];
-					_.each(albumsinfo, function(album) {
-						var prename             = album.name+'',
-							name                = prename.substr(0, (prename.indexOf("(") == -1) ? prename.length : prename.indexOf("(")),
-							parenthesisregex    = /\(([^()]+)\)/g,
-							inparenthesis       = prename.match(parenthesisregex),
-							withoutbrackets     = inparenthesis ? inparenthesis[0].substr(1, inparenthesis[0].length-2) : null;
-						album.name              = name;
-						album.subtitle          = withoutbrackets;
-						newAlbumsArray.push(album);
-					});
-					albumsinfo = newAlbumsArray;
-					/*
-						Query for top tracks
-					*/
-					dbquery.getTracks(artist, function(tracksarray) {
-						var tracks = tracksarray;
-						if (tracks) {
-							tracks = _.uniq(tracks, false, function(song) {
-								return _.str.slugify((song.name + '').toLowerCase());
-							});
-						}
-						var songlistright = [];
-						/*
-							Add a class to the song if it is in the users library
-						*/
-						_.each(tracks, function(track) {
-							var song = track;
-							if (userdata.loggedin) {
-								song.inlib = (userdata && _.contains(userdata.collections.library, track.id));
-							}
-							songlistright.push(song);
-						});
-
-						/*
-							pass in parameters, custom for every artist
-						*/
-						var output = tmpl.render({
-							artist:             artistinfo,
-							albums:             albums,
-							//Not really the album... but for the tracklist template
-							album:              {cds: [songlistright]},
-							albumtemplate:      templates.album,
-							tracklist:          templates.tracklist,
-							parseduration:      parseduration,
-							templates: 			templates,
-							parsehours: 		parsehours,
-							parsetext: 			parsetext,
-							fromserver:         true,
-							coverstack:         _.first(albums, 10),
-							user: 				userdata,
-							type: 				'artist'
-						});
-						/*
-							Send to user
-						*/
-						response.end(output);
-					});
-				});
-			}
-			else {
-				console.log("Error! No artist info.");
-				response.end("Server error.");
-			}
-			
-		});
-		})
 };		
 this.drawalbum      = function(request, response) {
 	/*
@@ -525,6 +316,93 @@ this.drawalbum      = function(request, response) {
 		});
 	});
 };
+this.track 			= function(request, response) {
+	var tmpl 							= swig.compileFile(templates.newtrack),
+		id 								= parseFloat(request.params.id),
+		data 							= {parseduration: parseduration},
+		onlynumbers    	 				= new RegExp('^[0-9]+$'),
+		render 							= function() {
+			var output 					= tmpl.render(data);
+			response.end(output);
+		},
+		renderError 					= function(code) {
+			views.error({params: {code: code}}, response);
+		},
+		afterDBQueryPerformed 			= function(tracks) {
+			if (tracks.length === 0) {
+				itunes.lookup(id, {entity: 'song'}, afteriTunesQueryPerformed);
+				data.wasindb = false;
+			}
+			else {
+				afterTrackFound(tracks[0]);
+				data.wasindb = true;
+			}
+		},
+		afteriTunesQueryPerformed 		= function(res) {
+			var results = res.results
+			if (results.length === 0) {
+				renderError(497);
+			}
+			else {
+				var song = itunes.remap(results[0]);
+				afterTrackFound(song);
+			}
+		},
+		afterTrackFound 				= function(song) {
+			if (song.ytid) {
+				afterHasYTID(song);
+			}
+			else {
+				findYouTubeID(song);
+			}
+		},
+		afterHasYTID 					= function(song) {
+			data.hqcover = helpers.getHQAlbumImage(song, 400);
+			data.song = song;
+			facebook.checkLoginState(request, afterLoginStateChecked)
+		},
+		findYouTubeID 					= function(song) {
+			jsonload.get('http://gdata.youtube.com/feeds/api/videos?alt=json&max-results=15&q=' + song.artist + ' - ' + song.name, function(err, data) {
+				recognition.findBestVideo(data, song, function(video) {
+					song.ytid = helpers.parseYTId(video);
+					afterHasYTID(song);
+				}, _, _.str);
+			});
+		},
+		afterLoginStateChecked 			= function(user) {
+			if (user) {
+				data.user = user;
+				dbquery.getUserCollections(user, afterUserCollectionsFetched);
+			}
+			else {
+				afterUserProcessDone();
+			}
+		},
+		afterUserProcessDone 			= function() {
+			render();
+			dbquery.addTrack(data.song, function(song) {
+				console.log('Track added through track page!');
+			});
+		},
+		afterUserCollectionsFetched		= function(collections) {
+			data.library 	= collections.library;
+			data.playlists 	= collections.playlists;
+			data.inlib 		= _.contains(data.library, id);
+			dbquery.getPlaylistsFromUserId(data.user.id, afterPlaylistsFetched)
+		},
+		afterPlaylistsFetched 			= function(playlists) {
+			data.playlists 	= playlists;
+			data.playlists 	= _.map(data.playlists, function(playlist) { playlist.containssong = _.contains(playlist.tracks, id); return playlist });
+			afterUserProcessDone();
+		} 
+		if (onlynumbers.test(id)) {
+			dbquery.getSingleTrack(id, afterDBQueryPerformed);
+		}
+		else {
+			renderError(501);
+		}
+		
+};
 this.drawtrack      = function(request, response) {
     var tmpl            = swig.compileFile(templates.track),
         onlynumbers     = new RegExp('^[0-9]+$'),
@@ -606,28 +484,31 @@ this.wrapper       	= function(request, response) {
 this.charts         = function(request, response) {
 	facebook.getLibraryFromRequest(request, function(userdata) {
 		var tmpl        = swig.compileFile(dirup + "/sites/charts.html"),
-			table       = charts.table,
-			songs 		= [];
-		_.each(table, function(song) {
-			if (song != undefined) {
-				if (userdata.loggedin) {
-					song.inlib = (userdata && _.contains(userdata.collections.library, song.id));
-				}
-				songs.push(song);
-			}
-			
-		});
-		var	output      = tmpl.render({
-				album:              {cds: [songs]},
-				parseduration:      parseduration,
-				parsetext: 			parsetext,
-				showartistalbum:    true,
-				coverstack:         _.first(table, 10),
-				user: 				userdata,
-				type: 				'charts',
-				templates: 			templates
-			});
-		response.end(output);
+			songs 		= [],
+			afterChartsFetched = function(table) {
+				_.each(table, function(song) {
+					if (song != undefined) {
+						if (userdata.loggedin) {
+							song.inlib = (userdata && _.contains(userdata.collections.library, song.id));
+						}
+						songs.push(song);
+					}
+					
+				});
+				var	output      = tmpl.render({
+						album:              {cds: [songs]},
+						parseduration:      parseduration,
+						parsetext: 			parsetext,
+						showartistalbum:    true,
+						coverstack:         _.first(table, 10),
+						user: 				userdata,
+						type: 				'charts',
+						templates: 			templates
+					});
+				response.end(output);
+			},
+			table       = charts.getCharts(afterChartsFetched);
+		
 	});
 };
 this.error          = function(request, response) {
@@ -650,40 +531,45 @@ this.error          = function(request, response) {
 this.about          = function(request, response) {
 	response.sendfile(dirup + "/sites/about.html");
 };
-this.library		= function(request, response) {
-	var tmpl = swig.compileFile(templates.library);
-	facebook.checkLoginState(request, function(user) {
-		if (user) {
-			dbquery.getUserCollections(user, function(collection) {
-				if (collection.library.length == 0) {
-					response.end("No tracks in the library.");
-				}
-				dbquery.getSongsByIdList(collection.library, function(songs) {
-					var tracks = [];
-					_.each(songs, function(song) {
-						song.inlib = true;
-						tracks.unshift(song);
-					});
-					var output  = tmpl.render({
-						user: user,
-						album: 				{cds: [tracks]},
-						templates: 			templates,
-						parseduration: 		parseduration,
-						parsetext: 			parsetext,
-						showartistalbum: 	true,
-						coverstack: 		helpers.coverArrayToHQ(_.first(_.uniq(_.pluck(_.first(tracks, 15), 'image')), 10), 150),
-						user: 				{loggedin: true},
-						type: 				'library'
-					});
-					response.end(output);
-				});
-			});
-		}
-		else {
-			var output = tmpl.render({user: user, templates: templates});
+this.library 				= function(request, response) {
+	var tmpl = swig.compileFile(templates.library),
+		data = {
+			templates: templates,
+			parseduration: parseduration,
+			parsetext: 	parsetext,
+			showartistalbum: true,
+			type: 'library'
+		},
+		afterFacebookLoginStateChecked = function(user) {
+			if (user) {
+				data.user = user;
+				dbquery.getUserCollections(user, afterUserCollectionsFetched)
+			}
+			else {
+				render()
+			}
+		},
+		afterUserCollectionsFetched 	= function(collections) {
+			data.collections = collections;
+			if (collections.library.length == 0) {
+				data.album = {cds: []};
+				render();
+			}
+			else {
+				dbquery.getSongsByIdList(collections.library, afterSongListIsReceived);
+			}	
+		},
+		afterSongListIsReceived 		= function(songs) {
+			var tracks = _.map(songs.reverse(), function(song) { song.inlib = true; return song; });
+			data.coverstack = helpers.coverArrayToHQ(_.first(_.uniq(_.pluck(_.first(tracks, 15), 'image')), 10), 150);
+			data.album = {cds: [tracks]};
+			render();
+		},
+		render 							= function() {
+			var output = tmpl.render(data);
 			response.end(output);
 		}
-	});
+	facebook.checkLoginState(request, afterFacebookLoginStateChecked)
 };
 this.main 					= function(request, response) {
 	var tmpl = swig.compileFile(templates.main),
@@ -702,14 +588,19 @@ this.main 					= function(request, response) {
 				dbquery.getUserCollections(user, afterCollection)
 			}
 			else {
-				buildcharts();
+				fetchCharts();
 			}
 		},
 		afterCollection 	= function(collections) {
 			var library 	= collections.library,
 				first7 		= _.last(library, 7).reverse();
 			data.inlibrary  = library;
-			dbquery.getSongsByIdList(first7, afterIdList);
+			if (first7.length == 0) {
+				fetchCharts();
+			}
+			else {
+				dbquery.getSongsByIdList(first7, afterIdList);
+			}
 		},
 		afterIdList			= function(songs) {
 			/*
@@ -717,9 +608,18 @@ this.main 					= function(request, response) {
 			*/
 			var songs 		= _.map(songs, function(song) {song.inlib = true; return song;});
 			data.library 	= [{cds: [songs]}];
-			buildcharts();
+			fetchCharts()
 		},
-		buildcharts			= function() {
+		fetchCharts 		= function() {
+			charts.getCharts(afterCharts)
+		},
+		afterCharts 		= function(charts) {
+			var top7 		= _.first(charts, 7);
+			var top7 		= _.map(top7, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
+			data.charts 	= [{cds: [top7]}]
+			throwtogether()
+		},
+		throwtogether		= function() {
 			var top 		= _.first(charts.table, 7),
 				top7 		= [],
 				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 6);
@@ -727,13 +627,7 @@ this.main 					= function(request, response) {
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
 			});
-			var top 		= _.compact(top);
-			_.each(top, function(song) {
-				song.inlib 	= (data.user && _.contains(data.inlibrary, song.id));
-				top7.push(song);
-			});
 			data.redditsongs= redditsongs;
-			data.charts 	= [{cds: [top7]}];
 			render();
 		}
 		render 				= function() {
@@ -810,7 +704,6 @@ this.playlist 				= function(request, response) {
 			data.library = collections.library;
 		}
 		var playlist 		= '/u/' + request.params.username + '/p/' + request.params.playlist;
-		console.log(playlist)
 		dbquery.getPlaylist(playlist, afterPlaylistFetched);
 	},
 	afterPlaylistFetched 	= function(playlist) {

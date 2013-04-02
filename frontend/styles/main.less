@@ -1,5 +1,6 @@
 @import "light-noise-uris.less";
-@coolblue: -webkit-linear-gradient(bottom, #4183ef, #478cff);
+@blue: #4183ef;
+@coolblue: -webkit-linear-gradient(bottom, @blue, #478cff);
 @sidebarbg: #f0f0f0;
 @sidebarcolor: #515765;
 @bordercolor: #bebebe;
@@ -219,7 +220,7 @@ img {
 		}
 		width: 16px;
 		height: 16px;
-		border: 3px solid #575757;
+		border: 3px solid @blue;
 		border-radius: 50%;
 		-webkit-mask-image: -webkit-linear-gradient(black 50%, transparent 50%);
 		left: 50%;
@@ -379,7 +380,7 @@ img {
 		left: 160px;
 		opacity: 0.7;
 	}
-	.menuselected {
+	li.menuselected {
 		background: rgba(0,0,0,0.3);
 		background: @coolblue;
 		border-bottom: 1px solid #2774f0;
@@ -660,7 +661,7 @@ img {
 		width: -webkit-calc(~"100% + 20px");
 		width: -moz-calc(~"100% + 20px");
 		width: -ms-calc(~"100% + 20px");
-		background: rgb(230,230,230);
+		background: rgb(220,220,220);
 		background-image: url(@light-noise-100);
 		height: 186px;
 		padding-bottom: -3px;
@@ -1324,64 +1325,82 @@ img {
 	position: fixed;
 	z-index: 3;
 	width: 225px;
-	min-height: 100px;
-	.basic;
-	box-shadow: none;
+	min-height: 236px;
+	background: white;
+	border: 1px solid @bordercolor;
 	.context-tip {
-		background: rgba(0,0,0,0.04);
 		overflow: hidden;
+		height: 100px;
 		img {
-			height: 60px;
-			width: 60px;
-			margin-left: 5px;
-			margin-right: 5px;
-			margin-top: 3px;
-			padding: 3px;
-			background: white;
+			opacity: 0.7;
 		}
 		h1, h2 {
-			font-family: Arial;
+			left: 10px;
 			text-transform: none !important;
-			left: 68px;
-			font-size: 0.7em !important;
 			font-weight: 300;
 			position: absolute !important;
 			overflow: hidden;
 			white-space: nowrap;
 			text-overflow: ellipsis;
-			width: 146px;
-			height: 12px !important;
-			color: black !important;
+			width: 205px;
+			color: white !important;
 		}
 		h1 {
-			top: 0;
+			top: 60px !important;
+			font-size: 16px;
 			font-weight: bold;
+			text-shadow: 1px 1px 5px black;
 		}
 		h2 {
-			top: 18px;
+			top: 45px;
+			font-size: 14px !important;
 			margin-top: 3px !important;
-			opacity: 0.6;
+			font-weight: bold;
+			text-shadow: 1px 1px 5px black;
 		}
 		a {
-			color: black !important;
+			color: white !important;
 		}
 		a:hover {
-			text-decoration: underline;
 			cursor: pointer;
 		}
-		border-bottom: 1px solid rgba(0,0,0,0.2);
+	}
+	.contextmenu-arrow {
+		width: 0px;
+		height: 15px;
+		position: absolute;
+		z-index: 1;
+		top: 85px;
+		left: 12px;
+		border-bottom: 10px solid white;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
 	}
 	.playlist-context-tip {
 		min-height: 45px;
+		height: 45px;
 		h1, h2 {
 			left: 20px;
 			padding-left: 0 !important;
 			margin-left: 0 !important;
+			color: black !important;
+			a {
+				color: black !important;
+			}
+		}
+		h1 {
+			font-size: 1em !important;
+			top: -5px;
+		}
+		h2 {
+			font-size: 0.6em !important;
+			top: 24px;
 		}
 	}
 	.context-options {
-		margin-top: 5px;
-		margin-bottom: 5px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		background: white;
 		div {
 			padding: 8px;
 			padding-left: 20px;
@@ -1603,7 +1622,7 @@ img {
 	cursor: pointer;
 }
 .song.in-library {
-	.reddit-image-actions {
+	.reddit-image-actions, .song-page-heart-action {
 		.heart {
 			background: url(/api/svg/heart);
 			background-size: 14px 14px;
@@ -1627,7 +1646,7 @@ img {
 	}
 }
 .song.not-in-library {
-	.reddit-image-actions {
+	.reddit-image-actions, .song-page-heart-action {
 		.heart {
 			background: url(/api/svg/heart/white);
 			background-size: 14px 14px;
@@ -1641,6 +1660,17 @@ img {
 			background: url(/api/svg/heart/white);
 			background-size: 12px 12px;
 		}
+	}
+}
+.song-page-heart-action {
+	height: 0px;
+	.heart {
+		background-size: 40px 40px !important;
+		height: 40px !important;
+		width: 40px !important;
+		position: absolute;
+		left: 10px;
+		top: 14px;
 	}
 }
 .playlistdescription {
@@ -1716,7 +1746,7 @@ img {
 .dropdownoption:hover {
 	background: rgba(0,0,0,0.1);
 }
-.in-playlist::before, .dropdown-check::before {
+.contextmenu .in-playlist::before, .dropdown-check::before {
 	content: '';
 	padding-left: 16px;
 	margin-right: 8px;
@@ -1725,7 +1755,7 @@ img {
 	opacity: 0.3;
 	position: relative;
 }
-.not-in-playlist::before, .dropdown-no-check::before {
+.contextmenu .not-in-playlist::before, .dropdown-no-check::before {
 	content: '';
 	padding-left: 24px;
 }
@@ -1764,4 +1794,188 @@ img {
 	background: rgba(0,0,0,0.05);
 }
 .reddit-page {
+}
+.song-page-full {
+	background: rgba(0,0,0,0.05);
+	color: @sidebarcolor;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	.song-page-title {
+		font-weight: bold;
+		margin-left: 65px;
+		margin-top: 10px;
+		font-size: 1.5em;
+		color: @sidebarcolor;
+	}
+	.song-page-subtitle {
+		margin-left: 65px;
+	}
+	[data-navigate] {
+		cursor: pointer;
+		td, .song-page-title, .song-page-subtitle {
+			cursor: pointer;
+		}
+	}
+	.song-page-container {
+		margin: auto;
+		margin-top: 50px;
+		width: 700px;
+		border: 1px solid @bordercolor;
+		.song-page-header {
+			height: 400px;
+			.song-page-header-cover {
+				position: relative;
+				width: 400px;
+				height: 400px;
+				float: right;
+			}
+			.song-page-header-info {
+				width: 298px;
+				background: @sidebarbg;
+				height: 100%;
+				float: left;
+				border-right: 1px solid @bordercolor;
+				.song-page-header-info-top {
+					padding-top: 10px;
+					padding-left: 5px;
+					height: 30px;
+					width: 100%;
+					.song-page-header-info-table {
+						position: absolute;
+						top: 130px;
+						margin-left: 10px;
+						width: 300px;
+						font-size: 0.75em;
+						td:nth-child(1) {
+							opacity: 0.4;
+						}
+						td:nth-child(2) {
+							margin-left: 10px;
+							position: absolute;
+						}
+					}
+				}
+			}
+		}
+		.song-page-actions {
+			height: 300px;
+			margin-top: -36px;
+			background: @sidebarbg;
+			.song-page-actions-left {
+				padding-top: 10px;
+				width: 298px;
+				float: left;
+				overflow: auto;
+				height: 264px;
+				border-right: 1px solid @bordercolor;
+				.no-playlists-available {
+					margin-left: 68px;
+				}
+				.song-page-playlist {
+					max-height: 47px;
+					overflow: hidden;
+					clear: left;
+					padding-top: 7px;
+					padding-bottom: 7px;
+					border-top: 1px solid transparent;
+					border-bottom: 1px solid transparent;
+					img {
+						float: left;
+						opacity: 0.4;
+						width: 30px;
+						height: 30px;
+						margin-left: 15px;
+						margin-right: 20px;
+						margin-top: 1px;
+					}
+					.song-page-playlist-title {
+						font-size: 0.8em;
+						margin-left: 15px;
+						font-weight: bold;
+						white-space: nowrap;
+						text-overflow: ellipsis;
+						width: 180px;
+						overflow: hidden;
+					}
+					.song-page-playlist-tracks {
+						font-size: 0.8em;
+						margin-left: 15px;
+					}
+					.song-page-playlist-check {
+						display: none;
+					}
+				}
+				.song-page-playlist.contains-song {
+					.song-page-playlist-icon {
+						-webkit-filter: invert(100%);
+						opacity: 0.7;
+					}
+					color: white;
+					text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+					background: @coolblue;
+					border-bottom: 1px solid #2774f0;
+					border-top: 1px solid #2774f0;
+					.song-page-playlist-check {
+						float: right;
+						display: block;
+						margin-top: -30px;
+						opacity: 0.7 !important;
+						position: absolute;
+						margin-left: 250px;
+					}
+				}
+				
+			}
+			.song-page-actions-right {
+				width: 400px;
+				background: rgba(0,0,0,0.05);
+				background-image: url(@light-noise-070);
+				height: 300px;
+				float: right;
+				padding-top: 30px;
+				a {
+					text-decoration: none;
+					color: @sidebarcolor;
+				}
+				div:hover {
+					cursor: pointer;
+					color: black;
+				}
+				div {
+					margin-left: 30px;
+					font-size: 1.1em;
+					margin-bottom: 5px;
+				}
+			}
+		}
+	}
+	.song-page-shadow {
+		background: -webkit-linear-gradient(right, rgba(0,0,0,0.15), transparent);
+		height: 664px;
+		position: absolute;
+		z-index: 1;
+		width: 10px;
+		margin-left: 288px;
+	}
+}
+tr.song.now-playing {
+	td:first-child:after {
+		content: '' !important;
+		background-image: url(/api/svg/play/blue);
+		background-size: 15px 10px;
+		margin-left: 3px;
+		top: 12px;
+		opacity: 1 !important;
+		height: 10px;
+		width: 10px;
+		position: absolute;
+	}
+}
+tr.song.now-playing.selected {
+	td:first-child:after {
+		background-image: url(/api/svg/play/white);
+	}
 }

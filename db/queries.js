@@ -1,7 +1,7 @@
 var mongo       = require("mongoskin"),
-	//auth        = require("../auth/auth"),
+	auth        = require("../auth/auth"),
 	_			= require("underscore"),
-	connection  = mongo.db('jonny:zinedinezidane11@ds047307.mongolab.com:47307/chinchilla?auto_reconnect', {safe: true}),
+	connection  = mongo.db(auth.auth, {safe: true}),
     options     = {save: true, upsert: true},
     standards   = require("../config/standards");
 /*
@@ -123,6 +123,16 @@ this.addTrack				= function(track, callback) 	{
 		}
 	});
 };
+this.addWithOutYTID 		= function(track, callback) 	{
+	connection.collection("tracks").update({id: track.id}, track, options, function(err) {
+		if (err) {
+			console.log(err);
+		}
+		else {
+			callback();
+		}
+	})
+}
 this.addTracksBulk 			= function(tracks, callback)	{
 	connection.collection("tracks").insert(tracks, options, function(err) {
 		if (!err && callback) {

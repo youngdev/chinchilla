@@ -181,7 +181,6 @@ var exchange 			= function(code, request, response) {
 				response.end("Facebook error")
 			}
 			else {
-				console.log("worked!");
 				var token 			= code.substr(code.indexOf("access_token=") + 13),
 					access_token	= token.substr(0, token.indexOf("&expires"));
 				getUserInfo(access_token, request, response);

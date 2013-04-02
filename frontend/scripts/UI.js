@@ -495,3 +495,15 @@ $(document)
 
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
+
+/*
+	When new tracks are in the DOM, there are some things we should do on the client-side...
+*/
+$(document).ready(function() {
+	$.subscribe('new-tracks-entered-dom', function() {
+	    _.each($('.not-recognized'), function(track) {
+	    	recognition.queue.push(track);
+		});
+		$('.song[data-id="' + player.nowPlaying.get().id + '"]').addClass('now-playing')
+	});
+});

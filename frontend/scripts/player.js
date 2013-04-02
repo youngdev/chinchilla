@@ -41,10 +41,12 @@ player.nowPlaying = {
 	replace: function(song) {
 		var song = helpers.parseDOM(song);
 		localStorage['nowPlaying'] = JSON.stringify(song);
-		$("#track-title a").text(song.name);
-		$("#track-artist a").text(song.artist);
-		$("#track-album a").text(song.album);
-		$("#nowplaying-image").attr("src", helpers.getHQAlbumImage(song, 225))
+		$("#track-title a").text(song.name).attr('data-navigate', '/song/' + song.id);
+		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
+		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
+		$("#nowplaying-image").attr("src", helpers.getHQAlbumImage(song, 225));
+		$('.song').removeClass('now-playing')
+		$(".song[data-id='" + song.id + "']").addClass('now-playing');
 		var queue1    = player.queue1.get(),
 			queue2    = player.queue2.get(),
 			queue     = queue1.concat(queue2),
