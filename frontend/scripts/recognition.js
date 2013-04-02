@@ -22,23 +22,19 @@ recognition = {
 			  cb	  = obj.cb;
 		var song = helpers.parseDOM(track);
 		recognition.findVideo(song, function(video) {
-			cb();
-      var firsttrackinarray = (track.length != undefined && track.length != 0) ? track[0] : track;
+            var firsttrackinarray = (track.length != undefined && track.length != 0) ? track[0] : track;
             var dom   = (firsttrackinarray instanceof HTMLElement) ? $(firsttrackinarray) : $(".song[data-id=" + firsttrackinarray.id + "]")[0];
             if (video) {
-                recognition.uploadTrack(track, video);
                 /*
                     Mark it as recognized
                 */
-                $(dom).addClass("recognized")
-                /* 
-                    Unmark it as not recognized
-                */
-                .removeClass("not-recognized pending")
+                var song = helpers.parseDOM(track);
+                var div = $('.song[data-id="' + song.id + '"]').attr("data-ytid", video.id.$t.substr(-11));
+                div.addClass("recognized").removeClass("not-recognized pending")
+                recognition.uploadTrack(song, video);
                 /*
                     Add YouTube ID to the dom
                 */
-                .attr("data-ytid", video.id.$t.substr(-11));
                 if ($(track).hasClass("wantstobeplayed")) {
                       $(track).removeClass("wantstobeplayed");
                       player.playSong($(track)[0]);
@@ -66,6 +62,7 @@ recognition = {
             else {
                 $(dom).addClass('no-video-found')
             }
+            cb();
 		});
 	},
 	started: false,
@@ -114,57 +111,103 @@ recognition = {
           }
         );
     },
-    findBestVideo: function(json, song, callback, _, _s) {
-        var filterVideos = function(videotitle, callback) {
-             var filters = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid", "dance"];
-             var filterout = false;
-             _.each(filters, function(filter, key) {
-                 if (_s.include(videotitle.toLowerCase(), filter)) {
-                   // Filter covers, parodies and Chipmunk versions out
-                   filterout = true
-                 }
-             })
-             return filterout;
-         }
-         // Find the video most related to our video by duration.
-         var videos = json.feed.entry;
-         var videos = (_.filter(videos, function(video) {
-             return (filterVideos(video.title.$t) === false)
-         }));
-         // Filter videos that are too short
-         var videos = (_.filter(videos, function(video) {
-           return video.media$group.yt$duration.seconds > ((song.duration/1000) - 10);
-         }));
-         // Filter videos that are more than 30 seconds too long.
-         var videos = _.filter(videos, function(video) {
-             return (video.media$group.yt$duration.seconds) < ((song.duration/1000) + 30);
-         });
-         // Filter videos that contain 'live' in the description
-         var videos = _.filter(videos, function(video) {
-             return !(_s.include((video.media$group.media$description.$t).toLowerCase(), 'live'));
-         });
-         // Give lyric videos a little levenshtein bonus
-         var videos = _.map(videos, function(video) {
-             var lower = video.title.$t.toLowerCase();
-             var index = lower.indexOf('lyric');
-             video.title.$t = (index == -1) ? lower : (lower.substr(0, index));
-             return video;
-         });
-         // Filter videos with bad rating and with rating disabled;
-         var videos = _.filter(videos, function(video) {
-             return video.gd$rating && video.gd$rating.average > 2.5
-         });
-         // Get the closest video
-          var closestVideo = _.sortBy(videos, function (video) {
-              return _s.levenshtein(_s.slugify(video.title.$t), _s.slugify(song.artist + " - "+ song.name));
-          })[0];          
-          callback(closestVideo);
+    findBestVideo: function (json, song, callback, _, _s) {
+        var videos = json.feed.entry,
+            mostviewed  = 
+                _.max(videos, function(video) { 
+                    var views =  video.yt$statistics != undefined ? parseFloat(video.yt$statistics.viewCount) : 0;
+                    return views
+                })
+            mostviews = mostviewed.yt$statistics ? mostviewed.yt$statistics.viewCount : 0;
+        _.map(videos, function(video) {
+
+            /*
+                Every video can score between 0 and 1000 points
+            */
+            video.points = 0;
+
+            /*
+                300 Points: Levenshtein distance
+                -2 Distances are calculated, both formats are allowed: [Song] - [Artist] and [Artist] - [Song]
+                -The better distance counts
+                -Minus 5 points per levenshtein difference
+            */
+            var videotitle      = _s.slugify(video.title.$t),
+                format1         = _s.slugify(song.artist + ' - ' + song.name),
+                format2         = _s.slugify(song.name + ' - ' + song.artist),
+                levenshtein1    = _s.levenshtein(videotitle, format1),
+                levenshtein2    = _s.levenshtein(videotitle, format2),
+                better          = levenshtein1 < levenshtein2 ? levenshtein1 : levenshtein2,
+                levpoints       = 300 - (better*5),
+                levpoints       = levpoints < 0 ? 0 : levpoints;
+            video.points += levpoints;
+
+            /*
+                150 Points: Duration
+                -1 less or more is okay
+                -For every another second, take away 5 points
+            */
+            var videoduration   = video.media$group.yt$duration.seconds,
+                songduration    = song.duration/1000,
+                difference      = Math.abs(videoduration - songduration)
+                tolerance       = 1,
+                minuspoints     = difference === 0 ? 0 : (difference-1)*5
+                durpoints       = 150 - minuspoints;
+                durpoints       = durpoints < 0 ? 0: durpoints
+            video.points += durpoints;
+
+            /*
+                50 Points: View count
+                -Best video gets 50 Points
+                -All the other videos get 50 points divided by the ratio of views they have. 
+            */
+            var viewCount       = video.yt$statistics ? parseFloat(video.yt$statistics.viewCount) : 0,
+                ratio           = viewCount / mostviews;
+                viepoints       = Math.ceil(ratio*50);
+            video.points += viepoints;
+
+            /*
+                150 Points: Rating
+                -100% positive rating gets 150 points
+                -100% negative rating gets 000 points
+            */
+            var rating          = video.gd$rating ? video.gd$rating.average*20 : 0
+                ratpoints       = Math.ceil(rating * 1.5);
+            video.points += ratpoints;
+
+            /*
+                200: Bad words
+                -200 points if no bad words included
+                -minus 75 points for every bad word
+
+            */
+            video.points += 200;
+            var badwords = ["cover", "parod", "chipmunk", "snippet", "preview", "live", "review", "vocaloid", "dance"];
+            _.each(badwords, function (word) {
+                if (_s.include(videotitle.toLowerCase(), word) && !_s.include(format1, word)) {
+                    video.points -= 75
+                }
+            });
+
+            /*
+                Album name included
+                -If track is a skit / intro / outro, take away 50 points if there is no album name
+            */
+            video.points += 50
+            if (_s.include(videotitle.toLowerCase()), song.album && (_s.include(format1, 'skit') || _s.include(format1, 'intro') || _s.include(format1, 'outro')) ) {
+                video.points -= 50;
+            }
+        }); 
+        var bestvideo = _.first(_.sortBy(videos, function(video) { return video.points }).reverse());
+        console.log('The best video has ', bestvideo.points, ' points!', song.name);
+        callback(bestvideo);
     },
     uploadTrack: function(track, video) {
     	var videoid = video.id.$t.substr(-11);
-    	var json = $(track).data()
-    	json.ytid = videoid
-    	socket.emit('new-track', json);
+    	var json = track;
+    	json.ytid = videoid;
+        json.id = parseFloat(json.id);
+        socket.emit('new-track', json);
     },
     uploadAlbum: function(album) {
     	var json = $(album).data();

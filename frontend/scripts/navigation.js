@@ -24,7 +24,7 @@ routes = {
 		views.main.get();
 	},
 	'/artist/:id': 				function(match) {
-		views.newartist.load(match[1]);
+		views.artist.load(match[1]);
 	},
 	'/u/:name/p/:name': 		function(match) {
 		views.playlist.load(match[0]);
@@ -35,6 +35,9 @@ routes = {
 	},
 	'/': 						function(match) {
 		views.main.get();
+	},
+	'/song/:id': 				function(match) {
+		views.song.load(match[1]);
 	}
 };
 $(document)

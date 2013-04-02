@@ -23,7 +23,7 @@ console.log("App started on port", port);
 app.get('/',                            views.wrapper           );
 app.get('/home',                        views.wrapper           );
 app.get('/artist/:id',                  views.wrapper           );
-app.get('/new-artist/:id',              views.wrapper           );
+app.get('/song/:id',                    views.wrapper           );
 app.get('/charts',                      views.wrapper           );
 app.get('/u/:username/p/:playlist',     views.wrapper           );
 app.get('/album/:id',                   views.wrapper           );
@@ -39,8 +39,8 @@ app.get('/reddit',                      views.wrapper           );
 */
 app.get('/api/script/:scriptname',      scripts.get             );
 app.get('/api/styles/:filename',        styles.get              );
-app.get('/api/artist/:id',              views.drawartist        );
-app.get('/api/new-artist/:id',          views.artist            );
+app.get('/api/artist/:id',              views.artist            );
+app.get('/api/song/:id',                views.track             );
 app.get('/api/charts',                  views.charts            );
 app.get('/api/album/:album',            views.drawalbum         );
 app.get('/api/i/:filename',             styles.images.get       );
@@ -69,6 +69,6 @@ io.set('log level', 1);
 io.sockets.on('connection', events.connection);
 
 /*
-    Fetch iTunes feeds every 24 hours
+    Fetch iTunes feeds every hour
 */
-charts.update();
+charts.refresh();

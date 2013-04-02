@@ -24,7 +24,7 @@ search = {
 				title: 		'trackName',
 				sub: 		'artistName',
 				element: 	$('#results-tracks'),
-				link: 		'/track/$1',
+				link: 		'/song/$1',
 				id: 		'trackId'
 			}
 		}

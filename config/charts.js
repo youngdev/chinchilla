@@ -3,83 +3,89 @@
 */
 var json    = require("jsonreq"),
 	_       = require("underscore"),
+	itunes  = require("../config/itunes"),
 	db      = require("../db/queries"),
     charts  = this;
-/*
-	Load every 24h
-*/
-this.update = function() {
-	var limit = 100;
-	json.get("https://itunes.apple.com/us/rss/topsongs/limit=" + limit + "/explicit=true/json", function(err, result) {
+this.refresh = function() {
+		var notAllTracksInDB = function(items) {
+			tracksInDB = _.pluck(items, 'id');
+			var tofetch = _.reject(charts.iTunesIDs, function (item) { return _.contains(tracksInDB, item) }).join(",");
+			json.get("https://itunes.apple.com/lookup?id=" + tofetch + "&entity=song", function(err, result) {
+				if (!err) {
+					_.each(result.results, function(track) {
+						var song = itunes.remap(track);
+						items.push(song);
+					});
+					AllTracksInDB(items)
+				}
+			});
+		},
+		AllTracksInDB = function(items) {
+			charts.cache = items;
+			afterAllTracksInDB();
+		},
+		afterAllTracksInDB = function() {
+			console.log('All tracks in cache!', charts.cache.length);
+			setTimeout(this.refresh, 3600000)
+		},
+		afterDBQuery = function(items) {
+			if (items.length < charts.limit) {
+				notAllTracksInDB(items);
+			}
+			else {
+				AllTracksInDB(items);
+			}
+		}
+	json.get("https://itunes.apple.com/us/rss/topsongs/limit=" + charts.limit + "/explicit=true/json", function(err,result) {
 		if (!err) {
-			var songs = result.feed.entry;
-			var songids = [], pureids = [];
-			_.each(songs, function(entry) {
-				/*
-					Merge all songids together
-				*/
-				var id = parseFloat(entry.id.attributes['im:id']);
-				songids.push({preview: entry.link[1].attributes.href});
-				pureids.push(id);
-			});
-			db.getSongsByQuery(songids, function(items) {
-				console.log(items.length, " of 100 songs collected");
-				if (items.length < limit) {
-					var dbtracks = [];
-					_.each(items, function(item) {
-						dbtracks.push(item.id);
-					});
-					var tofetch = (_.reject(pureids, function(item) { return _.contains(dbtracks, item) })).join(",");
-					/*
-						Fetch missing track
-					*/
-					json.get("https://itunes.apple.com/lookup?id=" + tofetch + "&entity=song", function(err, result) {
-						if (!err) {
-							var toadd = result.results.length;
-							_.each(result.results, function(song) {
-								var track = {
-									artistid: song.artistId,
-									albumid: song.collectionId,
-									id: song.trackId,
-									album: song.collectionName,
-									artist: song.artistName,
-									preview: song.previewUrl,
-									image: song.artworkUrl100,
-									name: song.trackName,
-									release: song.releaseDate.substr(0,4), 
-									explicit: song.collectionExplicitness == "explicit" ? true : false,
-									genre: song.primaryGenreName,
-									listens: 0,
-									duration: song.trackTimeMillis,
-									cdinalbum: song.discNumber,
-									cdcount: song.discCount,
-									tracks: song.trackCount,
-									numberinalbum: song.trackNumber
-								};
-								items.push(track);
-								db.addTrack(track, function() {
-									toadd--;
-									if (toadd === 0) {
-										charts.update();
-									}
-								});
-							});
-						}
-					});
-				}
-				else {
-					/*
-						Order the tracks right
-					*/
-					var ordered = [];
-					_.each(pureids, function(track, key) {
-						ordered[key] = _.find(items, function(song) { return track == song.id });
-					});
-					charts.table = ordered;
-					setTimeout(charts.update, 120000);
-				}
-			});
+			var songs 			= result.feed.entry;
+			charts.iTunesIDs 	= _.map(songs, function(entry) {return parseFloat(entry.id.attributes['im:id'])}); 
+			db.getSongsByIdList(charts.iTunesIDs, afterDBQuery);
 		}
 	});
-};
+}
+this.getCharts = function(callback) {
+	var topsongs = charts.cache,
+		query 	 = _.pluck(topsongs, 'id'),
+		haveytid = _.reject(topsongs, function(item) {return item.ytid == undefined}),
+		notAllTracksInDB = function(items) {
+			tracksInDB = _.pluck(items, 'id');
+			var tofetch = _.reject(charts.iTunesIDs, function (item) { return _.contains(tracksInDB, item) }).join(",");
+			json.get("https://itunes.apple.com/lookup?id=" + tofetch + "&entity=song", function(err, result) {
+				if (!err) {
+					_.each(result.results, function(track) {
+						var song = itunes.remap(track);
+						items.push(song);
+					});
+					AllTracksInDB(items);
+				}
+			});
+		},
+		AllTracksInDB = function(items) {
+			charts.cache = items;
+			afterAllTracksInDB(items);
+		},
+		afterAllTracksInDB = function(items) {
+			callback(items);
+		},
+		afterDBQuery = function(items) {
+			if (items.length < charts.limit) {
+				notAllTracksInDB(items)
+			}
+			else {
+				AllTracksInDB(items)
+			}
+		}
+	if (haveytid.length < charts.limit) {
+		console.log(charts.iTunesIDs)
+		db.getSongsByIdList(charts.iTunesIDs, afterDBQuery);
+	}
+	else {
+		callback(haveytid)
+	}
+
+}
+this.iTunesIDs 	= [];
+this.cache 		= [];
 this.table = [];
+this.limit = 100;
