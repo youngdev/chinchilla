@@ -2059,6 +2059,11 @@ tr.song.now-playing.selected {
 				opacity: 0.7;
 				-webkit-transition: 1.5s;
 			}
+			.visual-play-button {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+			}
 			.lyrics-header-arrow {
 				position: absolute;
 				top: 361px;
@@ -2109,4 +2114,21 @@ tr.song.now-playing.selected {
 }
 .image-fadein {
 	opacity: 0;
+}
+.visual-play-button {
+	border-radius: 50px;
+	width: 100px;
+	height: 100px;
+	background: rgba(0,0,0,0.7);
+	border: 4px solid rgba(255,255,255,0.8);
+	box-shadow: 0 0 5px rgba(0,0,0,0.3);
+	.play-icon {
+		background: url(/api/svg/play/white);
+		opacity: 0.8;
+		background-size: 40px 60px;
+		width: 40px;
+		height: 60px;
+		margin-left: 32px;
+		margin-top: 15px;
+	}
 }

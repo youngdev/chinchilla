@@ -9,6 +9,8 @@
 				<h1 data-navigate="/song/{{song.id}}">{{lyricfind.title}}</h1>
 				<h2 data-navigate="/artist/{{song.artistid}}">{{lyricfind.artist.name}}</h2>
 			</div>
+			<div class="play-button visual-play-button recognized" data-album="{{song.album}}" data-name="{{song.name}}" data-duration="{{song.duration}}" data-albumid="{{song.albumid}}" data-artist="{{song.artist}}" data-artistid="{{song.artistid}}" data-image="{{song.image}}" data-id="{{song.id}}" data-explicit="{{song.explicit}}" data-genre="{{song.genre}}" data-numberinalbum="{{song.numberinalbum}}" data-cdinalbum="{{song.cdinalbum}}" data-tracks="{{song.tracks}}" data-cdcount="{{song.cdcount}}" data-preview="{{song.preview}}" data-release="{{song.release}}" {% if song.ytid %} data-ytid="{{song.ytid}}" {% endif %}>
+			<div class="play-icon"></div></div>
 		</div>
 		<div class="lyrics-body">
 			<div class="lyricfind-ringtone-ad">RINGTONE AD GOES HERE</div>
