@@ -18,7 +18,8 @@ var swig        = 			require('swig'),
 		api_key:    			"29c1ce9127061d03c0770b857b3cb741",
 		secret:     			"473680e0257daa9a7cb45207ed22f5ef"
 	}),
-    views   	= 			this;
+    views   	= 			this,
+    lyricfind 	= 			require('../config/lyricfind');
 
 /*
     Underscore config
@@ -60,7 +61,8 @@ var templates 		= 		{
     redditbox: 				dirup + '/sites/reddit-box.html',
     track: 					dirup + '/sites/track.html',
     newtrack: 				dirup + '/sites/new-track.html',
-    reddit: 				dirup + '/sites/reddit.html'
+    reddit: 				dirup + '/sites/reddit.html',
+    lyrics: 				dirup + '/sites/lyrics.html'
 };
 
 /*
@@ -222,6 +224,7 @@ this.drawalbum      = function(request, response) {
 				Pass parameters to template
 			*/
 			if (albuminfo) {
+				console.log(albuminfo)
 				dbquery.getTracksFromAlbum(albuminfo.id, function(items) {
 					var items = _.uniq(items, false, function(song) {return song.id});
 					/*
@@ -400,8 +403,7 @@ this.track 			= function(request, response) {
 		}
 		else {
 			renderError(501);
-		}
-		
+		}		
 };
 this.drawtrack      = function(request, response) {
     var tmpl            = swig.compileFile(templates.track),
@@ -455,6 +457,96 @@ this.drawtrack      = function(request, response) {
         	});
         }
     });
+};
+this.lyrics	 		= function(request, response) {
+	var tmpl = swig.compileFile(templates.lyrics),
+		id 	 = request.params.id,
+		data = {},
+		domain = 'http://test.lyricfind.com/api_service/',
+		searchkey = '2c559b886036ca94aaf4fd92849298aa',
+		displaykey = '67c67c978a54c763b7595553fbe8a730',
+		metadata = 'ef15d7987683309b86c4f90b08354c46',
+		charts = '1067b013add841ec68c3bd5f2042b59f',
+		useragent = request.headers['user-agent'],
+		afterDBQueryMade 	= function(song) {
+			if (song.length == 0) {
+				makeiTunesQuery(id)
+			}
+			else {
+				afterSongIsFetched(song[0]);
+			}
+			
+		},
+		makeiTunesQuery 	= function(id, callback) {
+			itunes.lookup(id, {entity: 'song'}, function(result) {
+				var results = result.results;
+				if (results.length  !== 0 ) {
+					var song = itunes.remap(results[0]);
+					afterSongIsFetched(song)
+				}
+				else {
+					views.error({params: {code: 497}}, response);
+				}
+			});
+		},
+		afterSongIsFetched  = function(song) {
+			data.song = song;
+			data.header = helpers.getHQAlbumImage(song, 600);
+			var songnamewithoutparenthesis = (helpers.parseAlbumTitle(song)).name
+			lyricfind.search({
+				domain: domain,
+				api_key: searchkey,
+				track: songnamewithoutparenthesis,
+				artist: song.artist,
+				callback: afterLyricFindQueried
+			});
+		},
+		afterLyricFindQueried = function(json) {
+			var tracks = json.tracks;
+			if (tracks.length == 0) {
+				views.error({params: {code: 496}}, response);
+			}
+			else {
+				var lf = tracks[0];
+				if (lf.viewable) {
+					lyricfind.display({
+						domain: domain,
+						api_key: displaykey,
+						id: lf.amg,
+						useragent: useragent,
+						callback: afterLyricsFetched
+					})
+				}
+				else {
+					views.error({params: {code: 495}}, response);
+				}
+			}
+		},
+		afterLyricsFetched	= function(json) {
+			if (json.response) {
+				if (json.response.code == 101) {
+					afterLyricsValidated(json.track);
+				}
+				else {
+					views.error({params: {code: 493}}, response);
+				}
+			}
+			else {
+				views.error({params: {code: 494}}, response);
+			}
+			render()
+		},
+		afterLyricsValidated = function(obj) {
+			obj.lyrics = obj.lyrics.replace(/\n/g, "<br>");
+			data.lyricfind = obj;
+			render();
+		},
+		render 			 	= function() {
+			var output = tmpl.render(data);
+			response.end(output);
+		}
+	console.log(id)
+	dbquery.getSingleTrack(id, afterDBQueryMade);
 };
 this.wrapper       	= function(request, response) {
 	var tmpl 	= swig.compileFile(templates.wrapper),
@@ -520,6 +612,10 @@ this.error          = function(request, response) {
 			498: "Whoops... this album doesn't seem to exist. ",
             497: "Sorry... this track doesn't seem to exist.",
             501: "The Track ID can only contain numbers, so there is no music here :(",
+            496: "Sorry, there aren't any lyrics for this song.",
+            495: "We couldn't fetch the lyrics for this song. There might be license issues.",
+            494: "We received no response for your lyrics request.",
+            493: "There seems to be a problem with the lyrics server.",
             502: "This playlist doesn't seem to exist.",
             503: "This playlist is private, but you are not logged in.",
             504: "This playlist is private. Please ask the crator of the playlist to make it public."

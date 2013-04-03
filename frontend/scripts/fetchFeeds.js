@@ -138,6 +138,18 @@ views = {
 			});
 		}
 	},
+	lyrics: {
+		load: function(id) {
+			$.ajax({
+				url: '/api/lyrics/' + id,
+				dataType: 'html',
+				success: function(data) {
+					var view = $('#view');
+					view.html(data);
+				}
+			})
+		}
+	},
 	reddit: {
 		load: function() {
 			$.ajax({

@@ -648,8 +648,7 @@ img {
   width: -webkit-calc(100% + 20px);
   width: -moz-calc(100% + 20px);
   width: -ms-calc(100% + 20px);
-  background: #dcdcdc;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAABMlBMVEX///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9jiNL5AAAAZnRSTlOCZp9jcpBlYlKgZ5pXia2nenZVU2mIpISugayVpbCGjXlwbZlsb5aAr1ZdonFUpoxPnXNfnFyosXtaZFB9jnheUWtZoWGqiqN8fqtobn+UkliPh5ibl3RgdZGDnlupapN3soWLTrNMdu+dAAAIEElEQVR4Xk2UBXbj7BIFPzGjZZaMzMzMzMyQzP638Oxkzrx/CX27qkDIHtdm4UhveXP6lhHWa+b95hHw6INmhUkd4cjWUlNYxLxk/Kaqh1IfTRpkdga0ENxMmmeXcWkdsY9+qwGXvYIPl9yBIflliAuny4wIio6JPm3DM8QT6I/GYr4Qys2yGbAxGjcuYUi7MounroabiG/N1DIGxEh4tE+BBbaGo8FUDlzMAwuAcv4TdJbQkIOGN77VbGopeEpUWD3DbtJuuMTG5HFtSdVFYRDYzMFXDK6awimIndEuqhJYhftBvdnQLqmmVZ6w6LGUMJHnqNHgpwfdTXpC7aOALQyyUOa+rcWyOhytIgQcQlzrlRHZM9DxpibpFj/mkJPbJv9BmekDOpgBLjGBKdnrx3On4vvKgjjhfq7806PKQKOb84Hs0jIZPXkyRjGFZZ1d0AF83dkqagc3JjLupn/Wqi2lhhEpY9dpSAEmXbF3Du3YZqwjXNtb98n9AEHFcHzxlCmSjP4Bltrdzg904YTX4VPQThpFVjSEBXWZb1ELJDpta8WG9cCUD5efiXIC08to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");
+  background: #f0f0f0;
   height: 186px;
   padding-bottom: -3px;
   white-space: nowrap;
@@ -746,7 +745,8 @@ img {
 #view h1.oncoverstack {
   position: absolute;
   left: 185px;
-  color: #292929;
+  color: #515765;
+  text-shadow: 0px 1px white;
   top: 20px;
   padding: 5px;
   padding-left: 0;
@@ -1899,10 +1899,18 @@ img {
   margin-left: 65px;
   margin-top: 10px;
   font-size: 1.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 230px;
   color: #515765;
 }
 .song-page-full .song-page-subtitle {
   margin-left: 65px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 230px;
 }
 .song-page-full [data-navigate] {
   cursor: pointer;
@@ -1953,6 +1961,10 @@ img {
 .song-page-full .song-page-container .song-page-header .song-page-header-info .song-page-header-info-top .song-page-header-info-table td:nth-child(2) {
   margin-left: 10px;
   position: absolute;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 225px;
 }
 .song-page-full .song-page-container .song-page-actions {
   height: 300px;
@@ -2065,4 +2077,123 @@ tr.song.now-playing td:first-child:after {
 }
 tr.song.now-playing.selected td:first-child:after {
   background-image: url(/api/svg/play/white);
+}
+.lyrics-wrapper {
+  background: rgba(0, 0, 0, 0.05);
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  color: #515765;
+  font-size: 0.9em;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.lyrics-wrapper .lyricfind-ad {
+  width: 728px;
+  margin: auto;
+  text-align: center;
+  border: 1px solid #bebebe;
+  height: 90px;
+  padding-top: 38px;
+  font-size: 10px;
+}
+.lyrics-wrapper .lyricfind-skyscraper {
+  width: 160px;
+  height: 600px;
+  border: 1px solid #bebebe;
+  font-size: 10px;
+  position: absolute;
+  top: 135px;
+  left: 30px;
+  text-align: center;
+  padding-top: 295px;
+}
+.lyrics-wrapper .lyricfind-cube {
+  width: 300px;
+  height: 250px;
+  border: 1px solid #bebebe;
+  margin: auto;
+  font-size: 10px;
+  text-align: center;
+  padding-top: 120px;
+}
+@media screen and (max-width: 1238px) {
+  .lyrics-wrapper .lyrics-container {
+    margin-left: 200px !important;
+  }
+}
+.lyrics-wrapper .lyricfind-ringtone-ad {
+  color: blue;
+  font-weight: bold;
+}
+.lyrics-wrapper .lyrics-container {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  width: 602px;
+  margin: auto;
+  background: #f0f0f0;
+  border: 1px solid #bebebe;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+.lyrics-wrapper .lyrics-container h1,
+.lyrics-wrapper .lyrics-container h2 {
+  color: #515765 !important;
+  text-shadow: 0px 1px white;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.lyrics-wrapper .lyrics-container h1 {
+  height: 40px !important;
+}
+.lyrics-wrapper .lyrics-container .lyrics-header {
+  height: 484px;
+  overflow: hidden;
+}
+.lyrics-wrapper .lyrics-container .lyrics-header img.image-loaded {
+  opacity: 0.7;
+  -webkit-transition: 1.5s;
+}
+.lyrics-wrapper .lyrics-container .lyrics-header .lyrics-header-arrow {
+  position: absolute;
+  top: 361px;
+  margin-left: 50px;
+  border-bottom: 20px solid #f0f0f0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  -webkit-filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+}
+.lyrics-wrapper .lyrics-container .lyrics-header .lyrics-header-gradient {
+  width: 600px;
+  height: 5px;
+  background: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.2), transparent);
+  position: absolute;
+  top: 376px;
+  z-index: 0;
+}
+.lyrics-wrapper .lyrics-container .lyrics-header .lyrics-header-titles {
+  background: #f0f0f0;
+  padding: 20px;
+  position: absolute;
+  top: 381px;
+  width: 600px;
+}
+.lyrics-wrapper .lyrics-container .lyrics-body {
+  padding: 20px;
+  border-bottom: 1px solid #bebebe;
+  line-height: 20px;
+}
+.lyrics-wrapper .lyrics-container .lyrics-attribution {
+  padding: 20px;
+  opacity: 0.6;
+  font-size: 0.7em;
+}
+.lyrics-wrapper .lyrics-container .lyrics-attribution a {
+  text-decoration: none;
+  color: #515765;
+  border-bottom: 1px solid #515765;
+}
+.image-fadein {
+  opacity: 0;
 }
