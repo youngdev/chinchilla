@@ -1,0 +1,28 @@
+<div class="lyrics-wrapper">
+	<div class="lyricfind-ad">Ad goes here</div>
+	<div class="lyrics-container">
+		<div class="lyrics-header">
+			<img src="{{header}}" onload="this.className+=' image-loaded'" class="image-fadein">
+			<div class="lyrics-header-gradient"></div>
+			<div class="lyrics-header-arrow"></div>
+			<div class="lyrics-header-titles">
+				<h1 data-navigate="/song/{{song.id}}">{{lyricfind.title}}</h1>
+				<h2 data-navigate="/artist/{{song.artistid}}">{{lyricfind.artist.name}}</h2>
+			</div>
+		</div>
+		<div class="lyrics-body">
+			<div class="lyricfind-ringtone-ad">RINGTONE AD GOES HERE</div>
+			{% autoescape false %}
+			{{lyricfind.lyrics}}
+			{% endautoescape %}
+			<div class="lyricfind-ringtone-ad">RINGTONE AD GOES HERE</div>
+		</div>
+		<div class="lyrics-attribution">
+			Copyright: {{lyricfind.copyright}} <br>
+			Writer: {{lyricfind.writer}} <br>
+			Lyrics by <a href="http://lyricfind.com" target="_blank">LyricFind</a>
+		</div>
+	</div>
+	<div class="lyricfind-skyscraper">Ad goes here</div>
+	<div class="lyricfind-cube">Ad goes here</div>
+</div>

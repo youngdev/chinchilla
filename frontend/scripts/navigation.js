@@ -26,6 +26,9 @@ routes = {
 	'/artist/:id': 				function(match) {
 		views.artist.load(match[1]);
 	},
+	'/lyrics/:id': 				function(match) {
+		views.lyrics.load(match[1]);
+	},
 	'/u/:name/p/:name': 		function(match) {
 		views.playlist.load(match[0]);
 		console.log(match)
