@@ -137,7 +137,7 @@ this.getYearRange 		= function() {
 }
 getAlbumCovers();
 _.each(subreddits, function(subreddit) {
-	//getRedditTracks(subreddit);
+	getRedditTracks(subreddit);
 });
 var y = 0, max = years.length, retroChartsCallback = function() {
 	var table = {
