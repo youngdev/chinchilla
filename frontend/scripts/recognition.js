@@ -199,7 +199,9 @@ recognition = {
             }
         }); 
         var bestvideo = _.first(_.sortBy(videos, function(video) { return video.points }).reverse());
-        console.log('The best video has ', bestvideo.points, ' points!', song.name);
+        if (bestvideo) {
+            console.log('The best video has ', bestvideo.points, ' points!', song.name);
+        }
         callback(bestvideo);
     },
     uploadTrack: function(track, video) {

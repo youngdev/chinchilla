@@ -41,6 +41,9 @@ routes = {
 	},
 	'/song/:id': 				function(match) {
 		views.song.load(match[1]);
+	},
+	'/retro-charts/:id':		function(match) {
+		views.retrocharts.load(match[1]);
 	}
 };
 $(document)

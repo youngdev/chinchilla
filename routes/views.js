@@ -62,7 +62,9 @@ var templates 		= 		{
     track: 					dirup + '/sites/track.html',
     newtrack: 				dirup + '/sites/new-track.html',
     reddit: 				dirup + '/sites/reddit.html',
-    lyrics: 				dirup + '/sites/lyrics.html'
+    lyrics: 				dirup + '/sites/lyrics.html',
+    charts: 				dirup + '/sites/charts.html',
+    retrocharts: 			dirup + '/sites/retro-charts.html'
 };
 
 /*
@@ -87,10 +89,12 @@ this.artist 					= function(request, response) {
 	 	afterArtistFetch 		= function(artistarray) {
 	 		var artist 			= artistarray.length === 0 ? null : artistarray[0];
 	 		if (!artist) {
+	 			console.log('no artist found');
 	 			iTunesQuery(id, evaluateiTunesQuery);
 	 		}
 	 		else {
 	 			data.artist 	= artist;
+	 			console.log(data.artist)
 	 			afterArtistIsAvailable();
 	 		}
 	 	},
@@ -122,8 +126,12 @@ this.artist 					= function(request, response) {
 	 			ids 			= _.pluck(tracks, 'id');
 	 		data.artist.ids  	= ids;
 	 		afterSongListIsReceived(tracks);
-	 		dbquery.addArtist(data.artist);
-	 		dbquery.addTracksBulk(tracks);
+	 		dbquery.addArtist(data.artist, function() {
+	 			console.log('Artist added', data.artist);
+	 		});
+	 		dbquery.addTracksBulk(tracks, function() {
+	 			console.log('Bulk tracks added');
+	 		});
 	 	},
 	 	afterArtistIsAvailable 	= function() {
 	 		dbquery.getSongsByArtistId(data.artist.id, afterSongListIsReceived);
@@ -575,7 +583,7 @@ this.wrapper       	= function(request, response) {
 }
 this.charts         = function(request, response) {
 	facebook.getLibraryFromRequest(request, function(userdata) {
-		var tmpl        = swig.compileFile(dirup + "/sites/charts.html"),
+		var tmpl        = swig.compileFile(templates.charts),
 			songs 		= [],
 			afterChartsFetched = function(table) {
 				_.each(table, function(song) {
@@ -603,6 +611,49 @@ this.charts         = function(request, response) {
 		
 	});
 };
+this.retrocharts 	= function(request, response) {
+	var tmpl 				= swig.compileFile(templates.retrocharts),
+		data 				= {},
+		year 				= request.params.year,
+		data 				= {
+			parseduration: parseduration,
+			parsetext: parsetext,
+			showartistalbum: true,
+			type: 'retrocharts',
+			templates: templates,
+			range: workers.getYearRange()
+		},
+		afterIdsFetched 	= function(chart) {
+			if (chart) {
+				data.year = chart.year;
+				dbquery.getSongsByIdList(chart.charts, afterChartsFetched);
+			}
+			else {
+				render();
+			}
+		},
+		afterChartsFetched 	= function(table) {
+			data.table = table;
+			checkUser();
+		},
+		checkUser 			= function() {
+			facebook.getLibraryFromRequest(request, afterLibraryFetched);
+		},
+		afterLibraryFetched = function(user) {
+			if (user) {
+				data.user = user;
+				data.table = _.map(data.table, function(song) { song.inlib = _.contains(user.collections.library, song.id); return song});
+			}
+			data.album = {cds: [data.table]};
+			data.coverstack = _.first(data.table, 10);
+			render();
+		},
+		render 				= function() {
+			var output = tmpl.render(data);
+			response.end(output);
+		}
+		dbquery.getRetroCharts(year, afterIdsFetched);
+}
 this.error          = function(request, response) {
 	var tmpl        = swig.compileFile(dirup + "/sites/error.html"),
 		error       = request.params.code,

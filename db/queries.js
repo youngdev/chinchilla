@@ -2,7 +2,7 @@ var mongo       = require("mongoskin"),
 	auth        = require("../auth/auth"),
 	_			= require("underscore"),
 	connection  = mongo.db(auth.auth, {safe: true}),
-    options     = {save: true, upsert: true},
+    options     = {safe: true, upsert: true},
     standards   = require("../config/standards");
 /*
 	Get matching artists.
@@ -123,15 +123,12 @@ this.addTrack				= function(track, callback) 	{
 		}
 	});
 };
-this.addWithOutYTID 		= function(track, callback) 	{
-	connection.collection("tracks").update({id: track.id}, track, options, function(err) {
-		if (err) {
-			console.log(err);
-		}
-		else {
+this.addYTID 				= function(track, callback) 	{
+	connection.collection("tracks").update({id: track.id}, { $set: {ytid: track.ytid} }, options,  function(err) {
+		if (!err) {
 			callback();
 		}
-	})
+	});
 }
 this.addTracksBulk 			= function(tracks, callback)	{
 	connection.collection("tracks").insert(tracks, options, function(err) {
@@ -151,7 +148,7 @@ this.addAlbum				= function(album, callback) 	{
 	});
 };
 this.addArtist				= function(artist, callback) 	{
-	connection.collection("artists").update({id: artist.id}, artist, options, function(err) {
+	connection.collection("artists").insert(artist, options, function(err) {
 		if (!err && callback) {
 			callback();
 		}
@@ -294,4 +291,26 @@ this.getPlaylistByUrl 		= function(url, callback) {
 }
 this.savePlaylist 			= function(playlist, callback) {
 	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks, 'public': playlist['public'], newestattop: playlist.newestattop}}, function(err, item) {});
+}
+this.cacheCharts 			= function(chart, callback) {
+	connection.collection("charts").update({year: chart.year}, chart, options, function(err) {
+		if (!err) {
+			callback();
+		}
+	});
+}
+this.checkCharts			= function(callback) {
+	connection.collection("charts").find({}, {limit: 100}).toArray(function(err, items) {
+		if (!err) {
+			callback(items)
+		}
+	});
+}
+this.getRetroCharts 		= function(year, callback) {
+	var year = (1900 < parseFloat(year) < 2020) ? parseFloat(year) : 1959;
+	connection.collection("charts").findOne({year: year}, function(err, chart) {
+		if (!err) {
+			callback(chart);
+		}
+	});
 }
