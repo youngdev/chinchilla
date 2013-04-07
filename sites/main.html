@@ -15,7 +15,6 @@
 	</div>
 	<div class="home-body">
 		{% if user %}
-			{% if album %}
 				<div class="box-wrapper">
 					<h3>Newest songs in your library<span class="main-link" data-navigate="/library">Go to library</span></h3>
 					<div class="home-list-box">
@@ -24,7 +23,6 @@
 						{% endfor %}
 					</div>
 				</div>
-			{% endif %}
 		{% endif %}
 			<div class="box-wrapper">
 				<h3>iTunes Charts<span class="main-link" data-navigate="/charts">Go to charts</span></h3>

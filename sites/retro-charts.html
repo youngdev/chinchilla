@@ -1,0 +1,23 @@
+{% if year %}
+<div class="coverstack nomargin">
+	{% for track in coverstack %}<img src="{{track.image}}" border="0">{% endfor %}
+</div>
+
+<h1 class="oncoverstack">Retro Charts: {{year}}</h1>
+<div class="coverstack-description">
+	<p>Check out the other years:</p>
+	<p>
+		{% for anno in range %}
+		<span data-navigate="/retro-charts/{{anno}}">{% if anno == year %}<strong>{% endif %}{{anno}}{% if anno == year %}</strong>{% endif %}</span> 
+		{% endfor %}
+	</p>
+</div>
+<div class="extendedtable">
+	<div class="album-tracks">
+		{% include templates.tracklist %}
+	</div>
+</div>
+<p class="attribution"><a href="http://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_">Source: Wikipedia</a></p>
+{% else %}
+Sorry, we don't have charts for this year. Try a year between <a data-navigate="/retro-charts/1959">1959</a> and <a data-navigate="/retro-charts/2012">2012</a>.
+{% endif %}

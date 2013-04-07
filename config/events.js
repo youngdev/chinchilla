@@ -61,9 +61,10 @@ this.connection = function (socket) {
 				Add a element where we can store the play count.
 			*/
 			track.listens = 0;
-			track.id = parseFloat(track.id)
-			db.addTrack(track, function() {
-				console.log("Track added successfully.");
+			track.id = parseFloat(track.id);
+			track.artistid = parseFloat(track.artistid);
+			track.albumid = parseFloat(track.albumid);
+			db.addYTID(track, function() {
 				socket.emit('track-uploaded', track.id)
 			});
 		});

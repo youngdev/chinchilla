@@ -77,7 +77,6 @@ this.getCharts = function(callback) {
 			}
 		}
 	if (haveytid.length < charts.limit) {
-		console.log(charts.iTunesIDs)
 		db.getSongsByIdList(charts.iTunesIDs, afterDBQuery);
 	}
 	else {

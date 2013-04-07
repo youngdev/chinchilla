@@ -100,6 +100,19 @@ views = {
 			})
 		}
 	},
+	retrocharts: {
+		load: function(year) {
+			$.ajax({
+				url: "/api/charts/" + year,
+				dataType: "html",
+				success: function(data) {
+					var view = $("#view");
+					view.html(data);
+					$.publish('new-tracks-entered-dom');
+				} 
+			})
+		}
+	},
 	about: {
 		load: function() {
 			$.ajax({
