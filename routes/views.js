@@ -64,13 +64,13 @@ var templates 		= 		{
     reddit: 				dirup + '/sites/reddit.html',
     lyrics: 				dirup + '/sites/lyrics.html',
     charts: 				dirup + '/sites/charts.html',
-    retrocharts: 			dirup + '/sites/retro-charts.html'
+    retrocharts: 			dirup + '/sites/retro-charts.html',
+    about: 					dirup + '/sites/about.html'
 };
 
 /*
     Routes
 */
-this.lastloop = null;
 this.artist 					= function(request, response) {
 	var id 						= request.params.id,
 	 	data 					= {
@@ -210,7 +210,6 @@ this.artist 					= function(request, response) {
 	 		response.end(tmpl.render(data));
 	 	}
  	facebook.getLibraryFromRequest(request, afterUserFetch);
-
 };		
 this.drawalbum      = function(request, response) {
 	/*
@@ -640,7 +639,7 @@ this.retrocharts 	= function(request, response) {
 			facebook.getLibraryFromRequest(request, afterLibraryFetched);
 		},
 		afterLibraryFetched = function(user) {
-			if (user) {
+			if (user.loggedin) {
 				data.user = user;
 				data.table = _.map(data.table, function(song) { song.inlib = _.contains(user.collections.library, song.id); return song});
 			}
@@ -674,9 +673,12 @@ this.error          = function(request, response) {
 		message     = messages[error],
 		phrase      = message !== undefined ? message : "Super fail: Not only that something didn't work, we also don't know what this error code means.",
         output      = tmpl.render({error: phrase});
-	response.end(output);};
+	response.end(output);
+};
 this.about          = function(request, response) {
-	response.sendfile(dirup + "/sites/about.html");
+	var tmpl 	= swig.compileFile(templates.about),
+		output 	= tmpl.render({});
+	response.end(output);
 };
 this.library 				= function(request, response) {
 	var tmpl = swig.compileFile(templates.library),
@@ -769,7 +771,7 @@ this.main 					= function(request, response) {
 		throwtogether		= function() {
 			var top 		= _.first(charts.table, 7),
 				top7 		= [],
-				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 6);
+				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 5);
 			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 

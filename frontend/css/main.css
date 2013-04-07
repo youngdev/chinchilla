@@ -1663,7 +1663,7 @@ img {
 .reddit-box {
   width: 202px;
   display: inline-block;
-  margin-right: 10px;
+  margin-left: 23px;
   cursor: pointer;
   background: #ebebeb;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -1717,6 +1717,9 @@ img {
   color: white;
   font-size: 0.75em;
   font-weight: bold;
+}
+.reddit-box:first-of-type {
+  margin-left: 0;
 }
 .reddit-box:hover .reddit-image-actions {
   opacity: 1;
