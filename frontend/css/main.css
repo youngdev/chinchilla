@@ -742,6 +742,10 @@ img {
   margin-top: 3px;
   margin-bottom: 3px;
 }
+#view .coverstack-description span[data-navigate]:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
 #view h1.oncoverstack {
   position: absolute;
   left: 185px;
