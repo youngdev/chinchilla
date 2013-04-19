@@ -1910,12 +1910,16 @@ img {
 		.song-page-actions {
 			height: 300px;
 			margin-top: -36px;
+			.song-page-actions-left::-webkit-scrollbar {
+				display: none;
+			}
 			background: @sidebarbg;
 			.song-page-actions-left {
 				padding-top: 10px;
 				width: 298px;
 				float: left;
 				overflow: auto;
+				overflow-x: hidden;
 				height: 264px;
 				border-right: 1px solid @bordercolor;
 				.no-playlists-available {
@@ -2051,7 +2055,7 @@ tr.song.now-playing.selected {
 		border: 1px solid @bordercolor;
 		font-size: 10px;
 		position: absolute;
-		top: 135px;
+		top: 400px;
 		left: 30px;
 		text-align: center;
 		padding-top: 295px;
@@ -2060,14 +2064,16 @@ tr.song.now-playing.selected {
 		width: 300px;
 		height: 250px;
 		border: 1px solid @bordercolor;
-		margin: auto;
+		position: absolute;
+		top: 135px;
+		left: 30px;
 		font-size: 10px;
 		text-align: center;
 		padding-top: 120px;
 	}
-	@media screen and (max-width: 1238px) {
+	@media screen and (max-width: 1542px) {
 		.lyrics-container {
-			margin-left: 200px !important;
+			margin-left: 350px !important;
 		}
 	}
 	.lyricfind-ringtone-ad {

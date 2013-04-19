@@ -2002,11 +2002,15 @@ img {
   margin-top: -36px;
   background: #f0f0f0;
 }
+.song-page-full .song-page-container .song-page-actions .song-page-actions-left::-webkit-scrollbar {
+  display: none;
+}
 .song-page-full .song-page-container .song-page-actions .song-page-actions-left {
   padding-top: 10px;
   width: 298px;
   float: left;
   overflow: auto;
+  overflow-x: hidden;
   height: 264px;
   border-right: 1px solid #bebebe;
 }
@@ -2135,7 +2139,7 @@ tr.song.now-playing.selected td:first-child:after {
   border: 1px solid #bebebe;
   font-size: 10px;
   position: absolute;
-  top: 135px;
+  top: 400px;
   left: 30px;
   text-align: center;
   padding-top: 295px;
@@ -2144,14 +2148,16 @@ tr.song.now-playing.selected td:first-child:after {
   width: 300px;
   height: 250px;
   border: 1px solid #bebebe;
-  margin: auto;
+  position: absolute;
+  top: 135px;
+  left: 30px;
   font-size: 10px;
   text-align: center;
   padding-top: 120px;
 }
-@media screen and (max-width: 1238px) {
+@media screen and (max-width: 1542px) {
   .lyrics-wrapper .lyrics-container {
-    margin-left: 200px !important;
+    margin-left: 350px !important;
   }
 }
 .lyrics-wrapper .lyricfind-ringtone-ad {

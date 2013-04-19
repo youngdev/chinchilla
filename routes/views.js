@@ -266,6 +266,7 @@ this.artist 					= function(request, response) {
 	 		render();
 	 	},
 	 	render 					= function() {
+	 		console.log(data.artist.freebase);
 	 		response.end(tmpl.render(data));
 	 	}
  	facebook.getLibraryFromRequest(request, afterUserFetch);
@@ -975,7 +976,7 @@ this.playlist 				= function(request, response) {
 			tracks.reverse();
 		}
 		data.album = {cds: [tracks]};
-		data.playlist.rawduration = _.reduce(tracks, function(a, b) { return a + b.duration }, 0)
+		data.playlist.rawduration = _.reduce(tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
 		data.playlist.duration = helpers.parsehours(data.playlist.rawduration);
 		data.playlist.trackcount = tracks.length;
 		data.coverstack = _.first(_.pluck(tracks, 'image'), 10);
