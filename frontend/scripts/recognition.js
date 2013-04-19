@@ -20,10 +20,14 @@ recognition = {
 	recognizeTrack: function(obj) {
 		var track = obj.track,
 			  cb	  = obj.cb;
-		var song = helpers.parseDOM(track);
+		var song = helpers.parseDOM(track),
+            firsttrackinarray = (track.length != undefined && track.length != 0) ? track[0] : track,
+            dom   = (firsttrackinarray instanceof HTMLElement) ? $(firsttrackinarray) : $(".song[data-id=" + firsttrackinarray.id + "]")[0];
+        if ($(dom).hasClass('recognized')) {
+            cb();
+            return;
+        }
 		recognition.findVideo(song, function(video) {
-            var firsttrackinarray = (track.length != undefined && track.length != 0) ? track[0] : track;
-            var dom   = (firsttrackinarray instanceof HTMLElement) ? $(firsttrackinarray) : $(".song[data-id=" + firsttrackinarray.id + "]")[0];
             if (video) {
                 /*
                     Mark it as recognized
@@ -209,7 +213,7 @@ recognition = {
     	var json = track;
     	json.ytid = videoid;
         json.id = parseFloat(json.id);
-        socket.emit('new-track', json);
+        socket.emit('new-ytid', json);
     },
     uploadAlbum: function(album) {
     	var json = $(album).data();
@@ -248,10 +252,14 @@ function EventedArray(handler) {
    };
    this.getArray = function() {
       return this.stack;
-   }
-   this.unshift = function() {
-    this.stack.unshift();
+   };
+   this.unshift = function(obj) {
+    this.stack.unshift(obj);
     this.callHandler();
+   };
+   this.clear   = function() {
+    this.stack = [];
+    recognition.stop()
    }
 }
 /*

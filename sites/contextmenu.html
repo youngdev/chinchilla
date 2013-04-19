@@ -1,5 +1,5 @@
 <div class="context-tip">
-	<img src="{{song.image}}">
+	<img src="{{song.image}}" onload="$(this).removeClass('image-op0')" class="image-op0">
 	<h1><a data-navigate="/song/{{song.id}}">{{song.name}}</a></h1>
 	<h2><a data-navigate="/artist/{{song.artistid}}">{{song.artist}}</a></h2>
 </div>

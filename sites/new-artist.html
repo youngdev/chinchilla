@@ -1,35 +1,48 @@
 <div class="artist-page">
 	{% if artist %}
 		<div class="coverstack">
-			{% if artist.lastfm.image %}<img class="artist-header-image" src="{{artist.lastfm.image}}" border="0">{% endif%}{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+			{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
 		</div>
 		<h1 class="oncoverstack">{{artist.name}}</h1>
-		{% if top10 %}
-			<div class="top10-wrapper">
-				<h2>Top tracks</h2>
-				<section class="top10">
-					{% for album in top10 %}
-						{% include templates.tracklist %}
-					{% endfor %}
+		<div class="artist-page-two-columns">
+			<div class="artist-page-left-column">
+				<h2>Info</h2>
+				<div class="artist-freebase-description">
+					{% include templates.artistfreebase %}
+				</div>
+			</div>
+			<div class="artist-page-right-column">
+				{% if top10 %}
+					<div class="top10-wrapper">
+						<h2>Top tracks</h2>
+						<section class="top10">
+							{% for album in top10 %}
+								{% include templates.tracklist %}
+							{% endfor %}
+						</section>
+					</div>
+				{% endif %}
+				<section class="album-list artist-album-container artist-page-table artist-container">
+					{% if albums %}
+						<h2>Albums</h2>
+						{% for album in albums %}
+							{% if album.hidden %}
+							<div class="albumhidden">
+								<div class="albumhidden-message">{{album.hidden}} {{album.name}}. Click to show anyway.</div>
+								<div class="hidden-album-container">
+							{% endif %}
+									{% include templates.album %}
+							{% if album.hidden %}
+								</div>
+							</div>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
 				</section>
 			</div>
-		{% endif %}
-		<section class="album-list artist-album-container artist-page-table artist-container">
-			{% if albums %}
-				{% for album in albums %}
-					{% if album.hidden %}
-					<div class="albumhidden">
-						<div class="albumhidden-message">{{album.hidden}} {{album.name}}. Click to show anyway.</div>
-						<div class="hidden-album-container">
-					{% endif %}
-							{% include templates.album %}
-					{% if album.hidden %}
-						</div>
-					</div>
-					{% endif %}
-				{% endfor %}
-			{% endif %}
-		</section>
+		</div>
+		
+		
 	{% else %}
 		<h1>No artist found.</h1>
 	{% endif %}

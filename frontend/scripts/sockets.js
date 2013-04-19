@@ -32,6 +32,7 @@ socket.on('track-added', function (data) {
 	else {
 		table.append(data.song);
 	}
+	$('.song[data-id="' + $(data.song).attr('data-id') + '"]').addClass('in-library animated').removeClass('not-in-library')
 });
 socket.on('tracks-added', function(songsadded) {
 	

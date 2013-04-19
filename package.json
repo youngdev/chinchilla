@@ -15,7 +15,8 @@
     "jquery": "1.8.3",
     "cookies": "0.3.6",
     "facebook-api": "0.1.2",
-    "sanitizer": "0.0.15"
+    "sanitizer": "0.0.15",
+    "freebase": "2.1.9"
   },
   "main": "app.js",
   "scripts": {

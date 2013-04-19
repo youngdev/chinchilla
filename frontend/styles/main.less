@@ -71,7 +71,6 @@ img {
 					position: relative;
 					top: 6px;
 					margin-left: 25px;
-					-webkit-transition: 0.3s;
 					position: absolute;
 				}
 			}
@@ -239,6 +238,8 @@ img {
 	-webkit-transition: 0.3s;
 }
 #sidebar {
+	overflow-y: auto;
+	overflow-x: hidden; 
 	#queue {
 		position: absolute;
 		left: 0;
@@ -272,12 +273,12 @@ img {
 			background: #478cff;
 		}
 	}
-	overflow: hidden;
 	p.nowplaying-info {
 		margin-top: 0;
 		margin-bottom: 0;
 		padding-left: 15px;
 		font-size: 0.8em;
+		height: 16px;
 		z-index: 1;
 		white-space: nowrap;
 		overflow: hidden;
@@ -434,6 +435,7 @@ img {
 			border-bottom: 1px solid transparent;
 			img {
 				height: 12px;
+				width: 12px;
 				margin-right: 5px;
 				margin-top: -3px;
 				vertical-align: middle;
@@ -472,10 +474,20 @@ img {
 	#clear-input {
 		position: absolute;
 		display: none;
-		left: 182px;
+		left: 190px;
 		font-size: 0.7em;
-		top: 114px;
+		top: 294px;
+		border-radius: 50%;
+		width: 16px;
+		height: 16px;
+		padding-left: 5px;
+		color: black;
 		cursor: pointer;
+	}
+	#clear-input:hover {
+		color: white;
+		cursor: pointer;
+		background: @coolblue;
 	}
 	h1 {
 		font-size: 0.6em;
@@ -600,6 +612,18 @@ img {
 		color: black;
 		outline: none;
 	}
+	.droppableindicator {
+		border-top: 1px solid @bordercolor !important;
+		border-bottom: 1px solid @bordercolor !important;
+		background: -webkit-linear-gradient(bottom, rgba(0,0,0,0.1), transparent) !important;
+		a {
+			color: @sidebarcolor !important;
+			text-shadow: 0 1px white !important;
+		}
+		img {
+			-webkit-filter: none !important;
+		}
+	}
 }
 #dropfiles {
 	width: 100%;
@@ -628,6 +652,7 @@ img {
 	display: block;
 }
 #view {
+	background: rgba(0,0,0,0.05);
 	overflow-x: hidden;
 	.box {
 		header {
@@ -898,22 +923,7 @@ img {
 		margin-right: 8px;
 	}
 	.top10-wrapper {
-		background: rgba(0,0,0,0.1);
 		position: relative;
-		margin-left: -10px;
-		margin-right: -10px;
-		padding-bottom: 10px;
-		padding-top: 5px;
-		border-bottom: 1px solid rgba(0,0,0,0.1);
-		border-top: 1px solid rgba(0,0,0,0.1);
-		h2 {
-			position: relative;
-			left: 50%;
-			width: 700px;
-			margin-left: -350px;
-			color: rgba(0,0,0,0.8);
-			padding-top: 10px;
-		}
 	}
 	.top10 {
 		border: 1px solid rgba(0,0,0,0.2);
@@ -1059,6 +1069,11 @@ img {
 		opacity: 0.6;
 		font-size: 0.7em;
 		margin-top: 5px;
+		a {
+			color: black;
+			text-decoration: none;
+			cursor: pointer;
+		}
 	}
 	.extendedtable {
 		min-height: -webkit-calc(~"100% - 143px");
@@ -1129,7 +1144,6 @@ img {
 	h2 {
 		font-size: 1.3em;
 		margin-top: 5px;
-		color: white;
 		span {
 			a {
 				text-decoration: none;
@@ -1141,12 +1155,6 @@ img {
 	}
 	h2 + * {
 		clear: left;
-	}
-	.artist-page .album, .albumhidden, .top10 {
-		max-width: 700px;
-		left: 50%;
-		position: relative;
-		margin-left: -350px;
 	}
 	.album-list {
 		margin-top: 20px;
@@ -1386,6 +1394,8 @@ img {
 	.playlist-context-tip {
 		min-height: 45px;
 		height: 45px;
+		background: rgba(0,0,0,0.05);
+		border-bottom: 1px solid @bordercolor;
 		h1, h2 {
 			left: 20px;
 			padding-left: 0 !important;
@@ -1396,12 +1406,16 @@ img {
 			}
 		}
 		h1 {
-			font-size: 1em !important;
-			top: -5px;
+			font-size: 0.8em !important;
+			top: -4px !important;
+			a {
+				color: @sidebarcolor !important;
+			}
 		}
 		h2 {
 			font-size: 0.6em !important;
-			top: 24px;
+			top: 20px;
+			color: @sidebarcolor !important;
 		}
 	}
 	.context-options {
@@ -1559,6 +1573,9 @@ img {
 	clear: left;
 	margin: 10px;
 }
+.main-retro {
+	margin: 10px;
+}
 .reddit-box {
 	width: 202px;
 	display: inline-block ;
@@ -1582,6 +1599,9 @@ img {
 	.reddit-song-upvotes {
 		font-size: 0.8em;
 		opacity: 0.4;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
 	}
 	img {
 		left: 50%;
@@ -1837,6 +1857,11 @@ img {
 			cursor: pointer;
 		}
 	}
+	.visual-play-button {
+		position: absolute;
+		margin-left: 590px;
+		margin-top: 10px;
+	}
 	.song-page-container {
 		margin: auto;
 		margin-top: 50px;
@@ -1955,7 +1980,7 @@ img {
 				width: 400px;
 				background: rgba(0,0,0,0.05);
 				background-image: url(@light-noise-070);
-				height: 300px;
+				height: 264px;
 				float: right;
 				padding-top: 30px;
 				a {
@@ -2140,4 +2165,91 @@ tr.song.now-playing.selected {
 		margin-left: 32px;
 		margin-top: 15px;
 	}
+}
+.artist-page {
+	.artist-page-two-columns {
+		width: 1030px;
+		margin: auto;
+		padding-top: 20px;
+		h2 {
+			color: rgba(0,0,0,0.8);
+		}
+		.artist-page-left-column {
+			width: 300px;
+			float: left;
+			padding-top: 10px;
+			.artist-freebase-description {
+				overflow: hidden;
+				white-space: nowrap;
+				background: @sidebarbg;
+				border: 1px solid @bordercolor;
+				h3 {
+					color: @sidebarcolor;
+					font-size: 11px;
+					text-transform: uppercase;
+					background: rgba(0,0,0,0.05);
+					padding: 6px;
+					margin-top: 0;
+					margin-bottom: 0;
+					border-bottom: 1px solid @bordercolor;
+				}
+				img {
+					width: 298px;
+					opacity: 0.7;
+				}
+				p {
+					opacity: 0.5;
+					padding: 6px;
+					font-size: 0.8em;
+					white-space: normal;
+				}
+				div.freebase-info-wrapper {
+					padding-left: 6px;
+					padding-right: 6px;
+					padding-bottom: 3px;
+					padding-top: 3px;
+					div.freebase-info {
+						font-size: 0.8em;
+						opacity: 0.5;
+					}
+				}
+				h4 {
+					margin-top: 3px;
+					margin-bottom: 3px;
+					font-size: 12px;
+				}
+				a {
+					color: black;
+					text-decoration: none;
+					cursor: pointer;
+				} 
+			}
+		}
+		.artist-page-right-column {
+			width: 700px;
+			float: right;
+			padding-top: 10px;
+			.album-list {
+				width: 700px !important;
+				margin: auto;
+			}
+		}
+	}
+	
+}
+#draglabel {
+	position: absolute;
+	z-index: 3;
+	background: rgb(249, 255, 208);
+	padding: 5px;
+	border: 1px solid @bordercolor;
+	font-size: 0.8em;
+	font-weight: bold;
+	display: none;
+}
+.image-op0 {
+	opacity: 0 !important;
+}
+img {
+	-webkit-transition: 0.3s opacity;
 }

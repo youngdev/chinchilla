@@ -70,7 +70,7 @@
 		<ul>
 			<h2>My music</h2>
 			<li data-navigate="/home"><a><img src="/api/svg/house">Home</a></li>
-			<li data-navigate="/library"><a><img src="/api/svg/music">Library</a></li>
+			<li data-navigate="/library" class="librarymenuitem"><a><img src="/api/svg/music">Library</a></li>
 			<h2>Playlists</h2>
 			<li class="add-new-playlist"><a><img src="/api/svg/plus">New playlist</a></li>
 			<div class="new-playlist-input">
@@ -87,15 +87,14 @@
 			<!--- <li data-navigate="/about"><a><img src="/api/svg/info">About</a></li> -->
 			<h2>Tunechilla</h2>
 			<li data-navigate="/settings"><a><img src="/api/svg/settings">Settings</a></li>
+			{% if user %}
+			<h2>{{user.first}} {{user.last}}</h2>
+			<li data-navigate="/logout"><a><img src="/api/svg/logout">Logout</a></li>
+			{% else %}
+			<h2>You</h2>
+			<li data-navigate="/login"><a><img src="/api/svg/key">Login with Facebook</a></li>
+			{% endif %}
 		</ul>
-		{% if user %}
-		<div id="signed-in">
-			<img src="http://graph.facebook.com/{{user.id}}/picture" id="profile-image">
-			<p id="name">{{user.first}} <span id="logout"><a href="/logout">(Logout)</a></span></p>
-		</div>
-		{% else %}
-		<div id="register"><a href="/auth/facebook">Login with Facebook</a></div>
-		{% endif %}
 	</div>
 	<div id="view">
 		<div class="loading-indicator">
@@ -108,8 +107,9 @@
 	<div id="dropfilescontent">
 		<h1>Drop your music here</h1>
 		<p>You can drag MP3 files or Spotify music.</p>
-		<p>Your music will be added to your library.</p>
+		<p>Your music will be added to <span id="drop-target-label">your library</span>.</p>
 	</div>
+	<div id="draglabel">Hello</div>
 	<div id="ytplayer" style="opacity: 0; position: absolute; z-index: -3; top: -3000px">
 		<div id="ytapiplayer">
   		</div>

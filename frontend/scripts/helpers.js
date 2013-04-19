@@ -149,6 +149,10 @@ helpers = {
 			{
 				word: 'live',
 				reason: 'This is a live album:'
+			},
+			{
+				word: 'karaoke',
+				reason: 'This is a karaoke/instrumental version: '
 			}
 		];
 		_.each(hidden, function(hide) {

@@ -19,7 +19,9 @@ var swig        = 			require('swig'),
 		secret:     			"473680e0257daa9a7cb45207ed22f5ef"
 	}),
     views   	= 			this,
-    lyricfind 	= 			require('../config/lyricfind');
+    lyricfind 	= 			require('../config/lyricfind'),
+    freebase 	= 			require('freebase'),
+    freebtools  = 			require('../config/freebase');
 
 /*
     Underscore config
@@ -65,7 +67,8 @@ var templates 		= 		{
     lyrics: 				dirup + '/sites/lyrics.html',
     charts: 				dirup + '/sites/charts.html',
     retrocharts: 			dirup + '/sites/retro-charts.html',
-    about: 					dirup + '/sites/about.html'
+    about: 					dirup + '/sites/about.html',
+    artistfreebase: 		dirup + '/sites/artistfreebase.html'
 };
 
 /*
@@ -94,7 +97,6 @@ this.artist 					= function(request, response) {
 	 		}
 	 		else {
 	 			data.artist 	= artist;
-	 			console.log(data.artist)
 	 			afterArtistIsAvailable();
 	 		}
 	 	},
@@ -165,9 +167,7 @@ this.artist 					= function(request, response) {
 	 			
 	 		});
 	 		var sortedPopularityList = _.first(data.artist.ids, 10);
-	 		var top10 = _.map(sortedPopularityList, function(id) {
-	 			return _.first(_.where(songs, {id: id}));
-	 		});
+	 		var top10 = _.map(sortedPopularityList, function(id) { return _.first(_.where(songs, {id: id})) });
 	 		var top10 = _.compact(top10);
 	 		data.top10 			= [{cds: [top10]}];
 	 		var collections 	= [];
@@ -193,7 +193,7 @@ this.artist 					= function(request, response) {
 	 				release: 	albumarray[0].release,
 	 				image: 		albumarray[0].image,
 	 				name: 		albumarray[0].album,
-	 				hours: 		_.reduce(_.pluck(albumarray, 'duration'), function(memo, num) {return memo + num}, 0)
+	 				hours: 		_.reduce(_.pluck(albumarray, 'duration'), function(memo, num) {return memo + parseFloat(num)}, 0)
 	 			}
 	 			var albuminfo 	= helpers.albumRelevance(albuminfo, _);
 	 			collections.push(albuminfo);
@@ -204,6 +204,65 @@ this.artist 					= function(request, response) {
 	 		var collections 	= _.uniq(collections, false, function(album) { return album.name });
 	 		data.coverstack		= _.first(_.pluck(collections, 'image'), 10);
 	 		data.albums 		= collections;
+	 		freebaseSearch();
+	 		
+	 	},
+	 	freebaseSearch 			= function() {
+	 		if (!data.artist.freebase) {
+	 			freebase.search(data.artist.name, {type: '/music/artist', limit: 1}, afterFreebaseSearch);
+	 		}
+	 		else {
+	 			render();
+	 		}
+	 	},
+	 	afterFreebaseSearch 	= function(results) {
+	 		if (results.length == 0) {
+	 			data.artist.freebase = {};
+	 			render();
+	 		}
+	 		else {
+				var id = results[0].id;
+				freebase.topic(id, {}, afterFreebaseTopic);
+	 		}
+	 	},
+	 	afterFreebaseTopic 		= function(topics) {
+	 		var info = topics.property;
+	 		var keep = _.pick(info,
+	 			'/common/topic/description',
+	 			'/common/topic/alias',
+	 			'/common/topic/image',
+	 			'/common/topic/official_website',
+	 			'/common/topic/social_media_presence',
+	 			'/people/person/date_of_birth',
+	 			'/people/person/employment_history',
+	 			'/people/person/ethnicity',
+	 			'/people/person/gender',
+	 			'/people/person/height_meters',
+	 			'/people/person/languages',
+	 			'/people/person/nationality',
+	 			'/people/person/parents',
+	 			'/people/person/place_of_birth',
+	 			'/people/deceased_person/cause_of_death',
+	 			'/people/deceased_person/date_of_burial',
+	 			'/people/deceased_person/date_of_death',
+	 			'/people/deceased_person/place_of_burial',
+	 			'/people/deceased_person/place_of_death',
+	 			'/award/ranked_item/appears_in_ranked_lists',
+	 			'/award/award_winner/awards_won',
+	 			'/film/actor/film',
+	 			'/music/artist/concert_tours',
+	 			'/music/artist/genre',
+	 			'/music/artist/label',
+	 			'/music/artist/origin',
+	 			'/music/artist/active_start',
+	 			'/music/artist/active_end',
+	 			'/music/musical_group/member',
+	 			'/music/group_member/instruments_played',
+	 			'/influence/influence_node/influenced_by',
+	 			'/celebrities/celebrity/substance_abuse_problems'
+	 		);
+	 		data.artist.freebase = freebtools.remap(keep);
+	 		dbquery.saveFreebaseInfo(data.artist);
 	 		render();
 	 	},
 	 	render 					= function() {
@@ -680,7 +739,7 @@ this.about          = function(request, response) {
 		output 	= tmpl.render({});
 	response.end(output);
 };
-this.library 				= function(request, response) {
+this.library 		= function(request, response) {
 	var tmpl = swig.compileFile(templates.library),
 		data = {
 			templates: templates,
@@ -765,16 +824,37 @@ this.main 					= function(request, response) {
 		afterCharts 		= function(charts) {
 			var top7 		= _.first(charts, 7);
 			var top7 		= _.map(top7, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
-			data.charts 	= [{cds: [top7]}]
-			throwtogether()
+			data.charts 	= [{cds: [top7]}];
+			var range 		= workers.getYearRange();
+			data.randomyear  = range[Math.floor(Math.random()*range.length)];
+			dbquery.getRetroCharts(data.randomyear, evaluateRetroCharts);
 		},
-		throwtogether		= function() {
+		evaluateRetroCharts = function(charts) {
+			if (charts) {
+				dbquery.getSongsByIdList(_.first(charts.charts, 5), throwtogether);
+			}
+			else {
+				throwtogether({});
+			}
+			
+		},
+		throwtogether		= function(topanno) {
+			data.topanno 	= _.map(topanno, function(song) {
+				return {
+					song: song,
+					hqimg: helpers.getHQAlbumImage(song, 200)
+				}
+			});
 			var top 		= _.first(charts.table, 7),
 				top7 		= [],
 				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 5);
 			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
+			});
+			data.topanno 	= _.map(data.topanno, function(song) {
+				song.inlib 	= (data.user && _.contains(data.inlibrary, song.song.id));
+				return song; 
 			});
 			data.redditsongs= redditsongs;
 			render();

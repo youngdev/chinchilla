@@ -22,10 +22,7 @@ library = {
 }
 var markAsInLibrary = function(id) {
 	var song = $('.song[data-id=' + id + ']')
-	song.removeClass('not-in-library').addClass('in-library animated');
-	setTimeout(function() {
-		song.removeClass('animated')
-	}, 300);
+	song.removeClass('not-in-library').addClass('in-library');
 
 }
 var markAsNotInLibrary = function(id) {

@@ -57,15 +57,16 @@ this.connection = function (socket) {
 		});
 		socket.on('new-track', 					function (data) {
 			var track = data;
-			/*
-				Add a element where we can store the play count.
-			*/
-			track.listens = 0;
 			track.id = parseFloat(track.id);
-			track.artistid = parseFloat(track.artistid);
-			track.albumid = parseFloat(track.albumid);
+			db.addTrack(track, function() {
+				socket.emit('track-uploaded', track.id);
+			});
+		});
+		socket.on('new-ytid', 					function (data) {
+			var track = data;
+			track.id = parseFloat(track.id);
 			db.addYTID(track, function() {
-				socket.emit('track-uploaded', track.id)
+				socket.emit('track-uploaded', track.id);
 			});
 		});
 		socket.on('new-album', 					function (data) {
@@ -268,7 +269,7 @@ this.connection = function (socket) {
 				db.getUserCollections(user, function(collections) {
 					var userplaylists = _.pluck(collections.playlists, 'url');
 					db.getPlaylistByUrl(data.url, function(playlist) {
-						if (playlist && _.include(userplaylists, data.url) && !_.include(playlist.tracks, data.songid)) {
+						if (playlist && _.include(userplaylists, data.url) && !_.include(playlist.tracks, parseFloat(data.songid))) {
 							playlist.tracks.push(parseFloat(data.songid));
 							db.savePlaylist(playlist);
 							db.getSingleTrack(data.songid, function(song) {
