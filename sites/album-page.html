@@ -1,9 +1,9 @@
 <div class="album-page">
 	<div class="album-page-header">
 		{% for cover in background %}
-			<img src="{{cover.image}}" class="background-cover" onload="this.className += ' fadein'">
+			<img src="{{cover.image}}" class="background-cover image-op0" onload="$(this).removeClass('image-op0')">
 		{% endfor %}
-		<img src="{{hqimage}}" class="album-hq">
+		<img src="{{hqimage}}" class="album-hq image-op0" onload="$(this).removeClass('image-op0')">
 	</div>
 	{% include albumhtml %}
 </div>
