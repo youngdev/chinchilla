@@ -113,7 +113,6 @@ this.getTracksFromAlbum 	= function(albumid, callback) 	{
 	});
 };
 this.addTrack				= function(track, callback) 	{
-	//TODO: This could overwrite previous listens.
 	connection.collection("tracks").update({id: track.id}, track, options, function(err) {
 		if (err) {
 			console.log(err);
@@ -124,7 +123,7 @@ this.addTrack				= function(track, callback) 	{
 	});
 };
 this.addYTID 				= function(track, callback) 	{
-	connection.collection("tracks").update({id: track.id}, { $set: {ytid: track.ytid} }, options,  function(err) {
+	connection.collection("tracks").update({id: track.id}, { $set: {ytid: track.ytid} }, {safe: true, upsert: false},  function(err) {
 		if (!err) {
 			callback();
 		}
@@ -290,7 +289,10 @@ this.getPlaylistByUrl 		= function(url, callback) {
 	});
 }
 this.savePlaylist 			= function(playlist, callback) {
-	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks, 'public': playlist['public'], newestattop: playlist.newestattop}}, function(err, item) {});
+	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks, 'public': playlist['public'], newestattop: playlist.newestattop}}, function() {});
+}
+this.saveFreebaseInfo 		= function(artist, callback) {
+	connection.collection("artists").update({id: artist.id}, {$set: {freebase: artist.freebase}}, function() {})
 }
 this.cacheCharts 			= function(chart, callback) {
 	connection.collection("charts").update({year: chart.year}, chart, options, function(err) {

@@ -89,7 +89,7 @@ var getRetroCharts		= function(year, callback) {
 				if (song.title && song.artist) {
 					return {
 						title: _s.clean(_.last(song.title.replace(/[[\]]/g,'').split('|'))),
-						artist: _s.clean(_.last(song.artist.replace(/[[\]]/g,'').replace('||', '').split('\n')[0].split('|')))
+						artist: _s.clean(_.last(song.artist.replace(/[[\]]/g,'').replace('||', '').split('\n')[0].split('|'))).replace(/featuring/g, '')
 					}
 				}
 				else {

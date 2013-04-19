@@ -145,7 +145,6 @@ recognizeSpotify    = (track, callback) ->
                 song = data.song
                 recognition.findVideo song, (video) ->
                     song.ytid = helpers.parseYTId video
-
                     # Upload to servers
                     socket.emit 'new-track', song
 

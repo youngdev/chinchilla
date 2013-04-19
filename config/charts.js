@@ -14,6 +14,7 @@ this.refresh = function() {
 				if (!err) {
 					_.each(result.results, function(track) {
 						var song = itunes.remap(track);
+						db.addTrack(song, function() {});
 						items.push(song);
 					});
 					AllTracksInDB(items)
@@ -55,6 +56,7 @@ this.getCharts = function(callback) {
 				if (!err) {
 					_.each(result.results, function(track) {
 						var song = itunes.remap(track);
+						db.addTrack(song, function() {});
 						items.push(song);
 					});
 					AllTracksInDB(items);

@@ -25,8 +25,10 @@
 				</section>
 			</section>
 			<section class="song-page-header-cover">
-				<img src="{{hqcover}}">
+				<img src="{{hqcover}}" onload="$(this).removeClass('image-op0')" class="image-op0">
 			</section>
+				<div class="play-button visual-play-button recognized" data-album="{{song.album}}" data-name="{{song.name}}" data-duration="{{song.duration}}" data-albumid="{{song.albumid}}" data-artist="{{song.artist}}" data-artistid="{{song.artistid}}" data-image="{{song.image}}" data-id="{{song.id}}" data-explicit="{{song.explicit}}" data-genre="{{song.genre}}" data-numberinalbum="{{song.numberinalbum}}" data-cdinalbum="{{song.cdinalbum}}" data-tracks="{{song.tracks}}" data-cdcount="{{song.cdcount}}" data-preview="{{song.preview}}" data-release="{{song.release}}" {% if song.ytid %} data-ytid="{{song.ytid}}" {% endif %}>
+				<div class="play-icon"></div></div>
 		</section>
 		<section class="song-page-actions">
 			<section class="song-page-actions-left">

@@ -31,7 +31,7 @@ routes = {
 	},
 	'/u/:name/p/:name': 		function(match) {
 		views.playlist.load(match[0]);
-		console.log(match)
+		$('#drop-target-label').text('this playlist')
 	},
 	'/reddit': 					function(match) {
 		views.reddit.load();
@@ -44,6 +44,12 @@ routes = {
 	},
 	'/retro-charts/:id':		function(match) {
 		views.retrocharts.load(match[1]);
+	},
+	'/logout': 					function(match) {
+		window.location = '/logout';
+	},
+	'/login': 					function(match) {
+		window.location = '/auth/facebook'
 	}
 };
 $(document)
@@ -52,6 +58,10 @@ $(document)
 	navigation.to(pathname);
 })
 .on('mousedown', '[data-navigate]', function(e) {
+	/* Prevent right-click navigation - for contextmenus */
+	if (e.button == 2) {
+		return;
+	}
 	var pathname            = $(this).attr('data-navigate');
 	e.preventDefault();
 	navigation.to(pathname);
@@ -71,6 +81,7 @@ navigation = {
 			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
 			if ((match && match != '/') || (match == '/' && path == '/')) {
+				$('#drop-target-label').text('your library')
 				callback(match);
 				showSpinner();
 				var method = prevent ? 'replaceState' : 'pushState';

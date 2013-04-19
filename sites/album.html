@@ -1,7 +1,7 @@
 {% if album %}
-	<div data-id="{{album.id}}" data-tracks="{{album.tracks}}" class="album" data-resource="https://itunes.apple.com/lookup?id={{album.id}}&entity=song&limit=200" data-artist="{{album.artist}}" data-release="{{album.release}}" data-image="{{album.image}}"  data-name="{{album.name}}" {% if !fromserver %} data-fetch {% endif %}>
+	<div data-id="{{album.id}}" data-tracks="{{album.tracks}}" class="album" data-resource="https://itunes.apple.com/lookup?id={{album.id}}&entity=song&limit=200" data-artist="{{album.artist}}" data-release="{{album.release}}" data-image="{{album.image}}" data-name="{{album.name}}" {% if !fromserver %} data-fetch {% endif %}>
 		<div class="album-header">
-			<img src="{{ album.image }}" title="{{ album.name }}" class="album-cover">
+			<img src="{{ album.image }}" title="{{ album.name }}" class="album-cover image-op0" onload="$(this).removeClass('image-op0')">
 			<div class="album-name" title="{{album.name}}">{{ album.name }}</div>
 			<div class="album-releaseyear">{{parseyear(album.release)}}{%  if album.subtitle%} • {{album.subtitle}}{% endif %}</div>
 		</div>

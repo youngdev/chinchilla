@@ -19,17 +19,87 @@ var select      = function(e)   {
 		If user just wants to fav songs, don't select
 	*/
 	if ($(e.srcElement).hasClass('heart')) {
-		return
+		return;
+	}
+	/*
+		If the track is already selected, make drag&drop possible
+	*/
+	if ($(this).hasClass('selected') && e.button == 0) {
+		var tounselect = $(".song.selected").not(this)
+		var toselect   = $(this)
+		$(document).one('mouseup', function () {
+			toselect.addClass("selected");
+			$(tounselect).removeClass("selected");
+		});
+		dragsongs(e);
+		return;
 	}
 	/*
 		Deselect all the other songs.
 	*/
 	if (e.button == 0) {
-		$(".song.selected").removeClass("selected");
+		var tounselect = $(".song.selected").not(this);
 		$(this).addClass("selected");
+		$(tounselect).removeClass("selected");
+		dragsongs(e);
 	}
 	
 };
+var dragsongs = function(e) {
+	var original = {
+			x: e.clientX,
+			y: e.clientY
+		},
+		todrag = _.map($('.selected'), function(dom) {return dom.dataset}),
+		droppableplaces = $('.playlistmenuitem, .librarymenuitem');
+	if (todrag.length == 1) {
+		$('#draglabel').text(todrag[0].name + ' - ' + todrag[0].artist)
+	}
+	else {
+		$('#draglabel').text(todrag.length + ' tracks');
+	}
+	document.body.style.cursor = 'default'
+	$(document).on('mousemove', function (e) {
+		var difference = Math.sqrt(Math.pow(Math.abs(e.clientX-original.x), 2) + Math.pow(Math.abs(e.clientY-original.y), 2));
+		if (difference > 20) {
+			$('#draglabel').css({top: e.clientY - 30, left: e.clientX}).show();
+		} 
+	});
+	droppableplaces.on('mouseenter', function () {
+		$(this).addClass('droppableindicator');
+	});
+	droppableplaces.on('mouseleave', function () {
+		$(this).removeClass('droppableindicator');
+	});
+	droppableplaces.one('mouseup', function () {
+		$(this).removeClass('droppableindicator');
+		var target = $(this).attr('data-navigate');
+			_.each(todrag, function(song) {
+				if (target == '/library') {
+					socket.emit('add-track', {
+						token: chinchilla.token,
+						song: {
+							id: song.id
+						},
+						destination: 'library'
+					});
+				}
+				else {
+					socket.emit('add-song-to-playlist', {
+						token: chinchilla.token,
+						songid: song.id,
+						url: target
+					});
+				}
+			});
+			
+	});
+	$(document).one('mouseup', function (e) {
+		$(document).off('mousemove');
+		$('#draglabel').hide()
+		droppableplaces.off('mouseenter mouseup')
+	})
+}
 window.playSong = function(e)    {
 		/*
 			If user just dblclicked on the heart, don't play the song.
@@ -492,7 +562,6 @@ $(document)
 .on('click', 		'.make-playlist-private',			mkplprivate 		) // Contextmenu option to make playlist private
 .on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
 .on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
-
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
 
@@ -501,7 +570,9 @@ $(window)
 */
 $(document).ready(function() {
 	$.subscribe('new-tracks-entered-dom', function() {
-	    _.each($('.not-recognized'), function(track) {
+		var unrecognized = $('.not-recognized');
+		recognition.queue.clear();
+	    _.each(unrecognized, function(track) {
 	    	recognition.queue.push(track);
 		});
 		$('.song[data-id="' + player.nowPlaying.get().id + '"]').addClass('now-playing')

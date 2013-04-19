@@ -71,7 +71,6 @@ img {
   position: relative;
   top: 6px;
   margin-left: 25px;
-  -webkit-transition: 0.3s;
   position: absolute;
 }
 #browsetable table tr td:first-child,
@@ -225,7 +224,8 @@ img {
   display: none;
 }
 #sidebar {
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   width: 225px;
   position: fixed;
   top: 0;
@@ -274,6 +274,7 @@ img {
   margin-bottom: 0;
   padding-left: 15px;
   font-size: 0.8em;
+  height: 16px;
   z-index: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -422,6 +423,7 @@ img {
 }
 #sidebar ul li img {
   height: 12px;
+  width: 12px;
   margin-right: 5px;
   margin-top: -3px;
   vertical-align: middle;
@@ -458,10 +460,20 @@ img {
 #sidebar #clear-input {
   position: absolute;
   display: none;
-  left: 182px;
+  left: 190px;
   font-size: 0.7em;
-  top: 114px;
+  top: 294px;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  padding-left: 5px;
+  color: black;
   cursor: pointer;
+}
+#sidebar #clear-input:hover {
+  color: white;
+  cursor: pointer;
+  background: -webkit-linear-gradient(bottom, #4183ef, #478cff);
 }
 #sidebar h1 {
   font-size: 0.6em;
@@ -584,6 +596,18 @@ img {
   color: black;
   outline: none;
 }
+#sidebar .droppableindicator {
+  border-top: 1px solid #bebebe !important;
+  border-bottom: 1px solid #bebebe !important;
+  background: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.1), transparent) !important;
+}
+#sidebar .droppableindicator a {
+  color: #515765 !important;
+  text-shadow: 0 1px white !important;
+}
+#sidebar .droppableindicator img {
+  -webkit-filter: none !important;
+}
 #dropfiles {
   width: 100%;
   height: 100%;
@@ -611,6 +635,7 @@ img {
   display: block;
 }
 #view {
+  background: rgba(0, 0, 0, 0.05);
   overflow-x: hidden;
   margin-left: 225px;
   width: -webkit-calc(100% - 225px);
@@ -838,7 +863,6 @@ img {
   position: relative;
   top: 6px;
   margin-left: 25px;
-  -webkit-transition: 0.3s;
   position: absolute;
 }
 #view .album-tracks table tr td:first-child,
@@ -1014,22 +1038,7 @@ img {
   display: none;
 }
 #view .top10-wrapper {
-  background: rgba(0, 0, 0, 0.1);
   position: relative;
-  margin-left: -10px;
-  margin-right: -10px;
-  padding-bottom: 10px;
-  padding-top: 5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-#view .top10-wrapper h2 {
-  position: relative;
-  left: 50%;
-  width: 700px;
-  margin-left: -350px;
-  color: rgba(0, 0, 0, 0.8);
-  padding-top: 10px;
 }
 #view .top10 {
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -1170,6 +1179,11 @@ img {
   font-size: 0.7em;
   margin-top: 5px;
 }
+#view .attribution a {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
 #view .extendedtable {
   min-height: -webkit-calc(100% - 143px);
   min-height: -moz-calc(100% - 143px);
@@ -1235,7 +1249,6 @@ img {
 #view h2 {
   font-size: 1.3em;
   margin-top: 5px;
-  color: white;
 }
 #view h2 span {
   background: rgba(0, 0, 0, 0.85);
@@ -1247,14 +1260,6 @@ img {
 }
 #view h2 + * {
   clear: left;
-}
-#view .artist-page .album,
-#view .albumhidden,
-#view .top10 {
-  max-width: 700px;
-  left: 50%;
-  position: relative;
-  margin-left: -350px;
 }
 #view .album-list {
   margin-top: 20px;
@@ -1488,6 +1493,8 @@ img {
 .contextmenu .playlist-context-tip {
   min-height: 45px;
   height: 45px;
+  background: rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #bebebe;
 }
 .contextmenu .playlist-context-tip h1,
 .contextmenu .playlist-context-tip h2 {
@@ -1501,12 +1508,16 @@ img {
   color: black !important;
 }
 .contextmenu .playlist-context-tip h1 {
-  font-size: 1em !important;
-  top: -5px;
+  font-size: 0.8em !important;
+  top: -4px !important;
+}
+.contextmenu .playlist-context-tip h1 a {
+  color: #515765 !important;
 }
 .contextmenu .playlist-context-tip h2 {
   font-size: 0.6em !important;
-  top: 24px;
+  top: 20px;
+  color: #515765 !important;
 }
 .contextmenu .context-options {
   padding-top: 5px;
@@ -1660,6 +1671,9 @@ img {
   clear: left;
   margin: 10px;
 }
+.main-retro {
+  margin: 10px;
+}
 .reddit-box {
   width: 202px;
   display: inline-block;
@@ -1684,6 +1698,9 @@ img {
 .reddit-box .reddit-song-upvotes {
   font-size: 0.8em;
   opacity: 0.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .reddit-box img {
   left: 50%;
@@ -1929,6 +1946,11 @@ img {
 .song-page-full [data-navigate] .song-page-subtitle {
   cursor: pointer;
 }
+.song-page-full .visual-play-button {
+  position: absolute;
+  margin-left: 590px;
+  margin-top: 10px;
+}
 .song-page-full .song-page-container {
   margin: auto;
   margin-top: 50px;
@@ -2048,7 +2070,7 @@ img {
   width: 400px;
   background: rgba(0, 0, 0, 0.05);
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAA2FBMVEX///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+0oG7xAAAASHRSTlNIW3BFOnl1PFZpfE9BX25Na3JKWENkUV0+YmZUdzdHZVA9bGBTc3pjdF5VWkxOezt2P0I4OUZLYURxeFdJaFltalJcb0BnfX48iaDuAAAHHklEQVR4Xl2V5ZLcWBYGzyUxM3MhMzO03/+Ntqp71mPPf0Uo9J3MFCidUDqZ8sa1ZNGVyxFiA7RHQ5VHVuVFWL6y2CoJcqtB2x3ibrwG0LxWIfAXff3QfVfcl7EZLPFixIlZY4xtGrZC7v48EV7o66rTyzTyBWrkzyRBmZ4UDV18/6JzNuha8EXjrE1SqR34Y0E2946HgtzAE96bwhMdGILp4A6PplD6gC+iejozYbjCZveBDdppPbkjjQzmzQXuML5EEHLYbZselCfQsT1WTZNXUWu36rZViTA19zidjwq/NYBDcnF07EygFA4KaK9rzCk0K1xCsEJ0Q/WJU0FkdTUI2LEmd6PH/yqqcww3BFlTjc90Y4bT++zzlYJef3/lrw1eIAnW0YHXJU1T6d2f5FZZyglsEZvLwUy6GblQGevBKYjdZumTRZ6cFQu16WzzULxyzW25ZHc17kYMvNWKfIbbsjb5hVj86rADNdNRX7SKrVMQFSDnqZYK0jjd7kS7l2/gzMzFV7pIc5UvttD0tDxKzxJr7K6XktHCcn2sKSmyYlRxihkM4j0Mv99oGL4Rb1n4FBbLMhOzILa7kuuFDixTXTQnS1droWl9lCSmgbfbBja3qukGOiBxOL7PZ1mkzpiMYk6jod3CU6XSg0ZW7b7OxiMXCNUFm4U63XYwFO1gJZqjLxopA76ZGqw2tMeVp2nuajLeCwdIhkcQizQzdUcXrGziFNTpTRN6v53hWQs46htu34cVF6v8Pu7au5eZNxp0mk1TJ6HbEb2qXVxmF/NoSO+HTLImc1J0YKrjG83SxhoYfUuv2yJUeyUr7Idvyqqyk2bYeSFLak2qdSVJkdqXkNQrha/JNSXitEXWpiIAmhwcM1GU2E8lITyKvDf/Mah2rdGPQe0BSv4wCN4I7LnfoHX/Ae0xJ0NDvRPHgPwv0L6KCtJNhGNNXp6T0S3TuCtX2LGj4VVXIPyh4cWs/zW55MFieaQcWFgWU5BR3NWW3/PPjeHv+fXcor0Zr3JrPqmd8UxCj5eTSaQiFKTQ6nM1t/iaIVuNsiAUZ9/ScQMfHrcf6a69j3Trt3TcWzqQtPGtpAz8k6F86Qo9qKtzX2ngXHmiShF2RGqVWaj7XETOS9rpqWA8Pj6Pct6bNUJnjfml3slfAQ9yh992nKxriMN6kR8E8RHX0caKCAjT7QCXY8RvpBQs3Nh8WettLEJjyleAbMc50qhLrABPL3n8ZgWAHKd1YjpCN6eIHwh5jbfMVtg8lQgxbdniJfW5dLlEk+FOomQx1aD84qHvfqXhZqq4/SBMxqfnX6jKP6hKyw+qtzeqYI97u9YnKnjFvaOyZar7HRXvr6iM16Zu33RPwoUJkiJp01HiaSnd8kZnRLiR6hla6uNuvlHGh4HFrDkzQFHag8QCcQHwvP97jv1/zvH/Bu66GFc0NGecRSMDzq/jOurLXvp1FLtD1RC2PeFsKRM8Fx4C1+6Alu2HRChbfjlJGpq+HHjDW3q/8/8NLy+j9h/5z7Fs/Jl/uOL1vIfP8lzDizm4Fc3QzV7jXm9ODQJT9XOAVvTHAZ7g256QHI9sdDU90NOyKJGUt/TKd/d2ipGsqs1K1if2qrcMj8LQJAXMmYoVf7f4yrqmRqqV2GL1duhN3IFH6HLtuWKyv7hssxvYSLQTm9+BSWRhl/ZaPMJSzaLKmzA7bxOypVJEk9Rg4Y4atMdoeIwomwVmCUoYdOIgPPX9kPNUob/yi7WvyVbQanFJMKFuvEz015ifAcjuQTvgEXSkqlaTJd/IRnCfaO12l3B68BiOOOcUxQX21PYLlrK5vyYSGvnOHAEa+6Ug8dcFEbmfgqgdSYs4a7ESrcj9JGv/TtbJu4yLaqaZVgVzAezR2AmfhTJcVnxtnnOkZLnlpOoAp0Ni4UXXApZwK2qPSl07q/Cat3fXvRqEDoghLyuG7VjPfl+Fnj8eKpIwZuiqyOmsmkU5v7dYHMNIaV4Tx6l4Le6iprwRygkn/un7pHBuxT2jqLkQWF7dVcyNZG7BAuA8PyuIpzNrTJOGva1atPKboJ/0Xnt/EHkO6bJjNr+C7gaR4OLdY6CCcp8EdXALxWS6sQ2ZcsHq0mB/OLxd3uhNTigK/RUn9Y8LrKPnRod/f09M8MipLhF384Y948h32VFyRbEK7gkWFFF+Wltu/A4B4D7HPoQnP4QHk/2H8M8mrJ59NunwhXL93kT42QRk0a+Vjogg3eQ41kbv0sqf0hpcYfc/pW19Snv7lPYXvUTv0oJej8XHv/wr4Bo0Q81v/o/JT4A+/J8Ft94R2E6kiE5To/2Nn89oCBFtf/DbkDzLZwgkwkCcV654rFFPyPfQZv9AJXedV9Qvdp7KTh+omDiVkO47DuoWGzl97gLVyMuOT+AtSqv1W5T1n6JME+23KHubxwdxRmL7/j9HWgU9CwSwlgAAAABJRU5ErkJggg==");
-  height: 300px;
+  height: 264px;
   float: right;
   padding-top: 30px;
 }
@@ -2227,4 +2249,88 @@ tr.song.now-playing.selected td:first-child:after {
   height: 60px;
   margin-left: 32px;
   margin-top: 15px;
+}
+.artist-page .artist-page-two-columns {
+  width: 1030px;
+  margin: auto;
+  padding-top: 20px;
+}
+.artist-page .artist-page-two-columns h2 {
+  color: rgba(0, 0, 0, 0.8);
+}
+.artist-page .artist-page-two-columns .artist-page-left-column {
+  width: 300px;
+  float: left;
+  padding-top: 10px;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #f0f0f0;
+  border: 1px solid #bebebe;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description h3 {
+  color: #515765;
+  font-size: 11px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 6px;
+  margin-top: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid #bebebe;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description img {
+  width: 298px;
+  opacity: 0.7;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description p {
+  opacity: 0.5;
+  padding: 6px;
+  font-size: 0.8em;
+  white-space: normal;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description div.freebase-info-wrapper {
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description div.freebase-info-wrapper div.freebase-info {
+  font-size: 0.8em;
+  opacity: 0.5;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description h4 {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  font-size: 12px;
+}
+.artist-page .artist-page-two-columns .artist-page-left-column .artist-freebase-description a {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.artist-page .artist-page-two-columns .artist-page-right-column {
+  width: 700px;
+  float: right;
+  padding-top: 10px;
+}
+.artist-page .artist-page-two-columns .artist-page-right-column .album-list {
+  width: 700px !important;
+  margin: auto;
+}
+#draglabel {
+  position: absolute;
+  z-index: 3;
+  background: #f9ffd0;
+  padding: 5px;
+  border: 1px solid #bebebe;
+  font-size: 0.8em;
+  font-weight: bold;
+  display: none;
+}
+.image-op0 {
+  opacity: 0 !important;
+}
+img {
+  -webkit-transition: 0.3s opacity;
 }

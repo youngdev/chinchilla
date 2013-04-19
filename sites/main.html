@@ -38,5 +38,11 @@
 					{% include templates.redditbox %}
 				{% endfor %}
 			</div>
+			<div class="main-retro">
+				<h3>What was hot in... {{randomyear}}?<span class="main-link" data-navigate="/retro-charts/{{randomyear}}">See the full list</span></h3>
+				{% for reddit in topanno %}
+					{% include templates.redditbox %}
+				{% endfor %}
+			</div>
 	</div>
 </div>
