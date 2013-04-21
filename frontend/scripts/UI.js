@@ -183,7 +183,18 @@ var autocomplete        = function() {
 		value		= searchfield.val(),
 		results     = $("#search-results"),
 		clearinput 	= $("#clear-input");
-	search.autocomplete(value);
+	if (!window.lastsearchtimestamp) {
+		window.lastsearchtimestamp = Date.now();
+	}
+	else {
+		var timestamp = Date.now()
+		window.lastsearchtimestamp = timestamp;
+		setTimeout(function() {
+			if (timestamp == window.lastsearchtimestamp) {
+				search.autocomplete(value);
+			}
+		}, 500);
+	}
 	/*
 		Hide/show suggestions
 	*/
@@ -229,7 +240,8 @@ var remfromlib			= function() {
 	library.remove(song);
 }
 var clearinput 			= function() {
-	$("#search-field").val("").keyup()
+	$("#search-field").val("").keyup();
+	window.lastsearchtimestamp = null;
 }
 var rightclick			= function(e) {
 	e.preventDefault()

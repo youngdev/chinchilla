@@ -11,7 +11,6 @@ player.playSong = function(song, noautoplay) {
 		else {
 			ytplayer.loadVideoById(songobj.ytid);
 		}
-		
 		/*
 			Add current song to localStorage
 		*/
@@ -25,16 +24,19 @@ player.playSong = function(song, noautoplay) {
  		*/
  		$('title').text(songobj.name + ' - ' + songobj.artist);
  		/*
-			If the user has wants to, set the album cover as favicon
+			If the user wants to, set the album cover as favicon
  		*/
  		if (chinchilla.settings.favicon_album) {
  			$('#favicon').attr('href', songobj.image);
  		}
 	}
 	else {
+		console.log('Unrecognized song gets played')
 		var dom = (song instanceof HTMLElement) ? $(song) : $(".song[data-id=" + song.id + "]")[0];
-		$(dom).addClass("wantstobeplayed")
-		recognition.queue.unshift(dom)
+		$(dom).addClass("wantstobeplayed");
+		recognition.stop();
+		recognition.queue.unshift(songobj)
+		recognition.start();
 	}
 }
 player.nowPlaying = {
