@@ -66,6 +66,7 @@ this.connection = function (socket) {
 			var track = data;
 			track.id = parseFloat(track.id);
 			db.addYTID(track, function() {
+				console.log('track uploaded')
 				socket.emit('track-uploaded', track.id);
 			});
 		});

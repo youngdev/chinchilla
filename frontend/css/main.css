@@ -369,7 +369,7 @@ img {
 #sidebar #time-right {
   position: absolute;
   font-size: 0.8em;
-  margin-top: -22px;
+  margin-top: 205px;
 }
 #sidebar #time-left {
   left: 125px;
@@ -393,8 +393,17 @@ img {
   -webkit-filter: invert(100%);
   opacity: 0.7;
 }
-#sidebar #sidebar-player #nowplaying-image {
+#sidebar #sidebar-player #nowplaying-image,
+#sidebar #sidebar-player #nowplaying-image2 {
   opacity: 0.7;
+  position: absolute;
+  -webkit-transition: opacity 0.5s ease-out;
+}
+#sidebar #sidebar-player #nowplaying-image2 {
+  opacity: 0;
+}
+#sidebar .npinfo-first {
+  margin-top: 227px !important;
 }
 #sidebar h2 {
   margin-top: 15px;
@@ -2317,7 +2326,7 @@ tr.song.now-playing.selected td:first-child:after {
 }
 .artist-page .artist-page-two-columns .artist-page-right-column {
   width: 700px;
-  float: right;
+  margin: auto;
   padding-top: 10px;
 }
 .artist-page .artist-page-two-columns .artist-page-right-column .album-list {
