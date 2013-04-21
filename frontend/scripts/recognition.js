@@ -32,16 +32,15 @@ recognition = {
                 /*
                     Mark it as recognized
                 */
-                var song = helpers.parseDOM(track);
                 var div = $('.song[data-id="' + song.id + '"]').attr("data-ytid", video.id.$t.substr(-11));
                 div.addClass("recognized").removeClass("not-recognized pending")
                 recognition.uploadTrack(song, video);
                 /*
                     Add YouTube ID to the dom
                 */
-                if ($(track).hasClass("wantstobeplayed")) {
-                      $(track).removeClass("wantstobeplayed");
-                      player.playSong($(track)[0]);
+                if ($(div).hasClass("wantstobeplayed")) {
+                      $(div).removeClass("wantstobeplayed");
+                      player.playSong($(div)[0]);
                 }
                 /*
                     If song is in an album
@@ -74,13 +73,16 @@ recognition = {
 		recognition.started = true;
 		var loop = function() {
 			recognition.recognizeTrack({track: recognition.queue.getArray()[0], cb: function() {
-					recognition.queue.shift()
-					if (recognition.queue.getArray().length == 0) {
-						recognition.stop()
-					}
-					else {
-						loop();
-					}
+                    if (recognition.started) {
+                        recognition.queue.shift()
+                        if (recognition.queue.getArray().length == 0) {
+                            recognition.stop()
+                        }
+                        else {
+                            loop();
+                        }
+                    }
+					
 				}
 			});
 		}

@@ -37,11 +37,11 @@ this.getLibraryFromRequest = function(request, callback) {
 	checkLoginState(request, function(user) {
 		if (user) {
 			db.getUserCollections(user, function(collections) {
-				callback({loggedin: true, collections: collections});
+				callback({collections: collections});
 			})
 		}
 		else {
-			callback({loggedin: false});
+			callback(null);
 		}
 	})
 }

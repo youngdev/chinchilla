@@ -7,7 +7,7 @@
 		</div>
 		<div class="album-actions">
 			<div class="play-all-album album-action-button"><img src="/api/svg/play" class="icon-16"><div class="album-action-button-label">Play all</div></div>
-			{% if user.loggedin %}
+			{% if user %}
 			<div class="add-all-album album-action-button"><img src="/api/svg/library" class="icon-16"><div class="album-action-button-label">Add all to library</div></div>
 			{% endif %}
 			{% if type == 'artist' %}
