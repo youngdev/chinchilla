@@ -752,13 +752,13 @@ this.main 					= function(request, response) {
 		},
 		afterCollection 	= function(collections) {
 			var library 	= collections.library,
-				first7 		= _.last(library, 7).reverse();
+				first5 		= _.last(library, 5).reverse();
 			data.inlibrary  = library;
-			if (first7.length == 0) {
+			if (first5.length == 0) {
 				fetchCharts();
 			}
 			else {
-				dbquery.getSongsByIdList(first7, afterIdList);
+				dbquery.getSongsByIdList(first5, afterIdList);
 			}
 		},
 		afterIdList			= function(songs) {
@@ -766,16 +766,26 @@ this.main 					= function(request, response) {
 				Add inlib to all songs
 			*/
 			var songs 		= _.map(songs, function(song) {song.inlib = true; return song;});
-			data.library 	= [{cds: [songs]}];
+			data.library = _.map(songs, function(song) {
+				return {
+					song: song,
+					hqimg: helpers.getHQAlbumImage(song, 200)
+				}
+			});
 			fetchCharts()
 		},
 		fetchCharts 		= function() {
 			charts.getCharts(afterCharts)
 		},
 		afterCharts 		= function(charts) {
-			var top7 		= _.first(charts, 7);
-			var top7 		= _.map(top7, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
-			data.charts 	= [{cds: [top7]}];
+			var top5 		= _.first(charts, 5);
+			var top5 		= _.map(top5, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
+			data.charts 	= _.map(top5, function(song) {
+				return {
+					song: song,
+					hqimg: helpers.getHQAlbumImage(song, 200)
+				}
+			});
 			var range 		= workers.getYearRange();
 			data.randomyear  = range[Math.floor(Math.random()*range.length)];
 			dbquery.getRetroCharts(data.randomyear, evaluateRetroCharts);
@@ -796,14 +806,20 @@ this.main 					= function(request, response) {
 					hqimg: helpers.getHQAlbumImage(song, 200)
 				}
 			});
-			var top 		= _.first(charts.table, 7),
-				top7 		= [],
 				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 5);
 			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
 			});
 			data.topanno 	= _.map(data.topanno, function(song) {
+				song.inlib 	= (data.user && _.contains(data.inlibrary, song.song.id));
+				return song; 
+			});
+			data.charts 	= _.map(data.charts, function(song) {
+				song.inlib 	= (data.user && _.contains(data.inlibrary, song.song.id));
+				return song; 
+			});
+			data.library 	= _.map(data.library, function(song) {
 				song.inlib 	= (data.user && _.contains(data.inlibrary, song.song.id));
 				return song; 
 			});
