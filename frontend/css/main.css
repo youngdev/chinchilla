@@ -1013,8 +1013,6 @@ img {
   cursor: pointer;
 }
 #view .home-container .home-body .box-wrapper {
-  width: 550px;
-  float: left;
   margin: 10px;
 }
 #view .home-container .home-covers {
@@ -1675,13 +1673,6 @@ img {
 #notifications .notification .actions span:hover {
   text-decoration: underline;
   cursor: pointer;
-}
-.reddit-feature {
-  clear: left;
-  margin: 10px;
-}
-.main-retro {
-  margin: 10px;
 }
 .reddit-box {
   width: 202px;
