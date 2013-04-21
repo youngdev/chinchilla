@@ -208,12 +208,16 @@ this.artist 					= function(request, response) {
 	 		
 	 	},
 	 	freebaseSearch 			= function() {
-	 		if (!data.artist.freebase) {
-	 			freebase.search(data.artist.name, {type: '/music/artist', limit: 1}, afterFreebaseSearch);
-	 		}
-	 		else {
-	 			render();
-	 		}
+	 		/*
+				Freebase killed for now! Skip to render.
+	 		*/
+	 		//if (!data.artist.freebase) {
+	 		//	freebase.search(data.artist.name, {type: '/music/artist', limit: 1}, afterFreebaseSearch);
+	 		//}
+	 		//else {
+	 		//	render();
+	 		//}
+	 		render();
 	 	},
 	 	afterFreebaseSearch 	= function(results) {
 	 		if (results.length == 0) {
@@ -266,7 +270,6 @@ this.artist 					= function(request, response) {
 	 		render();
 	 	},
 	 	render 					= function() {
-	 		console.log(data.artist.freebase);
 	 		response.end(tmpl.render(data));
 	 	}
  	facebook.getLibraryFromRequest(request, afterUserFetch);
@@ -471,59 +474,6 @@ this.track 			= function(request, response) {
 		else {
 			renderError(501);
 		}		
-};
-this.drawtrack      = function(request, response) {
-    var tmpl            = swig.compileFile(templates.track),
-        onlynumbers     = new RegExp('^[0-9]+$'),
-        trackid         = request.params.id,
-        /*
-			Passing in the parseduration function with the song for simplicity
-        */
-        song            = null;
-    if (!onlynumbers.test(trackid)) {
-        views.error({params: {code: 501}}, response);
-        return;
-    }
-    dbquery.getSingleTrack(trackid, function (tracks) {
-        if (tracks.length === 0) {
-            itunes.lookup(trackid, {entity: 'song'}, function(res) {
-                if (res.results.length !== 0) {
-                    song 				= itunes.remap(res.results.splice(0,1)[0]);
-                    /*
-                        Fetch YouTube video
-                    */
-                    jsonload.get('http://gdata.youtube.com/feeds/api/videos?alt=json&max-results=15&q=' + song.artist + ' - ' + song.name, function(err, data) {
-                    	recognition.findBestVideo(data, song, function(video) {
-                    		song.ytid = helpers.parseYTId(video);
-                        	response.end(tmpl.render({song: song, parseduration: parseduration, image: helpers.getHQAlbumImage(song)}));
-                        	dbquery.addTrack(song, function() {
-                        	    console.log("Track successfully added (Through /track/:id site)");
-                        	});
-                    	}, _, _.str);
-                    });
-                }
-                else {
-                    console.log("No track here");
-                    views.error({params: {code: 497}}, response);
-                }
-            });
-        }
-        else {
-        	var track = tracks[0];
-        	facebook.checkLoginState(request, function(user) {
-        		if (user) {
-        			dbquery.getUserCollections(user, function(collection) {
-        				var library = collection.library,
-        					inlib 	= (_.contains(library, track.id));
-        				response.end(tmpl.render({song: track, parseduration: parseduration, inlib: inlib, image: helpers.getHQAlbumImage(track)}));
-        			});
-        		}
-        		else {
-        			response.end(tmpl.render({song: track, parseduration: parseduration, image: helpers.getHQAlbumImage(track)}));
-        		}
-        	});
-        }
-    });
 };
 this.lyrics	 		= function(request, response) {
 	var tmpl = swig.compileFile(templates.lyrics),

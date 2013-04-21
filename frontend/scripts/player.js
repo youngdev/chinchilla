@@ -44,7 +44,21 @@ player.nowPlaying = {
 		$("#track-title a").text(song.name).attr('data-navigate', '/song/' + song.id);
 		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
 		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
-		$("#nowplaying-image").attr("src", helpers.getHQAlbumImage(song, 225));
+		var npimage1 = $("#nowplaying-image"), npimage2 = $("#nowplaying-image2"), cover = helpers.getHQAlbumImage(song, 225);
+		if (npimage1.hasClass('np-placeholder-used')) {
+			npimage1.removeClass('np-placeholder-used').attr('src', '');
+			npimage2.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
+				$(npimage2).css({opacity: 0.7}, 400);
+				$(npimage1).css({opacity: 0}, 400);
+			});
+		}
+		else {
+			npimage2.removeClass('np-placeholder-used').attr('src', '')
+			npimage1.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
+				$(npimage1).css({opacity: 0.7}, 400);
+				$(npimage2).css({opacity: 0}, 400);
+			});
+		}
 		$('.song').removeClass('now-playing')
 		$(".song[data-id='" + song.id + "']").addClass('now-playing');
 		var queue1    = player.queue1.get(),

@@ -56,7 +56,7 @@ this.getCharts = function(callback) {
 				if (!err) {
 					_.each(result.results, function(track) {
 						var song = itunes.remap(track);
-						db.addTrack(song, function() {});
+						db.addTrack(song, function() { console.log('Track added through charts')});
 						items.push(song);
 					});
 					AllTracksInDB(items);
