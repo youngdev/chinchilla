@@ -33,12 +33,13 @@ this.svg = {
 	getColor: function(request, response) {
 		var filename 	= request.params.filename,
 			color 		= request.params.color,
-			allowed 	= ['white', 'blue', 'black'];
+			allowed 	= ['white', 'blue', 'black', 'gray'];
 		if (!_.contains(allowed, color)) { response.end('not allowed!'); return;};
 		var colors 		= {
 			white: '#FFFFFF',
 			blue: '#4183ef',
-			black: '#000'
+			black: '#000',
+			gray: '#f0f0f0'
 		}
 		var color 		= colors[color];  
 		response.setHeader("Content-Type", "image/svg+xml");
