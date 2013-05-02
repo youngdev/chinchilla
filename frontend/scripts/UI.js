@@ -486,6 +486,7 @@ var addsongtopl 		= function() {
 		destination: data.url
 	}
 	socket.emit('add-tracks-to-collection', socketdata);
+	notifications.create('Adding...')
 }
 var remsongfrompl 		= function() {
 	var data = this.dataset;
