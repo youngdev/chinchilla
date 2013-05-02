@@ -1,30 +1,37 @@
 library = {
 	add: function(song) {
-		socket.emit('add-track', 		{destination: 'library', song: song, token: chinchilla.token});
-		markAsInLibrary(song.id);
+		var socketdata = {
+			destination: 'library',
+			tracks: [song.id],
+			token: chinchilla.token,
+			type: 'library'
+		}
+		socket.emit('add-tracks-to-collection', socketdata);
+		libdom.markAsInLibrary(song.id);
+		notifications.create('Adding...');
 		$('.library-button').text("Remove from library").removeClass('library-button').addClass('library-remove-button');
 	},
 	batchAdd: function(songs) {
-		socket.emit('add-tracks', 		{destination: 'library', songs: songs, token: chinchilla.token});
+		var socketdata = {
+			destination: 'library',
+			tracks: _.pluck(songs, 'id'),
+			token: chinchilla.token,
+			type: 'library'
+		}
+		socket.emit('add-tracks-to-collection', socketdata);
+		notifications.create('Adding...');
 		_.each(songs, function(song) {
-			markAsInLibrary(song.id);
+			libdom.markAsInLibrary(song.id);
 		});
 	},
 	remove: function(song) {
 		socket.emit('remove-track', 	{destination: 'library', song: song, token: chinchilla.token});
-		markAsNotInLibrary(song.id);
+		libdom.markAsNotInLibrary(song.id);
+		notifications.create('Removing...')
 		$('.library-remove-button').text("Add to library").removeClass('library-remove-button').addClass('library-button');
 		/*
 			Remove from view
 		*/
 		var view = $('#view[data-route="/library"] .song[data-id="' + song.id + '"]').remove();
 	}
-}
-var markAsInLibrary = function(id) {
-	var song = $('.song[data-id=' + id + ']')
-	song.removeClass('not-in-library').addClass('in-library');
-
-}
-var markAsNotInLibrary = function(id) {
-	$('.song[data-id=' + id + ']').addClass('not-in-library').removeClass('in-library');
 }

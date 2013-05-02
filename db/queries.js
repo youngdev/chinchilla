@@ -90,6 +90,13 @@ this.getSingleTrack 		= function (id, callback) 		{
         }
     });
 };
+this.findOneTrack 			= function(id, callback) 		{
+	connection.collection("tracks").findOne({id: parseFloat(id)}, function(err, item) {
+		if (!err) {
+			callback(item);
+		}
+	});
+}
 this.getSingleAlbum 		= function(albumid, callback) 	{
 	/*
 		Convert albumid from a number into a string
@@ -289,7 +296,11 @@ this.getPlaylistByUrl 		= function(url, callback) {
 	});
 }
 this.savePlaylist 			= function(playlist, callback) {
-	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks, 'public': playlist['public'], newestattop: playlist.newestattop}}, function() {});
+	connection.collection("playlists").update({url: playlist.url}, {$set: {tracks: playlist.tracks, 'public': playlist['public'], newestattop: playlist.newestattop}}, function(err) {
+		if (callback && !err) {
+			callback();
+		}
+	});
 }
 this.saveFreebaseInfo 		= function(artist, callback) {
 	connection.collection("artists").update({id: artist.id}, {$set: {freebase: artist.freebase}}, function() {})

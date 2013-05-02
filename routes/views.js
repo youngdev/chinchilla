@@ -57,6 +57,7 @@ var templates 		= 		{
     login: 					dirup + '/sites/login.html',
     artist: 				dirup + '/sites/new-artist.html',
     album: 					dirup + '/sites/album.html',
+    albumpage: 				dirup + '/sites/album-page.html',
     playlistmenuitem: 		dirup + '/sites/playlistmenuitem.html',
     playlist: 				dirup + '/sites/playlist.html',
     song: 					dirup + '/sites/song.html',
@@ -274,7 +275,7 @@ this.artist 					= function(request, response) {
 	 	}
  	facebook.getLibraryFromRequest(request, afterUserFetch);
 };		
-this.track 			= function(request, response) {
+this.track 						= function(request, response) {
 	var tmpl 							= swig.compileFile(templates.newtrack),
 		id 								= parseFloat(request.params.id),
 		data 							= {parseduration: parseduration},
@@ -360,7 +361,78 @@ this.track 			= function(request, response) {
 			renderError(501);
 		}		
 };
-this.lyrics	 		= function(request, response) {
+this.album 						= function(request, response) {
+	var tmpl 			= swig.compileFile(templates.albumpage),
+		id 				= parseFloat(request.params.id),
+		data 			= { parseduration: parseduration , templates: templates, parsetext: parsetext, parseyear: parseyear},
+		onlynumbers		= new RegExp('^[0-9]+$'),
+		render 			= function() {
+			console.log(data)
+			var output 	= tmpl.render(data);
+			response.end(output);
+		},
+		renderError 					= function(code) {
+			views.error({params: {code: code}}, response);
+		},
+		afterLibraryFetched 			= function(user) {
+			data.user = user;
+			dbquery.getSingleAlbum(id, afterDBQueryPerformed)
+		}
+		afterDBQueryPerformed 			= function(album) {
+			var album = (album.length == 0) ? null : album[0];
+			if (album) {
+				data.album = album;
+				dbquery.getTracksFromAlbum(id, afterAlbumTracksFetched)
+			}
+			else {
+				itunes.lookup(id, {entity: 'song'}, function(itunesresponse) {
+					var info = itunesresponse.results
+					if (info.length == 0)  {
+						renderError(498);
+					}
+					data.album = info.splice(0,1)[0];
+					data.songs = _.map(info, function(song) { return itunes.remap(song)});
+					data.album = {
+	 					id: 		data.album.collectionId,
+	 					tracks: 	data.songs.length,
+	 					artist: 	data.album.artistName,
+	 					release: 	data.album.releaseDate,
+	 					image: 		data.album.artworkUrl100,
+	 					name: 		data.album.collectionName,
+	 					hours: 		_.reduce(_.pluck(data.songs, 'duration'), function(memo, num) {return memo + parseFloat(num)}, 0)
+	 				}
+	 				dbquery.addAlbum(data.album, function() {
+	 					console.log('Album added', data.album.name);
+	 				});
+	 				dbquery.addTracksBulk(data.songs, function() {
+	 					console.log('Bulk tracks added.');
+	 				});
+	 				remapAlbums();
+				});
+			}
+		},
+		afterAlbumTracksFetched 		= function(songs) {
+			data.songs = songs;
+			remapAlbums();
+		},
+		remapAlbums 					= function() {
+			if (data.user) {
+				console.log(data.user);
+				data.songs = _.map(data.songs, function(song) { song.inlib = _.contains(data.user.collections.library, song.id); return song;})
+			}
+			data.album.cds = _.values(_.groupBy(_.sortBy(data.songs, function(song) { return song.numberinalbum }), function(song) { return  song.cdinalbum }));
+			data.hqimage   = helpers.getHQAlbumImage(data.album);
+			data.background= workers.returnAlbumCovers() 
+			render();
+		}
+		if (onlynumbers.test(id)) {
+			facebook.getLibraryFromRequest(request, afterLibraryFetched)
+		}
+		else {
+			renderError(501);
+		}
+}
+this.lyrics	 					= function(request, response) {
 	var tmpl = swig.compileFile(templates.lyrics),
 		id 	 = request.params.id,
 		data = {},
@@ -450,7 +522,7 @@ this.lyrics	 		= function(request, response) {
 	console.log(id)
 	dbquery.getSingleTrack(id, afterDBQueryMade);
 };
-this.wrapper       	= function(request, response) {
+this.wrapper       				= function(request, response) {
 	var tmpl 	= swig.compileFile(templates.wrapper),
 		cookie 	= new cookies(request, response),
 		token   = cookie.get('token'),
@@ -475,7 +547,7 @@ this.wrapper       	= function(request, response) {
  	data.templates = templates;
 	dbquery.getUser(token, afterUserFetch);
 }
-this.charts         = function(request, response) {
+this.charts         			= function(request, response) {
 	facebook.getLibraryFromRequest(request, function(user) {
 		var tmpl        = swig.compileFile(templates.charts),
 			songs 		= [],
@@ -505,7 +577,7 @@ this.charts         = function(request, response) {
 		
 	});
 };
-this.retrocharts 	= function(request, response) {
+this.retrocharts 				= function(request, response) {
 	var tmpl 				= swig.compileFile(templates.retrocharts),
 		data 				= {},
 		year 				= request.params.year,
@@ -548,7 +620,7 @@ this.retrocharts 	= function(request, response) {
 		}
 		dbquery.getRetroCharts(year, afterIdsFetched);
 }
-this.error          = function(request, response) {
+this.error          			= function(request, response) {
 	var tmpl        = swig.compileFile(dirup + "/sites/error.html"),
 		error       = request.params.code,
 		messages = {
@@ -556,7 +628,7 @@ this.error          = function(request, response) {
 			499: "It seems like this artist doesn't exist. ",
 			498: "Whoops... this album doesn't seem to exist. ",
             497: "Sorry... this track doesn't seem to exist.",
-            501: "The Track ID can only contain numbers, so there is no music here :(",
+            501: "The ID can only contain numbers, so there is no music here :(",
             496: "Sorry, there aren't any lyrics for this song.",
             495: "We couldn't fetch the lyrics for this song. There might be license issues.",
             494: "We received no response for your lyrics request.",
@@ -570,12 +642,12 @@ this.error          = function(request, response) {
         output      = tmpl.render({error: phrase});
 	response.end(output);
 };
-this.about          = function(request, response) {
+this.about          			= function(request, response) {
 	var tmpl 	= swig.compileFile(templates.about),
 		output 	= tmpl.render({});
 	response.end(output);
 };
-this.library 		= function(request, response) {
+this.library 					= function(request, response) {
 	var tmpl = swig.compileFile(templates.library),
 		data = {
 			templates: templates,
@@ -615,7 +687,7 @@ this.library 		= function(request, response) {
 		}
 	facebook.checkLoginState(request, afterFacebookLoginStateChecked)
 };
-this.main 					= function(request, response) {
+this.main 						= function(request, response) {
 	var tmpl = swig.compileFile(templates.main),
 		data = {
 			templates: templates, 
@@ -717,7 +789,7 @@ this.main 					= function(request, response) {
 		}
 	facebook.checkLoginState(request, afterlogin);
 };
-this.reddit 				= function(request, response) {
+this.reddit 					= function(request, response) {
 	var tmpl = swig.compileFile(templates.reddit),
 		subreddits = workers.returnSubreddits(),
 		data = {
@@ -761,7 +833,7 @@ this.reddit 				= function(request, response) {
 		}
 	facebook.checkLoginState(request, afterlogin);	
 }
-this.playlist 				= function(request, response) {
+this.playlist 					= function(request, response) {
 	var tmpl 				= swig.compileFile(templates.playlist),
 	cookie = new cookies(request, response),
 	token = cookie.get('token'),
@@ -839,7 +911,7 @@ this.playlist 				= function(request, response) {
 	}
 	dbquery.getUser(token, afterUserFetched)
 }
-this.settings				= function(request, response) {
+this.settings					= function(request, response) {
 	var tmpl = swig.compileFile(templates.settings),
 		cookie = new cookies(request, response),
 		token = cookie.get('token');

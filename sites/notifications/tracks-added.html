@@ -1,0 +1,13 @@
+{% if songs.length  == 1%}
+	'{{songs[0].name}}' is now in
+{% else %}
+	{{songs.length}} tracks were added to
+{% endif %} 
+
+{% if type == 'library' %}
+	your library.
+	<span data-navigate="/library">Go to library</span>
+{% else %}
+	the playlist.
+{% endif %}
+	<span class="close-notification">Dismiss</span>

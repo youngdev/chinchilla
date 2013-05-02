@@ -18,6 +18,7 @@ views = {
 					*/
 					views.loadingindicator.hide()
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 
 				},
 				error: function() {
@@ -34,6 +35,8 @@ views = {
 				success: function(data) {
 					$('#view').html(data);
 					$.publish('new-tracks-entered-dom');
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded')
 				}
 			})
 		}
@@ -46,6 +49,8 @@ views = {
 				success: function(data) {
 					$('#view').html(data);
 					$.publish('new-tracks-entered-dom');
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded')
 				}
 			})
 		}
@@ -60,6 +65,7 @@ views = {
 					view.html(data);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(404);
@@ -76,6 +82,7 @@ views = {
                     var view = $("#view");
                     view.html(data);
                     views.loadingindicator.hide();
+                    $.publish('view-got-loaded')
                 },
                 error: function() {
                     errors.draw(404);
@@ -93,6 +100,7 @@ views = {
 					view.html(data);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(404)
@@ -108,7 +116,9 @@ views = {
 				success: function(data) {
 					var view = $("#view");
 					view.html(data);
+					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 				} 
 			})
 		}
@@ -122,6 +132,7 @@ views = {
 					var view = $("#view");
 					view.html(data);
 					views.loadingindicator.hide();
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(404);
@@ -131,7 +142,7 @@ views = {
 	},
 	loadingindicator: {
 		hide: function() {
-			var indicator = $(".loading-indicator").remove()
+			$('#loading-indicator').removeClass('loading-indicator-visible');
 		}
 	},
 	library: {
@@ -144,6 +155,7 @@ views = {
 					view.html(data);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(404);
@@ -159,6 +171,8 @@ views = {
 				success: function(data) {
 					var view = $('#view');
 					view.html(data);
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded')
 				}
 			})
 		}
@@ -173,6 +187,7 @@ views = {
 					view.html(data);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(404);
@@ -188,6 +203,7 @@ views = {
 				success: function(data) {
 					$("#view").html(data);
 					views.loadingindicator.hide();
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(4040);
@@ -204,6 +220,7 @@ views = {
 					$("#view").html(data);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
 				},
 				error: function() {
 					errors.draw(404);

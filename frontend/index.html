@@ -4,10 +4,11 @@
 	<meta charset="UTF-8">
 	<title>Tunechilla</title>
 	<link id="favicon" rel="shortcut icon" type="image/png" />
+  <script type='text/javascript' id='lt_ws' src='http://localhost:52984/socket.io/lighttable/ws.js'></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<!--
 	<script src="/api/script/underscore"></script>
-	<script src="/api/script/helpers"></script>	
+	<script src="/api/script/helpers"></script>
 	<script src="/api/script/fetchFeeds"></script>
 	<script src="/api/script/navigation"></script>
 	<script src="/api/script/socket.io"></script>
@@ -22,6 +23,7 @@
 	<script src="/api/script/errors"></script>
 	<script src="/api/script/recognition"></script>
 	<script src="/api/script/swfobject"></script>
+	<script src="/api/script/libdom"></script>
 	<script src="/api/script/library"></script>
 	<script src="/api/script/pubsub"></script>
 	-->
@@ -29,6 +31,9 @@
 	<link rel="stylesheet" href="/api/styles/main">
 </head>
 <body>
+	<div id="statusbar-container">
+		<div id="statusbar"></div>
+	</div>
 	<div id="sidebar">
 		<div id="sidebar-player">
 			<div id="queue"></div>
@@ -99,10 +104,15 @@
 			{% endif %}
 		</ul>
 	</div>
+	<div id="loading-indicator">
+		<svg width="30" height="30" viewBox="0 0 300 300"
+     		xmlns="http://www.w3.org/2000/svg" version="1.1">
+  			<path d="M 150,0 a 150,150 0 0,1 106.066,256.066 l -35.355,-35.355 a -100,-100 0 0,0 -70.711,-170.711 z" fill="#4183ef">
+    			<animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 150 150" to="360 150 150" begin="0s" dur="2s" fill="freeze" repeatCount="indefinite" />
+  			</path>
+		</svg>
+	</div>
 	<div id="view">
-		<div class="loading-indicator">
-			<div class="spinner"></div>
-		</div>
 	</div>
 	<div id="dropfiles">
 
@@ -132,7 +142,7 @@
             swfobject.embedSWF("http://www.youtube.com/v/dFVxGRekRSg?enablejsapi=1&playerapiid=ytplayer&version=3", "ytapiplayer", "425", "356", "8", null, null, params, atts);
     </script>
     <script>
-    	
+
     	chinchilla = {
     		loggedin: {% if user %} true,
     		token: '{{user.token}}' {% else %} false {% endif %},

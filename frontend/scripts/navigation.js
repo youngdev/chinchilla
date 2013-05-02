@@ -67,8 +67,7 @@ $(document)
 	navigation.to(pathname);
 });
 var showSpinner = function() {
-	var spinner = loader.spinner();
-	$("#view").html(spinner);
+	$('#loading-indicator').addClass('loading-indicator-visible')
 };
 loader = {
 	spinner: function() {
@@ -77,6 +76,18 @@ loader = {
 }
 navigation = {
 	to: function(path, prevent) {
+		var currentroute = {
+			path: path,
+			timestamp: Date.now()
+		}
+		var tsdiff = currentroute.timestamp - window.currentroute.timestamp;
+		var issameroute = currentroute.path == window.currentroute.path;
+		if (tsdiff > 3000 || !issameroute) {
+			window.currentroute = currentroute
+		}
+		else {
+			return;
+		}
 		$.each(routes, function (route, callback) {
 			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
@@ -84,6 +95,7 @@ navigation = {
 				$('#drop-target-label').text('your library')
 				callback(match);
 				showSpinner();
+				$.publish('view-gets-loaded')
 				var method = prevent ? 'replaceState' : 'pushState';
 				history[method](null, null, path);
 				$('#view').attr('data-route', path);
@@ -100,4 +112,8 @@ navigation = {
 window.onpopstate = function() {
 	var pathname			= window.location.pathname;
 	navigation.to(pathname, true);
+}
+window.currentroute = {
+	path: '',
+	timestamp: Date.now()
 }
