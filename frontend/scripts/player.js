@@ -1,5 +1,5 @@
 player = {};
-player.playSong = function(song, noautoplay) {
+player.playSong = function(song, noautoplay, nohistory) {
 	var songobj = helpers.parseDOM(song);
 	if ($(song).hasClass("recognized") || songobj.ytid != undefined) {
 		/*
@@ -14,7 +14,9 @@ player.playSong = function(song, noautoplay) {
 		/*
 			Add current song to localStorage
 		*/
-		player.history.add(player.nowPlaying.get());
+		if (!nohistory) {
+			player.history.add(player.nowPlaying.get());
+		}
 		/*
 			Add old song to history
 		*/
@@ -110,7 +112,7 @@ if (name == "history") {
 			player.queue1.add(player.nowPlaying.get(), true)
 			var last = list.pop()
 			localStorage[name] = JSON.stringify(list);
-			player.playSong(last);
+			player.playSong(last, false, true);
 			player.drawQueue();
 		}		
 	}

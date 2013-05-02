@@ -18,7 +18,7 @@ var select      = function(e)   {
 	/*
 		If user just wants to fav songs, don't select
 	*/
-	if ($(e.srcElement).hasClass('heart')) {
+	if ($(e.srcElement).hasClass('heart') || e.srcElement.dataset.navigate != undefined) {
 		return;
 	}
 	/*
@@ -74,23 +74,11 @@ var dragsongs = function(e) {
 	droppableplaces.one('mouseup', function () {
 		$(this).removeClass('droppableindicator');
 		var target = $(this).attr('data-navigate');
-			_.each(todrag, function(song) {
-				if (target == '/library') {
-					socket.emit('add-track', {
-						token: chinchilla.token,
-						song: {
-							id: song.id
-						},
-						destination: 'library'
-					});
-				}
-				else {
-					socket.emit('add-song-to-playlist', {
-						token: chinchilla.token,
-						songid: song.id,
-						url: target
-					});
-				}
+			socket.emit('add-tracks-to-collection', {
+				token: chinchilla.token,
+				tracks: _.pluck(todrag, 'id'),
+				destination: (target == '/library' ? 'library' : target),
+				type: (target == '/library' ? 'library' : 'playlist')
 			});
 			
 	});
@@ -491,8 +479,13 @@ var suppressrenaming 	= function(e) {
 }
 var addsongtopl 		= function() {
 	var data = this.dataset;
-	data.token = chinchilla.token;
-	socket.emit('add-song-to-playlist', data);
+	var socketdata = {
+		type: 'playlist',
+		tracks: [data.songid],
+		token: chinchilla.token,
+		destination: data.url
+	}
+	socket.emit('add-tracks-to-collection', socketdata);
 }
 var remsongfrompl 		= function() {
 	var data = this.dataset;
@@ -536,6 +529,9 @@ var mkplnwatbottom 			= function() {
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': false});
 }
+var closenotification 		= function() {
+	$('#statusbar').hide();
+}
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -574,6 +570,7 @@ $(document)
 .on('click', 		'.make-playlist-private',			mkplprivate 		) // Contextmenu option to make playlist private
 .on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
 .on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
+.on('click',		'.close-notification', 				closenotification 	) // Dismiss popup messages
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
 
@@ -588,5 +585,11 @@ $(document).ready(function() {
 	    	recognition.queue.push(track);
 		});
 		$('.song[data-id="' + player.nowPlaying.get().id + '"]').addClass('now-playing')
+	});
+	$.subscribe('view-gets-loaded', function() {
+		$('#view').addClass('view-loading');
+	});
+	$.subscribe('view-got-loaded', function() {
+		$('#view').removeClass('view-loading');
 	});
 });

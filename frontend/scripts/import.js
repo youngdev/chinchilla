@@ -187,18 +187,18 @@ addToCollections = function(info, song) {
 	target = info.target;
 	if (song) {
 		if (_s.contains(target, '/u/') && _s.contains(target, '/p/')) {
-			return socket.emit('add-song-to-playlist', {
+			return socket.emit('add-tracks-to-collection', {
 				token: chinchilla.token,
-				songid: song.id,
-				url: target
+				tracks: [song.id],
+				destination: target,
+				type: 'playlist'
 			});
 		} else {
-			return socket.emit('add-track', {
+			return socket.emit('add-tracks-to-collection', {
 				token: chinchilla.token,
-				song: {
-					id: song.id
-				},
-				destination: 'library'
+				tracks: [song.id],
+				destination: 'library',
+				type: 'library'
 			});
 		}
 	}

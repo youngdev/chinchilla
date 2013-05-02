@@ -46,7 +46,7 @@ app.get('/api/song/:id',                views.track             );
 app.get('/api/lyrics/:id',              views.lyrics            );
 app.get('/api/charts',                  views.charts            );
 app.get('/api/charts/:year',            views.retrocharts       );
-app.get('/api/album/:album',            views.drawalbum         );
+app.get('/api/album/:id',               views.album             );
 app.get('/api/i/:filename',             styles.images.get       );
 app.get('/api/svg/:filename',           styles.svg.get          );
 app.get('/api/svg/:filename/:color',    styles.svg.getColor     );

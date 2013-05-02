@@ -18,7 +18,8 @@ var fs 		= require('fs'),
 var dirup = __dirname.substr(0, __dirname.length - 7);
 var notificationtemplates = {
 	track_added: 	swig.compileFile(dirup + '/sites/notifications/track-added.html'),
-	track_removed: 	swig.compileFile(dirup + '/sites/notifications/track-removed.html')
+	track_removed: 	swig.compileFile(dirup + '/sites/notifications/track-removed.html'),
+	tracks_added: 	swig.compileFile(dirup + '/sites/notifications/tracks-added.html')
 }
 var menutemplates 		  = {
 	playlist: 		swig.compileFile(dirup + '/sites/playlistmenuitem.html'),
@@ -321,5 +322,112 @@ this.connection = function (socket) {
 					socket.emit('receive-track-info', {error: 404})
 				}
 			});
+		});
+		socket.on('add-tracks-to-collection', 	function (data) {
+			/*
+			* {
+			* 	destination: 	'library' or '/u/jonnyburger/p/test-playlist',
+			* 	tracks: 		[42789472394, 3142349823749],
+			* 	token: 			'fdsjkhfsdkjfhsdkjf',
+			* 	type: 			'library' or 'playlist'		
+			* }
+			*/
+			var tmpl 				= notificationtemplates.tracks_added,
+				afterUserFetched 	= function(user) {
+					data.user = user;
+					if (data.user) {
+						fetchUserCollections()
+					}
+					else {
+						socket.emit('notification', { html: 'To add tracks you must be logged in. <span data-navigate="/login">Login</span><span class="close-notification">Dismiss</span>' })
+					}
+				},
+				fetchUserCollections = function() {
+					db.getUserCollections(data.user, getSongs)
+				},
+				getSongs 		= function(collections) {
+					data.collections = collections;
+					if (data.tracks != undefined && _.isArray(data.tracks)) {
+						if (data.tracks.length == 0) {
+							socket.emit('notification', { html: 'You have selected no tracks to add.' });
+							return;
+						}
+						else if (!(data.type == 'library' || data.type == 'playlist')) {
+							socket.emit('notification', { html: 'You must add the track to either the library or to a playlist. <span class="close-notification">Dismiss</span>' });
+							return;
+						}
+						else {
+							data.tracks = _.map(data.tracks, function(track) {
+								var number = parseFloat(track);
+								if (_.isNumber(number)) {
+									return parseFloat(number);
+								}
+								else {
+									return null;
+								}
+							});
+						}
+						console.log(data.tracks)
+						var cleanedtracks = _.compact(data.tracks);
+						db.getSongsByIdList(data.tracks, function(songs) {
+							data.songs = songs;
+							afterEnoughTrackInfoAvailable()
+						});
+					}
+				},
+				afterEnoughTrackInfoAvailable = function() {
+					data.songs = _.map(data.songs, function(song) {
+						if (data.type == 'library') {
+							song.inlib = true;
+						}
+						else {
+							song.inlib = _.contains(data.collections.library, song.id)
+						}
+						return song;
+					});
+					data.divs = _.map(data.songs, function(song) {
+						var info = {}
+						info.type 				= data.type;
+						info.showartistalbum 	= true;
+						info.cd 				= [song];
+						info.user 				= data.user;
+						info.parsetext 			= helpers.parsetext;
+						info.parseduration 		= helpers.parsetime;
+						var div = musictemplates.track.render(info);
+						return div;
+					});
+					var output = tmpl.render(data);
+					if (data.type == 'library') {
+						_.each(data.songs, function (song) {
+							data.collections.library.push(parseFloat(song.id));
+						});
+						data.collections.library = _.uniq(data.collections.library);
+						db.saveUserCollections(data.collections, function(collection) {
+							socket.emit('tracks-added', { divs: data.divs, position: 'top', notification: output });
+						});
+					}
+					else {
+						db.getPlaylistByUrl(data.destination, function(playlist) {
+							if (playlist) {
+								data.playlist = playlist;
+								var userplaylists = _.pluck(data.collections.playlists, 'url');
+
+								_.each(data.songs, function(song) {
+									if ( _.include(userplaylists, data.destination) && !_.include(data.playlist.tracks, parseFloat(song.id))) {
+										playlist.tracks.push(parseFloat(song.id));
+									}
+								});
+								db.savePlaylist(data.playlist, function() {
+									var diff = _.reduce(data.songs, function (a,b) { return a + b.duration }, 0);
+									socket.emit('multiple-playlist-songs-added', { divs: data.divs, position: data.playlist.newestattop ? 'top' : 'bottom', view: data.destination, trackcount: playlist.tracks.length, diff: diff, notification: output });
+								});
+							}
+							else {
+								socket.emit('notification', { html: 'This playlist does not exist. <span class="close-notification">Dismiss</span>' })
+							}
+						});
+					}
+				}
+			db.getUser(data.token, afterUserFetched);
 		});
 };

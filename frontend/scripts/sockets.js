@@ -34,8 +34,18 @@ socket.on('track-added', function (data) {
 	}
 	$('.song[data-id="' + $(data.song).attr('data-id') + '"]').addClass('in-library animated').removeClass('not-in-library')
 });
-socket.on('tracks-added', function(songsadded) {
-	
+socket.on('tracks-added', function(data) {
+	var table = $('[data-route="/library"]  .extendedtable tbody');
+	$.each(data.divs, function(key, song) {
+		if (data.position == 'top') {
+			table.find('.song').eq(0).before(song);
+		}
+		else {
+			table.append(song);
+		}
+		$('.song[data-id="' + $(song).attr('data-id') + '"]').addClass('in-library animated').removeClass('not-in-library')
+	});
+	notifications.create(data.notification)
 });
 socket.on('track-removed', function (data) {
 	notifications.create(data.notification);
@@ -51,11 +61,16 @@ socket.on('playlist-renamed-failed', pladdfail);
 socket.on('playlist-removed', function (data) {
 	$("#sidebar [data-navigate='" + data.url + "']").remove();
 });
+socket.on('notification', function (data) {
+	notifications.create(data.html)
+});
+socket.on('tracks-added-to-collection', function (data) {
+	notifications.create(data.html)
+});
 socket.on('playlist-song-removed', function (data) {
 	var view = $('[data-route="' + data.view + '"]');
 	view.find('[data-id="' + data.songid + '"]').remove();
 	var trackcountlabel = view.find('.playlist-trackcount');
-	console.log(data.view);
 	var trackcountlabel2 = $("[data-url='" + data.view + "']").addClass("add-song-to-playlist-button not-in-playlist").removeClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	var pldurationlabel = view.find('.playlist-duration');
 	var trackslabel 	= view.find('.playlist-plural-singular-tracks');
@@ -83,4 +98,27 @@ socket.on('playlist-song-added', function (data) {
 	var newduration = parseFloat($(pldurationlabel).attr('data-duration')) + data.lengthdifference;
 	$(pldurationlabel).text(helpers.parsehours(newduration)).attr('data-duration', newduration);
 	$(trackslabel).text(data.trackslabel == 1 ? 'track' : 'tracks');
+});
+socket.on('multiple-playlist-songs-added', function (data) {
+	console.log(data);
+
+	var view = $('[data-route="' + data.view + '"]')
+	var table = view.find('tbody');
+	var trackcountlabel = view.find('.playlist-trackcount');
+	var pldurationlabel = view.find('.playlist-duration');
+	var trackcountlabel2 = $("[data-url='" + data.view + "']").removeClass("add-song-to-playlist-button not-in-playlist").addClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
+	var trackslabel 	= view.find('.playlist-plural-singular-tracks');
+	$.each(data.divs, function (key, div) {
+		if (data.position == 'top' && (table.find('.song').length != 0)) {
+			table.find('.song').eq(0).before(div);
+		}
+		else {
+			table.append(div);
+		}
+	});
+	$(trackcountlabel).text(data.trackcount);
+	var newduration = parseFloat($(pldurationlabel).attr('data-duration')) + data.diff;
+	$(pldurationlabel).text(helpers.parsehours(newduration)).attr('data-duration', newduration);
+	$(trackslabel).text(data.trackslabel == 1 ? 'track' : 'tracks');
+	notifications.create(data.notification)
 });
