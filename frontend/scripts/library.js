@@ -35,3 +35,15 @@ library = {
 		var view = $('#view[data-route="/library"] .song[data-id="' + song.id + '"]').remove();
 	}
 }
+playlist = {
+	add: function(song, playlist) {
+		var socketdata = {
+			destination: playlist,
+			tracks: [song.id],
+			token: chinchilla.token,
+			type: 'playlist'
+		}
+		socket.emit('add-tracks-to-collection', socketdata);
+		notifications.create('Adding...');
+	}
+}

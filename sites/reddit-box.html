@@ -1,5 +1,8 @@
 <div class="reddit-box song{% if reddit.song.ytid %} recognized{% else %} not-recognized{% endif %}{% if reddit.inlib %} in-library {% else %} not-in-library{% endif %}" data-album="{{reddit.song.album}}" data-name="{{reddit.song.name}}" data-index="{{loop.index}}" data-duration="{{reddit.song.duration}}" data-albumid="{{reddit.song.albumid}}" data-artist="{{reddit.song.artist}}" data-artistid="{{reddit.song.artistid}}" data-image="{{reddit.song.image}}" data-id="{{reddit.song.id}}" data-explicit="{{reddit.song.explicit}}" data-genre="{{reddit.song.genre}}" data-numberinalbum="{{reddit.song.numberinalbum}}" data-cdinalbum="{{reddit.song.cdinalbum}}" data-tracks="{{reddit.song.tracks}}" data-cdcount="{{reddit.song.cdcount}}" data-preview="{{reddit.song.preview}}" data-release="{{reddit.song.release}}" {% if reddit.song.ytid %} data-ytid="{{reddit.song.ytid}}" {% endif %}>
 	<img src="{{reddit.hqimg}}" onload="$(this).removeClass('image-op0')" class="image-op0">
+	<div class="visual-play-button recognized findandplay" data-id="{{reddit.song.id}}">
+		<div class="play-icon"></div>
+	</div>
 	<div class="reddit-image-actions">
 		{% if user %}
 		<div class="heart"></div>

@@ -367,12 +367,28 @@ this.connection = function (socket) {
 								}
 							});
 						}
-						console.log(data.tracks)
-						var cleanedtracks = _.compact(data.tracks);
-						db.getSongsByIdList(data.tracks, function(songs) {
-							data.songs = songs;
-							afterEnoughTrackInfoAvailable()
+						data.tracks = _.compact(data.tracks);
+						db.getSongsByIdList(data.tracks, afterSongsByIdListFetched);
+					}
+				},
+				afterSongsByIdListFetched 	= function(songs) {
+					data.songs = songs;
+					checkForMissingTracksInDb(afterEnoughTrackInfoAvailable);
+				},
+				checkForMissingTracksInDb = function(callback) {
+					if (data.songs.length != data.tracks.length) {
+						var notindb = _.clone(data.tracks)
+						_.each(data.songs, function(song) {
+							notindb = _.without(notindb, song.id);
 						});
+						itunes.getFromItunes(notindb, function (songs) {
+							data.songs = _.union(data.songs, songs);
+							callback();
+							db.addTracksBulk(songs);
+						})
+					}
+					else {
+						callback();
 					}
 				},
 				afterEnoughTrackInfoAvailable = function() {

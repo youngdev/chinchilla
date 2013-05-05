@@ -9,6 +9,7 @@
 //@codekit-prepend "templates.js"
 //@codekit-prepend "player.js"
 //@codekit-prepend "search.js"
+//@codekit-prepend "add-tracks.js"
 //@codekit-prepend "import.js"
 //@codekit-prepend "errors.js"
 //@codekit-prepend "recognition.js"

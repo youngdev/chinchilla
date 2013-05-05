@@ -1,4 +1,5 @@
-var request = require('request')
+var request = require('request'),
+    _       = require('underscore');
 
 exports.search = function(query, options, callback) {
 
@@ -45,6 +46,19 @@ exports.lookup = function(id, options, callback) {
     }
   })
 }
+exports.getFromItunes = function(ids, callback) {
+  var idstring = _.compact(
+    _.map(ids, function(id) {
+      return parseFloat(id);
+    })
+  ).join(',');
+  request("http://itunes.apple.com/lookup?country=us&entity=song&media=music&id=" + ids, function(err, response, body) {
+    if (body != undefined && !err) {
+        var tracks = _.map(JSON.parse(body).results, function (song) { return itunes.remap(song) });
+        callback(tracks);
+    }
+  });
+}
 exports.remap = function (track) {
    return {
         name: track.trackName,
@@ -53,8 +67,8 @@ exports.remap = function (track) {
 		    albumid: track.collectionId,
 		    artistid: track.artistId,
 		    artist: track.artistName,
-        image: track.artworkUrl100,
-        id: track.trackId,
+            image: track.artworkUrl100,
+            id: track.trackId,
 		    explicit: track.trackExplicitness == "explicit" ? true : false,
 		    genre: track.primaryGenreName,
 		    numberinalbum: track.trackNumber,

@@ -196,6 +196,29 @@ var autocomplete        = function() {
 		clearinput.show();
 	}
 };
+var addtrack        = function(e) {
+	/*
+		Trigger search method
+	*/
+	if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 16) {
+		return;
+	}
+	var searchfield = $(".add-tracks-input"),
+		value		= searchfield.val(),
+		results     = $(".add-tracks-results");
+	if (!window.lastsearchtimestamp) {
+		window.lastsearchtimestamp = Date.now();
+	}
+	else {
+		var timestamp = Date.now()
+		window.lastsearchtimestamp = timestamp;
+		setTimeout(function() {
+			if (timestamp == window.lastsearchtimestamp) {
+				addtracks.autocomplete(value);
+			}
+		}, 200);
+	}
+};
 var logout 				= function() {
 	var cookies = document.cookie.split(";");
 
@@ -357,10 +380,17 @@ var playalbum 			= function() {
 	});
 	player.playSong(firstsong);
 }
+var findindom 			= function(dom) {
+	var id = $(dom).attr("data-id");
+	return ($('.song[data-id='+id+']').eq(0))[0];
+}
 var findandplay 		= function() {
-	var id = $(this).attr("data-id");
-	var song = ($('.song[data-id='+id+']').eq(0))[0];
+	var song = findindom(this);
 	player.playSong(song);
+}
+var findandqueue 		= function() {
+	var song = findindom(this);
+	player.queue1.add(song);
 }
 var addalbumtolib 		= function() {
 	var album 		= $(this).parents('.album');
@@ -371,12 +401,29 @@ var addalbumtolib 		= function() {
 	}); 
 	library.batchAdd(array);
 }
+var addtrackskeys 		= function(key) {
+	var classname = 'add-tracks-selected'
+	if (key == 13) {
+		$('.'+classname).click();
+	}
+	else {
+		var dom = $('.' + classname);
+		var direction = (key == 38) ? 'prev' : 'next'
+		var next = dom[direction]('a');
+		if (next.length != 0) {
+			$(next)	.addClass(classname);
+			$(dom)	.removeClass(classname);
+		}
+	}
+	
+	
+}
 var keys 				= function(e) {
 	var key = e.keyCode;
 	/*
 		Don't trigger this function when focus is in input
 	*/
-	if ($(e.srcElement).is('input')) {
+	if ($(e.srcElement).is('input') && !($(e.srcElement).is('.add-tracks-input'))) {
 		return;
 	}
 	e.preventDefault();
@@ -384,6 +431,11 @@ var keys 				= function(e) {
 		Down key
 	*/
 	if (key == 40 || key == 38) {
+		if ($('.add-tracks-dropdown').is(':visible')) {
+			e.preventDefault();
+			addtrackskeys(key)
+			return;
+		}
 		var thissong = $('.song.selected')
 		var upordown = (key == 40) ? 'next' : 'prev';
 		var next = thissong[upordown]('.song').addClass('selected');
@@ -395,6 +447,10 @@ var keys 				= function(e) {
 		Enter key
 	*/
 	if (key == 13) {
+		if ($('.add-tracks-dropdown').is(':visible')) {
+			addtrackskeys(key)
+			return;
+		}
 		var songs 		= $('.song.selected.recognized');
 		var last 		= songs[songs.length-1];
 		var firstsong 	= songs.splice(0,1);
@@ -408,6 +464,12 @@ var keys 				= function(e) {
 		$.each(queue2, function(key, song) {
 			player.queue2.add(helpers.parseDOM(song));
 		});
+	}
+	if (key == 39) {
+		player.playNext();
+	}
+	if (key == 37) {
+		player.playLast();
 	}
 
 }
@@ -506,31 +568,43 @@ var pldropdown 			= function() {
 		});
 	}
 }
-var mkplpublic 				= function() {
+var addtracksdd 		= function() {
+	$('.add-tracks-dropdown').toggle();
+	if ($('.add-tracks-dropdown').is(':visible')) {
+		$('body').one('click contextmenu', function() {
+			$(".add-tracks-dropdown").hide();
+		});
+		$('.add-tracks-dropdown').on('click contextmenu', function(e) {
+			e.stopPropagation();
+		});
+		$('.add-tracks-input').focus();
+	}
+}
+var mkplpublic 			= function() {
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy')
 	label.find('span').text('Public');
 	label.find('img').attr('src', '/api/svg/public');
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': true});
 }
-var mkplprivate 			= function() {
+var mkplprivate 		= function() {
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	label.find('span').text('Private');
 	label.find('img').attr('src', '/api/svg/lock');
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': false});
 }
-var mkplnwattop 			= function() {
+var mkplnwattop 		= function() {
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': true});
 }
-var mkplnwatbottom 			= function() {
+var mkplnwatbottom 		= function() {
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': false});
 }
-var closenotification 		= function() {
+var closenotification 	= function() {
 	$('#statusbar').hide();
 }
 $(document)
@@ -544,6 +618,7 @@ $(document)
 .on('click',        '#rewind',          				rewind				) // Go back to previous track.
 .on('mouseover',    '[data-tooltip]',   				tooltip     		) // Show small black tooltips.
 .on('keyup',        '#search-field',    				autocomplete		) // Show suggestions when user types into search.
+.on('keyup',        '.add-tracks-input',    			addtrack 			) // Show suggestions when user types into search.
 .on('click',		'#clear-input',						clearinput  		) // Delete everything in the search field.
 .on('click',        '.play-button',     				playSong			) // Play buttons are in track views for instance.
 .on('click',		'.library-button',					addtolib			) // Sends a request to the server to save the song.
@@ -558,6 +633,7 @@ $(document)
 .on('click',		'.play-all-album',					playalbum 			) // Play all the songs on one album
 .on('click', 		'.add-all-album',					addalbumtolib		) // Add all tracks to an album
 .on('click',		'.findandplay',						findandplay 		) // Searches for a track in the DOM and plays it
+.on('click',		'.findandqueue',					findandqueue 		) // Equivalent for 'findandplay' but for queueing
 .on('click', 		'.notification .actions span',		hidenotification	) // Close notifications
 .on('click',		'.albumhidden-message',				showalbum 			) // Show albums that are only instrumentals or EPs
 .on('click',		'.add-new-playlist',				newplaylist 		) // New playlist
@@ -567,6 +643,7 @@ $(document)
 .on('click',		'.add-song-to-playlist-button', 	addsongtopl 		) // Add a song to a playlist 
 .on('click',		'.remove-song-from-playlist-button',remsongfrompl 		) // Remove song from playlist
 .on('click', 		'.playlist-privacy',		 		pldropdown 			) // click to reveal privacy options
+.on('click', 		'.add-tracks-quickly',		 		addtracksdd 		) // click to reveal privacy options
 .on('click', 		'.make-playlist-public', 			mkplpublic 			) // Contextmenu option to make playlist public
 .on('click', 		'.make-playlist-private',			mkplprivate 		) // Contextmenu option to make playlist private
 .on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
@@ -585,7 +662,11 @@ $(document).ready(function() {
 	    _.each(unrecognized, function(track) {
 	    	recognition.queue.push(track);
 		});
-		$('.song[data-id="' + player.nowPlaying.get().id + '"]').addClass('now-playing')
+		var nowPlaying = player.nowPlaying.get();
+		if (nowPlaying) {
+			$('.song[data-id="' + nowPlaying.id + '"]').addClass('now-playing');
+		}
+		
 	});
 	$.subscribe('view-gets-loaded', function() {
 		$('#view').addClass('view-loading');
