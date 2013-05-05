@@ -119,7 +119,7 @@ this.getTracksFromAlbum 	= function(albumid, callback) 	{
         }
 	});
 };
-this.addTrack				= function(track, callback) 	{
+var addTrack = function(track, callback) 	{
 	connection.collection("tracks").update({id: track.id}, track, options, function(err) {
 		if (err) {
 			console.log(err);
@@ -129,6 +129,7 @@ this.addTrack				= function(track, callback) 	{
 		}
 	});
 };
+this.addTrack = addTrack;
 this.addYTID 				= function(track, callback) 	{
 	connection.collection("tracks").update({id: track.id}, { $set: {ytid: track.ytid} }, {safe: true, upsert: false},  function(err) {
 		if (!err) {
@@ -137,10 +138,8 @@ this.addYTID 				= function(track, callback) 	{
 	});
 }
 this.addTracksBulk 			= function(tracks, callback)	{
-	connection.collection("tracks").insert(tracks, options, function(err) {
-		if (!err && callback) {
-			callback();
-		}
+	_.each(tracks, function(track) {
+		addTrack(track, function(){});
 	});
 }
 this.addAlbum				= function(album, callback) 	{

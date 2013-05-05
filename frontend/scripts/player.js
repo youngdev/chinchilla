@@ -33,7 +33,6 @@ player.playSong = function(song, noautoplay, nohistory) {
  		}
 	}
 	else {
-		console.log('Unrecognized song gets played')
 		var dom = (song instanceof HTMLElement) ? $(song) : $(".song[data-id=" + song.id + "]")[0];
 		$(dom).addClass("wantstobeplayed");
 		recognition.stop();
@@ -41,31 +40,8 @@ player.playSong = function(song, noautoplay, nohistory) {
 		recognition.start();
 	}
 }
-player.nowPlaying = {
-	replace: function(song) {
-		var song = helpers.parseDOM(song);
-		localStorage['nowPlaying'] = JSON.stringify(song);
-		$("#track-title a").text(song.name).attr('data-navigate', '/song/' + song.id);
-		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
-		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
-		var npimage1 = $("#nowplaying-image"), npimage2 = $("#nowplaying-image2"), cover = helpers.getHQAlbumImage(song, 225);
-		if (npimage1.hasClass('np-placeholder-used')) {
-			npimage1.removeClass('np-placeholder-used').attr('src', '');
-			npimage2.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
-				$(npimage2).css({opacity: 0.7}, 400);
-				$(npimage1).css({opacity: 0}, 400);
-			});
-		}
-		else {
-			npimage2.removeClass('np-placeholder-used').attr('src', '')
-			npimage1.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
-				$(npimage1).css({opacity: 0.7}, 400);
-				$(npimage2).css({opacity: 0}, 400);
-			});
-		}
-		$('.song').removeClass('now-playing')
-		$(".song[data-id='" + song.id + "']").addClass('now-playing');
-		var queue1    = player.queue1.get(),
+updateHints = function() {
+	var queue1    = player.queue1.get(),
 			queue2    = player.queue2.get(),
 			queue     = queue1.concat(queue2),
 			next      = queue.shift(),
@@ -77,6 +53,36 @@ player.nowPlaying = {
 		$(".prev-update").html(prevlabel);
 		$("#skip").attr("data-tooltip", "<div class='next-update'>" + nextlabel + "</div>");
 		$("#rewind").attr("data-tooltip", "<div class='prev-update'>" + prevlabel + "</div>");
+}
+player.nowPlaying = {
+	replace: function(song) {
+		var oldsong = player.nowPlaying.get();
+		var song = helpers.parseDOM(song);
+		localStorage['nowPlaying'] = JSON.stringify(song);
+		$("#track-title a").text(song.name).attr('data-navigate', '/song/' + song.id);
+		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
+		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
+		var npimage1 = $("#nowplaying-image"), npimage2 = $("#nowplaying-image2"), cover = helpers.getHQAlbumImage(song, 225);
+		if (oldsong && oldsong.image != song.image) {
+			if (npimage1.hasClass('np-placeholder-used')) {
+				npimage1.removeClass('np-placeholder-used').attr('src', '');
+				npimage2.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
+					$(npimage2).css({opacity: 0.7}, 400);
+					$(npimage1).css({opacity: 0}, 400);
+				});
+			}
+			else {
+				npimage2.removeClass('np-placeholder-used').attr('src', '')
+				npimage1.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
+					$(npimage1).css({opacity: 0.7}, 400);
+					$(npimage2).css({opacity: 0}, 400);
+				});
+			}
+		}
+		
+		$('.song').removeClass('now-playing')
+		$(".song[data-id='" + song.id + "']").addClass('now-playing');
+		updateHints()
 	},
 	get: function(song) {
 		helpers.localStorageSafety('nowPlaying');
@@ -90,6 +96,7 @@ var Queue = function(name) {
 		helpers.localStorageSafety(lskey);
 		helpers.addToLocalStorage(lskey, song, first);
 		player.drawQueue();
+		updateHints();
 		return helpers.getLocalStorage(lskey);
 	}
 	this.get = function() {

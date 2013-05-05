@@ -132,9 +132,7 @@ this.artist 					= function(request, response) {
 	 		dbquery.addArtist(data.artist, function() {
 	 			console.log('Artist added', data.artist);
 	 		});
-	 		dbquery.addTracksBulk(tracks, function() {
-	 			console.log('Bulk tracks added');
-	 		});
+	 		dbquery.addTracksBulk(tracks);
 	 	},
 	 	afterArtistIsAvailable 	= function() {
 	 		dbquery.getSongsByArtistId(data.artist.id, afterSongListIsReceived);
@@ -404,15 +402,14 @@ this.album 						= function(request, response) {
 	 				dbquery.addAlbum(data.album, function() {
 	 					console.log('Album added', data.album.name);
 	 				});
-	 				dbquery.addTracksBulk(data.songs, function() {
-	 					console.log('Bulk tracks added.');
-	 				});
+	 				dbquery.addTracksBulk(data.songs);
 	 				remapAlbums();
 				});
 			}
 		},
 		afterAlbumTracksFetched 		= function(songs) {
 			data.songs = songs;
+			data.songs = _.uniq(data.songs, function(song) { return song.id });
 			remapAlbums();
 		},
 		remapAlbums 					= function() {

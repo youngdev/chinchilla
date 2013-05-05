@@ -144,7 +144,7 @@ helpers = {
 			},
 			{
 				word: 'itunes',
-				reason: 'This album is an itunes version:'
+				reason: 'This album is an iTunes version:'
 			},
 			{
 				word: 'live',
