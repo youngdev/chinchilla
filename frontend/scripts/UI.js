@@ -100,7 +100,6 @@ window.playSong = function(e)    {
 			Add them to the queue.
 		*/
 		var nextSongs = $(this).nextAll(".song");
-		player.queue1.clear();
 		player.queue2.clear();
 		$.each(nextSongs, function(key, song) {
 			player.queue2.add(song);
@@ -341,8 +340,9 @@ var setchange			= function() {
 		chinchilla.settings[setting.key] = setting.value;
 	});
 	socket.emit('update-settings', {settings: settings, token: chinchilla.token});
+	notifications.create('Saving...')
 	socket.once('settings-saved', function() {
-		console.log("Settings saved");
+		notifications.create('Settings saved.')
 	})
 }
 var ordersongs			= function() {
@@ -389,8 +389,15 @@ var findandplay 		= function() {
 	player.playSong(song);
 }
 var findandqueue 		= function() {
-	var song = findindom(this);
+	var duration 		= _.pluck(player.queue1.get(), 'duration'),
+		totalduration 	= _.reduce(duration, function(a, b) { return a + parseFloat(b) }, 0),
+		currentposition = ytplayer.getCurrentTime(),
+		songlength 		= ytplayer.getDuration()
+		untilplayed 	= totalduration + songlength*1000 - currentposition*1000,
+		label 			= helpers.parsehours(untilplayed),
+		song 			= findindom(this);
 	player.queue1.add(song);
+	notifications.create(helpers.parseDOM(song).name + ' was added to the queue. It will be played in ' + label + '.');
 }
 var addalbumtolib 		= function() {
 	var album 		= $(this).parents('.album');
@@ -456,7 +463,6 @@ var keys 				= function(e) {
 		var firstsong 	= songs.splice(0,1);
 		player.playSong(firstsong[0]);
 		player.queue2.clear();
-		player.queue1.clear();
 		_.each(songs, function(song) {
 			player.queue1.add(song);
 		});
@@ -471,6 +477,10 @@ var keys 				= function(e) {
 	if (key == 37) {
 		player.playLast();
 	}
+	if (key == 32) {
+		console.log('space key')
+		player.togglePlayState()
+	} 
 
 }
 var hidenotification  	= function() {
