@@ -3,6 +3,6 @@ notifications = {
 		/*
 			Set the given HTML as content
 		*/
-		$('#statusbar').html(html).css('display', 'inline');
+		$('#statusbar').html(html + ' <span class="close-notification">Dismiss</span>').css('display', 'inline');
 	}
 } 

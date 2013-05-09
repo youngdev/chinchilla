@@ -63,7 +63,7 @@ player.nowPlaying = {
 		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
 		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
 		var npimage1 = $("#nowplaying-image"), npimage2 = $("#nowplaying-image2"), cover = helpers.getHQAlbumImage(song, 225);
-		if (oldsong && oldsong.image != song.image) {
+		if ((oldsong && oldsong.image != song.image) || (npimage1.attr('src') == '' && npimage1.attr('src') == '')) {
 			if (npimage1.hasClass('np-placeholder-used')) {
 				npimage1.removeClass('np-placeholder-used').attr('src', '');
 				npimage2.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
@@ -79,7 +79,6 @@ player.nowPlaying = {
 				});
 			}
 		}
-		
 		$('.song').removeClass('now-playing')
 		$(".song[data-id='" + song.id + "']").addClass('now-playing');
 		updateHints()
@@ -224,4 +223,13 @@ player.drawQueue	= function() {
 		var img = $("<img>", {src: song.image}).appendTo(div);
 		div.appendTo("#queue");
 	})
+}
+player.togglePlayState 	= function() {
+	var state = ytplayer.getPlayerState();
+	if (state == 1) {
+		player.pause();
+	}
+	else {
+		player.play();
+	}
 }

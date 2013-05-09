@@ -116,7 +116,9 @@ helpers = {
 	parsehours: function(number) {
 		var seconds = number / 1000,
 			label;
-		if 			(seconds < 90) 	{ label = 'One minute' }
+		if 			(seconds < 10) { label = 'a few seconds'} 
+		else if 	(seconds < 50) { label = Math.round(seconds/10)*10 + ' seconds'}
+		else if 	(seconds < 90) 	{ label = 'one minute' }
 		else if 	(seconds < 3600) { label = Math.round(seconds/60) + ' minutes' }
 		else if 	(3600 <= seconds) { label = Math.round(seconds/360)/10 + ' hours'}
 		else 		{label = 'Unknown length'}

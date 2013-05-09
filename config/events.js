@@ -19,7 +19,8 @@ var dirup = __dirname.substr(0, __dirname.length - 7);
 var notificationtemplates = {
 	track_added: 	swig.compileFile(dirup + '/sites/notifications/track-added.html'),
 	track_removed: 	swig.compileFile(dirup + '/sites/notifications/track-removed.html'),
-	tracks_added: 	swig.compileFile(dirup + '/sites/notifications/tracks-added.html')
+	tracks_added: 	swig.compileFile(dirup + '/sites/notifications/tracks-added.html'),
+	tracks_removed: swig.compileFile(dirup + '/sites/notifications/tracks-removed.html')
 }
 var menutemplates 		  = {
 	playlist: 		swig.compileFile(dirup + '/sites/playlistmenuitem.html'),
@@ -339,11 +340,11 @@ this.connection = function (socket) {
 						fetchUserCollections()
 					}
 					else {
-						socket.emit('notification', { html: 'To add tracks you must be logged in. <span data-navigate="/login">Login</span><span class="close-notification">Dismiss</span>' })
+						socket.emit('notification', { html: 'To add tracks you must be logged in. <span data-navigate="/login">Login</span>' })
 					}
 				},
 				fetchUserCollections = function() {
-					db.getUserCollections(data.user, getSongs)
+					db.getUserCollections(data.user, getSongs);
 				},
 				getSongs 		= function(collections) {
 					data.collections = collections;
@@ -353,7 +354,7 @@ this.connection = function (socket) {
 							return;
 						}
 						else if (!(data.type == 'library' || data.type == 'playlist')) {
-							socket.emit('notification', { html: 'You must add the track to either the library or to a playlist. <span class="close-notification">Dismiss</span>' });
+							socket.emit('notification', { html: 'You must add the track to either the library or to a playlist.' });
 							return;
 						}
 						else {
@@ -423,7 +424,7 @@ this.connection = function (socket) {
 						});
 					}
 					else {
-						db.getPlaylistByUrl(data.destination, function(playlist) {
+						db.getPlaylistByUrl(data.destination, function (playlist) {
 							if (playlist) {
 								data.playlist = playlist;
 								var userplaylists = _.pluck(data.collections.playlists, 'url');
@@ -435,15 +436,89 @@ this.connection = function (socket) {
 								});
 								db.savePlaylist(data.playlist, function() {
 									var diff = _.reduce(data.songs, function (a,b) { return a + b.duration }, 0);
-									socket.emit('multiple-playlist-songs-added', { divs: data.divs, position: data.playlist.newestattop ? 'top' : 'bottom', view: data.destination, trackcount: playlist.tracks.length, diff: diff, notification: output });
+									socket.emit('multiple-playlist-songs-added', { divs: data.divs, position: data.playlist.newestattop ? 'top' : 'bottom', view: data.destination, trackcount: playlist.tracks.length, lengthdifference: diff, notification: output });
 								});
 							}
 							else {
-								socket.emit('notification', { html: 'This playlist does not exist. <span class="close-notification">Dismiss</span>' })
+								socket.emit('notification', { html: 'This playlist does not exist. ' })
 							}
 						});
 					}
 				}
 			db.getUser(data.token, afterUserFetched);
+		});
+		socket.on('remove-tracks-from-collection', function(data) {
+			var tmpl 				= notificationtemplates.tracks_removed,
+				afterUserFetched 	= function(user) {
+				data.user = user;
+				if (data.user) {
+					fetchUserCollections()
+				}
+				else {
+					socket.emit('notification', { html: 'To add tracks you must be logged in. <span data-navigate="/login">Login</span>' })
+				}
+				},
+				fetchUserCollections = function() {
+					db.getUserCollections(data.user, getSongs);
+				},
+				getSongs 			 = function(collections) {
+				data.collections = collections;
+					if (data.tracks != undefined && _.isArray(data.tracks)) {
+						if (data.tracks.length == 0) {
+							socket.emit('notification', { html: 'You have selected no tracks to remove.' });
+							return;
+						}
+						else if (!(data.type == 'library' || data.type == 'playlist')) {
+							socket.emit('notification', { html: 'You must remove the track from either the library or from a playlist.' });
+							return;
+						}
+						else {
+							data.tracks = _.map(data.tracks, function(track) {
+								var number = parseFloat(track);
+								if (_.isNumber(number)) {
+									return parseFloat(number);
+								}
+								else {
+									return null;
+								}
+							});
+						}
+						data.tracks = _.compact(data.tracks);
+						afterEnoughTrackInfoAvailable();
+					}
+				},
+				afterEnoughTrackInfoAvailable = function() {
+					var output = tmpl.render(data);
+					if (data.type == 'library') {
+						_.each(data.tracks, function (id) {
+							data.collections.library = _.without(data.collections.library, id)
+						});
+						data.collections.library = _.uniq(data.collections.library);
+						db.saveUserCollections(data.collections, function(collection) {
+							socket.emit('tracks-removed', { tracks: data.tracks, notification: output });
+						});
+					}
+					else {
+						db.getPlaylistByUrl(data.destination, function (playlist) {
+							if (playlist) {
+								data.playlist = playlist;
+								var userplaylists = _.pluck(data.collections.playlists, 'url');
+								_.each(data.tracks, function (song) {
+									if (_.include(userplaylists, data.destination)) {
+										playlist.tracks = _.without(playlist.tracks, song);
+									}
+								});
+								db.savePlaylist(data.playlist, function() {
+									/**
+										FIX THIS!!!
+									**/
+									var diff = 0;
+									socket.emit('multiple-playlist-songs-removed', {view: data.destination, trackcount: playlist.tracks.length, lengthdifference: diff, notification: output, tracks: data.tracks});
+								});
+							}
+						})
+					}
+				}
+				db.getUser(data.token, afterUserFetched);
 		});
 };

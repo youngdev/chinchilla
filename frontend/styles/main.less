@@ -407,12 +407,9 @@ img {
 	font-weight: 500;
 	#sidebar-player {
 		#nowplaying-image, #nowplaying-image2 {
-			opacity: 0.7;
+			opacity: 0;
 			position: absolute;
 			-webkit-transition: opacity 0.5s ease-out;
-		}
-		#nowplaying-image2 {
-			opacity: 0;
 		}
 	}
 	.npinfo-first {
@@ -690,7 +687,6 @@ img {
 			height: auto;
 			vertical-align: top;
 		}
-		margin-top: -10px;
 		padding: 0;
 		width: 100%;
 		width: -webkit-calc(~"100% + 20px");
@@ -773,7 +769,7 @@ img {
 		width: 100%;
 		background: white;
 		position: absolute;
-		top: 176px;
+		top: 186px;
 	}
 	.coverstack-description {
 		position: absolute;
@@ -1357,6 +1353,7 @@ img {
 	width: 225px;
 	background: white;
 	border: 1px solid @bordercolor;
+	min-height: 40px;
 	.context-tip {
 		overflow: hidden;
 		height: 100px;
@@ -1487,6 +1484,18 @@ img {
 		padding: 16px;
 		font-size: 0.8em;
 		opacity: 0.3;
+	}
+}
+[data-route='/library'] {
+	.add-tracks-quickly, .add-tracks-dropdown {
+		margin-left: 180px !important;
+	}
+	.add-tracks-dropdown {
+		top: 52px !important;
+		color: black;
+	}
+	.add-tracks-header {
+		height: 37px !important;
 	}
 }
 .settings {
