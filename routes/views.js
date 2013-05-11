@@ -735,6 +735,7 @@ this.main 						= function(request, response) {
 			var top5 		= _.first(charts, 5);
 			var top5 		= _.map(top5, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
 			var top5 		= _.compact(top5);
+			console.log(top5);
 			data.charts 	= _.map(top5, function(song) {
 				return {
 					song: song,
