@@ -45,6 +45,9 @@ socket.on('tracks-added', function (data) {
 		}
 		$('.song[data-id="' + $(song).attr('data-id') + '"]').addClass('in-library animated').removeClass('not-in-library')
 	});
+	_.each(data.tracks, function (track) {
+		chinchilla.library.push(track);
+	});
 	notifications.create(data.notification)
 });
 socket.on('tracks-removed', function (data) {
@@ -52,12 +55,17 @@ socket.on('tracks-removed', function (data) {
 	$.each(data.tracks, function (key, song) {
 		var song = table.find('[data-id="' + song + '"]').remove();
 	});
-	notifications.create(data.notification)
+	notifications.create(data.notification);
+	console.log(data.tracks);
+	_.each(data.tracks, function (track) {
+		chinchilla.library = _.without(chinchilla.library, track);
+	});
 });
 socket.on('track-removed', function (data) {
 	notifications.create(data.notification);
 	var view = $('[data-route="/library"]')
 	var song = view.find('[data-id="' + data.id + '"]').remove();
+	chinchilla.library = _.without(chinchilla.library, data.id);
 });
 
 socket.on('playlist-added', pladded);

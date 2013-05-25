@@ -82,10 +82,10 @@ helpers = {
         return text;
     },
     getHQAlbumImage: function(album, size) {
-    	var lq = album.image,
-    		replace = (size) ? size : '400',
-    		hq = lq.replace('100x100-75.jpg', (replace+'x'+replace+'-75.jpg'));
-    	return hq;
+    	var lq = album.image;
+    	//Just in case something invalid gets passed, so the server doesn't crash then.
+    	if (!lq) { return 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==' }
+    	return lq.replace('100x100-75.jpg', (size+'x'+size+'-75.jpg'));
     },
     coverArrayToHQ: function(songs, size) {
     	var newarray = [];

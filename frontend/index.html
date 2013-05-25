@@ -1,10 +1,12 @@
 <!doctype html>
+{% if user %}
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Tunechilla</title>
 	<link id="favicon" rel="shortcut icon" type="image/png" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/idbwrapper/1.1.0/idbstore.min.js"></script>
 	<!--
 	<script src="/api/script/underscore"></script>
 	<script src="/api/script/helpers"></script>
@@ -146,6 +148,7 @@
     	chinchilla = {
     		loggedin: {% if user %} true,
     		token: '{{user.token}}' {% else %} false {% endif %},
+    		{% if user %}library:  [{{collection.library}}] {% endif %},
     		settings: {% if user %} {
     			{% for setting in user.settings %}
     			{{setting.key}}: {{setting.value}} {% if !loop.last %}, {% endif %}
@@ -155,5 +158,93 @@
     </script>
 	</div>
 	<div id="notifications"></div>
+
+
+	<script type="text/template" id="template-library">
+		<% if (tmpl.user) { %>
+			<div class="coverstack nomargin">
+				<% _.each(tmpl.coverstack, function(image) { %>
+					<img src="<%- image %>" border="0">
+				<% }); %>
+			</div>
+			<h1 class="oncoverstack">Your library</h1>
+			<div class="playlistdescription">
+				<p class="add-tracks-quickly list-view-button">
+					<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
+				</p>
+				<div class="add-tracks-dropdown">
+					<div class="add-tracks-header">
+						<input type="text" class="add-tracks-input" autofocus placeholder='Search for songs'>
+					</div>
+					<div class="add-tracks-results">
+			
+					</div>
+				</div>
+			</div>
+			<div class="extendedtable">
+				<%= tmpl.tracklist %>
+			</div>
+		<% } else { %>
+			You must be logged in to use the library.
+		<% } %>
+	</script>
+	<script type="text/template" id="template-tracklist">
+		<div class="album-tracks">
+			<% if (tmpl.album.cds) { %>
+				<% _.each(tmpl.album.cds, function(cd, key) { %>
+					<% if (tmpl.album.cds.length > 1) { %>
+						<h1>Disc <%- (key+1) %></h1>
+					<% } %>
+					<div class="table-wrapper">
+						<table>
+							<tr>
+								<th data-value="menu"></th>
+								<th data-value="name" data-order>Name</th>
+								<% if (tmpl.showartistalbum) { %>
+								<th data-value="artist" data-order>Artist</th>
+								<th data-value="album" data-order>Album</th>
+								<% } %>
+								<th data-value="duration" data-order>Length</th>
+							</tr>
+								<%= templates.buildSongsInList(cd[key], {showartistalbum: tmpl.showartistalbum}) %>
+						</table>
+					</div>
+				<% }); %>
+			<% } else { %>
+			<p class="album-loading">No tracks available</p>
+			<% } %>
+		</div>
+	</script>
+	<script type="text/template" id="template-song">
+	<% _.each(tmpl.cd, function(track) { %>
+				<tr class="song
+				<% if (track.ytid) { %> recognized <% } else { %> not-recognized <% } %>
+				<% if (track.inlib) { %> in-library <% } else { %> not-in-library<% } %>" 
+				<% _.each(['album', 'name', 'duration', 'albumid', 'artist', 'artistid', 'image', 'id', 'explicit', 'genre', 'numberinalbum', 'cdinalbum', 'tracks', 'cdcount', 'preview', 'release'], function (key) { %>
+					data-<%- key %>='<%- track[key] %>'
+					<% }); %> 
+					<% if (track.ytid) { %> data-ytid="<%- track.ytid %>" <% } %>
+
+				>
+				<td class="inline-actions">
+					<% if (chinchilla.loggedin) { %>
+					<div class="heart"></div>
+					<% } %>
+				</td>
+				<td><% if (tmpl.type == 'home') { %> <%- helpers.parsetext(track.artist) %> - <% } %> <%= helpers.parsetext(track.name) %></td>
+				<% if (tmpl.showartistalbum) { %>
+					<td class="table-artist"><a data-navigate="/artist/<%= track.artistid %>"><%= track.artist %></a></td>
+					<td class="table-album"><a data-navigate="/album/<%= track.albumid %>"><%= helpers.parsetext(track.album) %></a></td>
+				<% } %>
+				<td>{{parseduration(track.duration)}}</td>
+			</tr>
+		<% }); %>
+	</script>
 </body>
 </html>
+{% else %}
+	{% if block %}
+		<p style="padding: 5px; background: rgb(249, 237, 190); color: black; text-align: center;">{{block}}</p>
+	{% endif %} 
+	{% include startup %}
+{% endif %}

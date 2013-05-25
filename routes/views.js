@@ -50,6 +50,7 @@ var templates 		= 		{
     registration:           dirup + '/sites/registration.html',
     newuser:                dirup + '/sites/new-user.html',
     wrapper: 				dirup + '/frontend/index.html',
+    startup: 				dirup + '/frontend/infoscreen.html',
     library: 				dirup + '/sites/library.html',
     tracklist: 				dirup + '/sites/tracklist.html',
     settings: 				dirup + '/sites/settings.html',
@@ -69,7 +70,8 @@ var templates 		= 		{
     charts: 				dirup + '/sites/charts.html',
     retrocharts: 			dirup + '/sites/retro-charts.html',
     about: 					dirup + '/sites/about.html',
-    artistfreebase: 		dirup + '/sites/artistfreebase.html'
+    artistfreebase: 		dirup + '/sites/artistfreebase.html',
+    templates: 				dirup + '/sites/templates.html'
 };
 
 /*
@@ -433,7 +435,7 @@ this.lyrics	 					= function(request, response) {
 	var tmpl = swig.compileFile(templates.lyrics),
 		id 	 = request.params.id,
 		data = {},
-		domain = 'http://test.lyricfind.com/api_service/',
+		domain = 'http://api.lyricfind.com/',
 		searchkey = '2c559b886036ca94aaf4fd92849298aa',
 		displaykey = '67c67c978a54c763b7595553fbe8a730',
 		metadata = 'ef15d7987683309b86c4f90b08354c46',
@@ -523,11 +525,19 @@ this.wrapper       				= function(request, response) {
 	var tmpl 	= swig.compileFile(templates.wrapper),
 		cookie 	= new cookies(request, response),
 		token   = cookie.get('token'),
-		data 	= {},
+		data 	= {startup: templates.startup},
+		betatesters = ['jonnyburger', 'loewe1000']
 		afterUserFetch = function(user) {
 			data.user = user;
 			if (user) {
-				facebook.getLibraryFromRequest(request, afterLibraryFetched);
+				if (_.contains(betatesters, user.username)) {
+					facebook.getLibraryFromRequest(request, afterLibraryFetched);
+				}
+				else {
+					data.user = null;
+					data.block = "You are not a beta tester. Write a nice e-mail to info@tunechilla.com and you might become one! :)";
+					render();
+				}
 			}
 			else {
 				render();
@@ -535,6 +545,7 @@ this.wrapper       				= function(request, response) {
 		},
 		afterLibraryFetched = function(user) {
 			data.collection = user.collections;
+			data.library = JSON.stringify(user.collections.library);
 			render();
 		},
  		render 	= function() {
@@ -735,7 +746,6 @@ this.main 						= function(request, response) {
 			var top5 		= _.first(charts, 5);
 			var top5 		= _.map(top5, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
 			var top5 		= _.compact(top5);
-			console.log(top5);
 			data.charts 	= _.map(top5, function(song) {
 				return {
 					song: song,
