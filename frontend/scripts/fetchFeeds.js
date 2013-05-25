@@ -147,20 +147,35 @@ views = {
 	},
 	library: {
 		load: function() {
-			$.ajax({
-				url: "/api/library",
-				dataType: "html",
-				success: function(data) {
-					var view = $("#view");
-					view.html(data);
+			var library = chinchilla.library,
+				data = {user: chinchilla.loggedin},
+				afterLocalTracksFetched = function(data) {
+					var fetched = data;
+					var tofetch = _.difference(library, _.pluck(fetched, 'id'));
+					console.log("Fetched", fetched, "tofetch", tofetch);
+					if (tofetch.length != 0) {
+						socket.emit ('/api/tracks/get', { tracks: tofetch });
+						socket.on	('/api/tracks/get/response', function (tracks) {
+							var alltracks = _.union(tracks, fetched);
+							afterAllTracksFetched(alltracks);
+							_.each(tracks, function (track) {
+								DB.addTrack(track)
+							})
+						});
+					}
+					else {
+						afterAllTracksFetched(fetched);
+					}
+				},
+				afterAllTracksFetched 		= function(tracks) {
+					data.tracks = tracks;
+					var html = templates.buildLibrary(data);
+					$('#view').html(html);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')
-				},
-				error: function() {
-					errors.draw(404);
 				}
-			});
+				DB.getTracks({ids: library, callback: afterLocalTracksFetched});
 		}
 	},
 	lyrics: {

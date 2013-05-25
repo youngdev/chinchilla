@@ -5,7 +5,6 @@
 //@codekit-prepend "socket.io.js"
 //@codekit-prepend "notifications.js"
 //@codekit-prepend "sockets.js"
-//@codekit-prepend "swig.js"
 //@codekit-prepend "templates.js"
 //@codekit-prepend "player.js"
 //@codekit-prepend "search.js"
@@ -18,3 +17,4 @@
 //@codekit-prepend "library.js"
 //@codekit-prepend "UI.js"
 //@codekit-prepend "pubsub.js"
+//@codekit-prepend "local.js"

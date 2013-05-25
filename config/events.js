@@ -35,7 +35,7 @@ this.connection = function (socket) {
 			Send a confirmation for a successful connect to a user.
 			This is triggered on every site visit.
 		*/
-		socket.on('load-template', 				function (data) {
+		socket.on('load-template', 					function (data) {
 			/*
 				Templates are HTML strings with place holders that are used on the client-side and on the server-side.
 				This automates the process of keeping both versions up to date.
@@ -57,14 +57,14 @@ this.connection = function (socket) {
 				}
 			});   
 		});
-		socket.on('new-track', 					function (data) {
+		socket.on('new-track', 						function (data) {
 			var track = data;
 			track.id = parseFloat(track.id);
 			db.addTrack(track, function() {
 				socket.emit('track-uploaded', track.id);
 			});
 		});
-		socket.on('new-ytid', 					function (data) {
+		socket.on('new-ytid', 						function (data) {
 			var track = data;
 			track.id = parseFloat(track.id);
 			db.addYTID(track, function() {
@@ -72,13 +72,13 @@ this.connection = function (socket) {
 				socket.emit('track-uploaded', track.id);
 			});
 		});
-		socket.on('new-album', 					function (data) {
+		socket.on('new-album', 						function (data) {
 			var album = data;
 			db.addAlbum(album, function() {
 				console.log("Album added successfully.");
 			});
 		});
-		socket.on('add-track',					function (data) {
+		socket.on('add-track',						function (data) {
 			var tmpl = musictemplates.track;
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
@@ -100,7 +100,7 @@ this.connection = function (socket) {
 				}
 			});
 		});
-		socket.on('add-tracks', 				function (data) {
+		socket.on('add-tracks', 					function (data) {
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.addTracks(data.songs, user, function(collection) {
@@ -109,7 +109,7 @@ this.connection = function (socket) {
 				}
 			})
 		});
-		socket.on('remove-track', 				function (data) {
+		socket.on('remove-track', 					function (data) {
 			db.getUser(data.token, function(user) {
 				if (data.destination == 'library' && user) {
 					fb.removeTrack(data.song, user, function(collection) {
@@ -122,7 +122,7 @@ this.connection = function (socket) {
 				}
 			})
 		});
-		socket.on('get-contextmenu',			function (data) {
+		socket.on('get-contextmenu',				function (data) {
 			var tmpl 	= swig.compileFile(dirup + '/sites/contextmenu.html');
 			var state 	= data.state;
 			var render	= function() {
@@ -140,7 +140,7 @@ this.connection = function (socket) {
 				render();
 			}
 		});
-		socket.on('get-playlist-contextmenu',	function (data) {
+		socket.on('get-playlist-contextmenu',		function (data) {
 			var tmpl 	= swig.compileFile(dirup + '/sites/playlist-contextmenu.html');
 			var state 	= data.state;
 			var render	= function() {
@@ -155,7 +155,7 @@ this.connection = function (socket) {
 				});
 			});
 		});
-		socket.on('add-playlist-dialogue', 		function (data) {
+		socket.on('add-playlist-dialogue', 			function (data) {
 			fb.getUserPlaylists(data.token, function(playlists) {
 				var playlists = _.map(playlists, function(playlist) { 
 					playlist.inpl = (_.contains(playlist.tracks, parseFloat(data.song))); 
@@ -165,7 +165,7 @@ this.connection = function (socket) {
 				socket.emit('add-playlist-dialog-response', {html: output});
 			});
 		});
-		socket.on('get-playlist-options',		function (data) {
+		socket.on('get-playlist-options',			function (data) {
 			var tmpl 	= swig.compileFile(dirup + '/sites/playlist-options.html');
 			var render 	= function() {
 				var output = tmpl.render(data);
@@ -191,7 +191,7 @@ this.connection = function (socket) {
 			}
 			checkPlaylistOwner();
 		});
-		socket.on('change-playlist-privacy', 	function (data) {
+		socket.on('change-playlist-privacy', 		function (data) {
 			if (data.token) {
 				fb.ownspl(data.playlist, data.token, function (ownspl) {
 					if (ownspl) {
@@ -203,7 +203,7 @@ this.connection = function (socket) {
 				});
 			}
 		});
-		socket.on('change-playlist-order', 		function (data) {
+		socket.on('change-playlist-order', 			function (data) {
 			if (data.token) {
 				fb.ownspl(data.playlist, data.token, function (ownspl) {
 					if (ownspl) {
@@ -215,7 +215,7 @@ this.connection = function (socket) {
 				});
 			}
 		});
-		socket.on('rename-playlist',			function (data) {
+		socket.on('rename-playlist',				function (data) {
 			var afterUserFetched = function(user) {
 				if (user) {
 					fb.renamePlaylist(data.oldname, data.newname, user, afterPlaylistRenameEvaluated)
@@ -232,7 +232,7 @@ this.connection = function (socket) {
 			}
 			db.getUser(data.token, afterUserFetched);
 		});
-		socket.on('delete-playlist', 			function (data) {
+		socket.on('delete-playlist', 				function (data) {
 			var afterUserFetched = function(user) {
 				if (user) {
 					fb.deletePlaylist(data.url, user, afterPlaylistDeletionEvaluated);
@@ -245,7 +245,7 @@ this.connection = function (socket) {
 			}
 			db.getUser(data.token, afterUserFetched);
 		});
-		socket.on('add-playlist', 				function (data) {
+		socket.on('add-playlist', 					function (data) {
 			var afterUserFetched = function(user) {
 				if (user) {
 					fb.addPlaylist(data.name, user, afterPlaylistCreationEvaluated)
@@ -266,7 +266,7 @@ this.connection = function (socket) {
 			}			
 			db.getUser(data.token, afterUserFetched);
 		});
-		socket.on('add-song-to-playlist', 		function (data) {
+		socket.on('add-song-to-playlist', 			function (data) {
 			var tmpl = musictemplates.track;
 			db.getUser(data.token, function(user) {
 				db.getUserCollections(user, function(collections) {
@@ -292,7 +292,7 @@ this.connection = function (socket) {
 				});
 			});
 		});
-		socket.on('remove-song-from-playlist', 	function (data) {
+		socket.on('remove-song-from-playlist', 		function (data) {
 			db.getUser(data.token, function(user) {
 				db.getPlaylistByUrl(data.url, function(playlist) {
 					if (playlist) {
@@ -305,12 +305,12 @@ this.connection = function (socket) {
 				});
 			});
 		});
-		socket.on('update-settings', 			function (data) {
+		socket.on('update-settings', 				function (data) {
 			db.updateSettings(data, function() {
 				socket.emit('settings-saved');
 			});
 		});
-		socket.on('request-track-info',			function (data) {
+		socket.on('request-track-info',				function (data) {
 			var query = _.clean(data.name) + ' ' + _.clean(data.artist)
 			itunes.search(query, {entity: 'song', limit: 3}, function (json) {
 				// ERROR_HANDLING
@@ -324,7 +324,7 @@ this.connection = function (socket) {
 				}
 			});
 		});
-		socket.on('add-tracks-to-collection', 	function (data) {
+		socket.on('add-tracks-to-collection', 		function (data) {
 			/*
 			* {
 			* 	destination: 	'library' or '/u/jonnyburger/p/test-playlist',
@@ -420,7 +420,7 @@ this.connection = function (socket) {
 						});
 						data.collections.library = _.uniq(data.collections.library);
 						db.saveUserCollections(data.collections, function(collection) {
-							socket.emit('tracks-added', { divs: data.divs, position: 'top', notification: output });
+							socket.emit('tracks-added', { divs: data.divs, position: 'top', notification: output, tracks: _.pluck(data.songs, 'id') });
 						});
 					}
 					else {
@@ -447,7 +447,7 @@ this.connection = function (socket) {
 				}
 			db.getUser(data.token, afterUserFetched);
 		});
-		socket.on('remove-tracks-from-collection', function(data) {
+		socket.on('remove-tracks-from-collection', 	function (data) {
 			var tmpl 				= notificationtemplates.tracks_removed,
 				afterUserFetched 	= function(user) {
 				data.user = user;
@@ -520,5 +520,12 @@ this.connection = function (socket) {
 					}
 				}
 				db.getUser(data.token, afterUserFetched);
+		});
+		socket.on('/api/tracks/get', 				function (data) {
+			if (data && data.tracks && _.isArray(data.tracks)) {
+				db.getSongsByIdList(data.tracks, function (tracks) {
+					socket.emit('/api/tracks/get/response', tracks);
+				});
+			}
 		});
 };

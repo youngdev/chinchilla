@@ -1,3 +1,37 @@
+(function(){
+ 
+    var parse = JSON.parse;
+ 
+    JSON = {
+ 
+        stringify: JSON.stringify,
+ 
+        validate: function(str){
+        
+            try{
+                parse(str);
+                return true;
+            }catch(err){
+                return err;
+            }
+ 
+        },
+ 
+        parse: function(str){
+ 
+            try{
+                return parse(str);
+            }catch(err){
+                return undefined;
+            }
+ 
+        }
+    }
+    
+})();
+
+
+
 var request = require('request'),
     _       = require('underscore');
 
