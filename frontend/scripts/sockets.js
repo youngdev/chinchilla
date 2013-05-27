@@ -87,7 +87,6 @@ function listChanged(data) {
 	var table = view.find('tbody');
 	var trackcountlabel = view.find('.playlist-trackcount');
 	var pldurationlabel = view.find('.playlist-duration');
-	var trackcountlabel2 = $("[data-url='" + data.view + "']").removeClass("add-song-to-playlist-button not-in-playlist").addClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	var trackslabel 	= view.find('.playlist-plural-singular-tracks');
 	$(trackcountlabel).text(data.trackcount);
 	var newduration = parseFloat($(pldurationlabel).attr('data-duration')) + data.lengthdifference;
@@ -97,11 +96,13 @@ function listChanged(data) {
 }
 socket.on('playlist-song-removed', function (data) {
 	var table = listChanged(data);
+	var trackcountlabel2 = $("[data-url='" + data.view + "']").addClass("add-song-to-playlist-button not-in-playlist").removeClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	var view = $('[data-route="' + data.view + '"]');
 	view.find('[data-id="' + data.songid + '"]').remove();
 });
 socket.on('playlist-song-added', function (data) {
 	var table = listChanged(data);
+	var trackcountlabel2 = $("[data-url='" + data.view + "']").removeClass("add-song-to-playlist-button not-in-playlist").addClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	if (data.position == 'top' && (table.find('.song').length != 0)) {
 		table.find('.song').eq(0).before(data.song);
 	}
@@ -110,14 +111,23 @@ socket.on('playlist-song-added', function (data) {
 	}
 });
 socket.on('multiple-playlist-songs-added', function (data) {
-	var table = listChanged(data)
-	$.each(data.divs, function (key, div) {
+	console.log(data);
+	var table = listChanged(data);
+ 	$.each(data.divs, function (key, div) {
 		if (data.position == 'top' && (table.find('.song').length != 0)) {
 			table.find('.song').eq(0).before(div);
 		}
 		else {
 			table.append(div);
 		}
+	});
+	_.each(data.tracks, function (trackid) {
+		$('[data-route="/song/' + trackid + '"]')
+		.find("[data-url='" + data.view + "']")
+			.removeClass("add-song-to-playlist-button not-in-playlist")
+			.addClass("remove-song-from-playlist-button in-playlist contains-song")
+			.find('.song-page-playlist-trackcount')
+				.text(data.trackcount);
 	});
 	notifications.create(data.notification)
 });

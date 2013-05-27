@@ -436,7 +436,14 @@ this.connection = function (socket) {
 								});
 								db.savePlaylist(data.playlist, function() {
 									var diff = _.reduce(data.songs, function (a,b) { return a + b.duration }, 0);
-									socket.emit('multiple-playlist-songs-added', { divs: data.divs, position: data.playlist.newestattop ? 'top' : 'bottom', view: data.destination, trackcount: playlist.tracks.length, lengthdifference: diff, notification: output });
+									socket.emit('multiple-playlist-songs-added', { 
+										divs: data.divs, 
+										position: data.playlist.newestattop ? 'top' : 'bottom', 
+										view: data.destination, trackcount: playlist.tracks.length, 
+										lengthdifference: diff, 
+										notification: output,
+										tracks: _.pluck(data.songs, 'id')
+									});
 								});
 							}
 							else {
