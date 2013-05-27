@@ -1,5 +1,5 @@
 <!doctype html>
-{% if user %}
+{% if user || !user %}
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -236,7 +236,7 @@
 					<td class="table-artist"><a data-navigate="/artist/<%= track.artistid %>"><%= track.artist %></a></td>
 					<td class="table-album"><a data-navigate="/album/<%= track.albumid %>"><%= helpers.parsetext(track.album) %></a></td>
 				<% } %>
-				<td>{{parseduration(track.duration)}}</td>
+				<td> <%= helpers.parsetime(track.duration) %></td>
 			</tr>
 		<% }); %>
 	</script>
