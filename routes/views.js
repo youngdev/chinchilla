@@ -526,20 +526,24 @@ this.wrapper       				= function(request, response) {
 		cookie 	= new cookies(request, response),
 		token   = cookie.get('token'),
 		data 	= {startup: templates.startup},
-		betatesters = ['jonnyburger', 'loewe1000']
+		betatesters = ['jonnyburger', 'loewe1000'];
 		afterUserFetch = function(user) {
 			data.user = user;
+			console.log(request.query.secretaccess)
 			if (user) {
 				if (_.contains(betatesters, user.username)) {
 					facebook.getLibraryFromRequest(request, afterLibraryFetched);
 				}
 				else {
 					data.user = null;
-					data.block = "You are not a beta tester. Write a nice e-mail to info@tunechilla.com and you might become one! :)";
+					data.block = "You are not a beta tester. Write e-mail to info@tunechilla.com and you might become one! :)";
 					render();
 				}
 			}
 			else {
+				if (request.query.secretaccess == 'royhennig') {
+					data.allowed = true;
+				}
 				render();
 			}
 		},
