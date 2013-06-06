@@ -146,14 +146,15 @@
     <script>
 
     	chinchilla = {
-    		loggedin: {% if user %} true,
-    		token: '{{user.token}}' {% else %} false {% endif %},
-    		{% if user %}library:  [{{collection.library}}] {% endif %},
-    		settings: {% if user %} {
-    			{% for setting in user.settings %}
-    			{{setting.key}}: {{setting.value}} {% if !loop.last %}, {% endif %}
-    			{% endfor %}
-    		}{% else %} false{% endif %}
+    						loggedin: 		{% if user %} 	true 						{% else %} false 	{% endif %},
+    						token: 			{% if user %} 	'{{user.token}}' 			{% else %} false 	{% endif %},
+    		{% if user %}	library:  						[{{collection.library}}], 						{% endif %}
+    						settings: 		{% if user %} {
+    							{% for setting in user.settings %}
+    								{{setting.key}}: {{setting.value}} {% if !loop.last %}, {% endif %}
+    							{% endfor %}
+    						}
+    																					{% else %} false	{% endif %}
     	}
     </script>
 	</div>

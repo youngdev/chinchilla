@@ -260,6 +260,14 @@ img {
 			}
 		}
 	}
+	@-webkit-keyframes animatedstripes {
+		from {
+			background-position: 0 0;
+		}
+		to {
+			background-position: 19px 0;
+		}
+	}
 	#seek-bar {
 		width: 224px;
 		top: 186px;
@@ -272,6 +280,21 @@ img {
 			width: 0;
 			background: #478cff;
 		}
+	}
+	#seek-bar.buffering {
+		background: -webkit-linear-gradient(
+		  -45deg, 
+	      darken(@sidebarbg, 10%) 25%, 
+	      @sidebarbg 25%, 
+	      @sidebarbg 50%, 
+	      darken(@sidebarbg, 10%) 50%, 
+	      darken(@sidebarbg, 10%) 75%, 
+	      @sidebarbg 75%, 
+	      @sidebarbg
+	    );
+		-webkit-animation: animatedstripes 0.3s infinite linear;
+		background-position: 10px;
+		background-size: 20px 20px;
 	}
 	p.nowplaying-info {
 		margin-top: 0;
