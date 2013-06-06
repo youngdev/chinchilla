@@ -91,7 +91,7 @@ recognition = {
 	stop: function() {
 		recognition.started = false;
 	},
-	findVideo: function (song, callback, jquery, underscore, underscorestring) {
+	findVideo: function (song, callback, jquery, underscore, underscorestring, options) {
         if (jquery != undefined) {
             $ = jquery 
         }
@@ -102,17 +102,22 @@ recognition = {
             _s = underscorestring;
         }
         song.name = (song.title == undefined) ? song.name : song.title;
+        var data = {
+            alt: "json",
+           "max-results": 15,
+            q: song.artist + " " + song.name,
+            v: 2
+        }
+        if (options != undefined && _.contains(options, 'restricted')) {
+            data.restricted = 'DE';
+        }
         $.ajax({
             url: "http://gdata.youtube.com/feeds/api/videos",
-            data: {
-                alt: "json",
-                "max-results": 15,
-                q: song.artist + " - " + song.name
-            },
+            data: data,
             success: function (json) {
               recognition.findBestVideo(json, song, function(video) {
                 callback(video);
-              }, _, _s);
+              }, _, _s, options);
             }
           }
         );
@@ -139,8 +144,8 @@ recognition = {
                 -Minus 5 points per levenshtein difference
             */
             var videotitle      = _s.slugify(video.title.$t),
-                format1         = _s.slugify(song.artist + ' - ' + song.name),
-                format2         = _s.slugify(song.name + ' - ' + song.artist),
+                format1         = _s.slugify(song.artist + ' ' + song.name),
+                format2         = _s.slugify(song.name + ' ' + song.artist),
                 levenshtein1    = _s.levenshtein(videotitle, format1),
                 levenshtein2    = _s.levenshtein(videotitle, format2),
                 better          = levenshtein1 < levenshtein2 ? levenshtein1 : levenshtein2,

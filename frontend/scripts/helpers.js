@@ -7,6 +7,11 @@ helpers = {
 			localStorage[key] = "[]";
 		}
 	},
+	localStorageSafetyObject: function(key) {
+		if (localStorage[key] == null || localStorage[key] == undefined || localStorage[key] == 'undefined') {
+			localStorage[key] = "{}";
+		}
+	},
 	getLocalStorage: function(key) {
 		this.localStorageSafety(key);
 		return JSON.parse(localStorage[key]);

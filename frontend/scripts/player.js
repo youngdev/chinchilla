@@ -3,6 +3,10 @@ player.playSong = function(song, noautoplay, nohistory) {
 	var songobj = helpers.parseDOM(song);
 	if ($(song).hasClass("recognized") || songobj.ytid != undefined) {
 		/*
+			If user has YTID replacements, f.e. when living in Germany these are generated
+		*/
+		songobj = videoIdReplacements(songobj);
+		/*
 			Send YTID to YouTube player
 		*/
 		if (noautoplay) {
@@ -146,8 +150,47 @@ var stateChange = function(state) {
 var videoEnded = function() {
 	player.playNext();
 }
-var errorOccured = function(a) {
-	console.log(a);
+var videoIdReplacements = function(song) {
+	helpers.localStorageSafetyObject('videoIdReplacements');
+	var replacements 	= helpers.getLocalStorage('videoIdReplacements');
+	var replacementid 	= replacements[song.ytid];
+	console.log(song, replacements, replacementid)
+	if (replacementid 	!= undefined) {
+		song.ytid = replacementid;
+	}
+	return song;
+
+}
+var replaceVideo = function(videoid, replacement) {
+	helpers.localStorageSafety('videoIdReplacements');
+	var replacements 					= JSON.parse(localStorage['videoIdReplacements']);
+	replacements[videoid] 				= replacement;
+	localStorage['videoIdReplacements'] = JSON.stringify(replacements);
+}
+var errorOccured = function(error_code) {
+	if (error_code == 0) {
+		notifications.create('The video could not be loaded due to some country restrictions. Looking for an alternative...');
+	}
+	else {
+		notifications.create('A unknown error happened while trying to play the video. Looking for an altenative...')
+	}
+	/*
+		Find an alternative video
+	*/
+	var song = player.nowPlaying.get()
+	recognition.findVideo(song, function(video) {
+		if (video != undefined) {
+			var oldid = song.ytid,
+				newid = video['media$group']['yt$videoid']['$t'];
+			song.ytid = newid;
+			replaceVideo(oldid, newid);
+			player.playSong(song, false, true);
+			notifications.create('Alternative found. In the future, this video will be played.');
+		}
+		else {
+			notifications.create('No video available in your country was found. We cannot play this song, sorry.');
+		}
+	}, undefined, undefined, undefined, ['restricted']);
 }
 player.setUpEvents = function() {
 	/*
