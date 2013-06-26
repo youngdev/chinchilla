@@ -167,7 +167,7 @@ views = {
 					}
 				},
 				afterAllTracksFetched 		= function(tracks) {
-					data.tracks = tracks;
+					data.tracks = (helpers.sortTracks(library, tracks)).reverse();
 					var html = templates.buildLibrary(data);
 					$('#view').html(html);
 					views.loadingindicator.hide();
