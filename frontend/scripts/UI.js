@@ -478,7 +478,6 @@ var keys 				= function(e) {
 		player.playLast();
 	}
 	if (key == 32) {
-		console.log('space key')
 		player.togglePlayState()
 	} 
 

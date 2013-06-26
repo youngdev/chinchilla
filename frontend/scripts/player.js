@@ -154,7 +154,6 @@ var videoIdReplacements = function(song) {
 	helpers.localStorageSafetyObject('videoIdReplacements');
 	var replacements 	= helpers.getLocalStorage('videoIdReplacements');
 	var replacementid 	= replacements[song.ytid];
-	console.log(song, replacements, replacementid)
 	if (replacementid 	!= undefined) {
 		song.ytid = replacementid;
 	}
