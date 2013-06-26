@@ -89,7 +89,8 @@ helpers = {
     getHQAlbumImage: function(album, size) {
     	var lq = album.image;
     	//Just in case something invalid gets passed, so the server doesn't crash then.
-    	if (!lq) { return 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==' }
+    	if (!lq) 	{ return 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==' }
+    	if (!size) 	{ return lq };
     	return lq.replace('100x100-75.jpg', (size+'x'+size+'-75.jpg'));
     },
     coverArrayToHQ: function(songs, size) {
