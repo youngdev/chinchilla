@@ -152,7 +152,6 @@ views = {
 				afterLocalTracksFetched = function(data) {
 					var fetched = data;
 					var tofetch = _.difference(library, _.pluck(fetched, 'id'));
-					console.log("Fetched", fetched, "tofetch", tofetch);
 					if (tofetch.length != 0) {
 						socket.emit ('/api/tracks/get', { tracks: tofetch });
 						socket.on	('/api/tracks/get/response', function (tracks) {

@@ -109,7 +109,6 @@ var getRetroCharts		= function(year, callback) {
 					});
 				}
 				i++;
-				console.log(i)
 				if (i == max) {
 					callback()
 				}

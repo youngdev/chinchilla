@@ -56,7 +56,6 @@ socket.on('tracks-removed', function (data) {
 		var song = table.find('[data-id="' + song + '"]').remove();
 	});
 	notifications.create(data.notification);
-	console.log(data.tracks);
 	_.each(data.tracks, function (track) {
 		chinchilla.library = _.without(chinchilla.library, track);
 	});
@@ -111,7 +110,6 @@ socket.on('playlist-song-added', function (data) {
 	}
 });
 socket.on('multiple-playlist-songs-added', function (data) {
-	console.log(data);
 	var table = listChanged(data);
  	$.each(data.divs, function (key, div) {
 		if (data.position == 'top' && (table.find('.song').length != 0)) {

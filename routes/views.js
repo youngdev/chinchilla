@@ -518,7 +518,6 @@ this.lyrics	 					= function(request, response) {
 			var output = tmpl.render(data);
 			response.end(output);
 		}
-	console.log(id)
 	dbquery.getSingleTrack(id, afterDBQueryMade);
 };
 this.wrapper       				= function(request, response) {
@@ -529,7 +528,6 @@ this.wrapper       				= function(request, response) {
 		betatesters = ['jonnyburger', 'loewe1000'];
 		afterUserFetch = function(user) {
 			data.user = user;
-			console.log(request.query.secretaccess)
 			if (user) {
 				if (_.contains(betatesters, user.username)) {
 					facebook.getLibraryFromRequest(request, afterLibraryFetched);
