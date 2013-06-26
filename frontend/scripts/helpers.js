@@ -182,6 +182,16 @@ helpers = {
 		album.name              = name;
 		album.subtitle          = withoutbrackets;
 		return album;
+	},
+	sortTracks: function(order, tracks) {
+		var songs = [];
+		_.each(order, function(id) {
+			var song = _.find(tracks, function(item) { return item.id == id });
+			if (song) {
+				songs.push(song);
+			}
+		});
+		return songs;
 	}
 };
 this.helpers = helpers;
