@@ -420,7 +420,7 @@ this.album 						= function(request, response) {
 				data.songs = _.map(data.songs, function(song) { song.inlib = _.contains(data.user.collections.library, song.id); return song;})
 			}
 			data.album.cds = _.values(_.groupBy(_.sortBy(data.songs, function(song) { return song.numberinalbum }), function(song) { return  song.cdinalbum }));
-			data.hqimage   = helpers.getHQAlbumImage(data.album);
+			data.hqimage   = helpers.getHQAlbumImage(data.album, 400);
 			data.background= workers.returnAlbumCovers() 
 			render();
 		}
