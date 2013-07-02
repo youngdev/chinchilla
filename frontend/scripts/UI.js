@@ -162,10 +162,13 @@ var tooltip             = function(e) {
 		$(tooltip).remove();
 	});
 };
-var autocomplete        = function() {
+var autocomplete        = function(e) {
 	/*
 		Trigger search method
 	*/
+	if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 16) {
+		return;
+	}
 	var searchfield = $("#search-field"),
 		value		= searchfield.val(),
 		results     = $("#search-results"),
@@ -422,15 +425,28 @@ var addtrackskeys 		= function(key) {
 			$(dom)	.removeClass(classname);
 		}
 	}
-	
-	
+}
+var searchkeys 			= function(key) {
+	var classname = 'search-selected'
+	if (key == 13) {
+		$('.'+classname).mousedown();
+	}
+	else {
+		var dom = $('.' + classname);
+		var direction = (key == 38) ? 'prev' : 'next'
+		var next = dom[direction]('li');
+		if (next.length != 0) {
+			$(next)	.addClass(classname);
+			$(dom)	.removeClass(classname);
+		}
+	}
 }
 var keys 				= function(e) {
 	var key = e.keyCode;
 	/*
 		Don't trigger this function when focus is in input
 	*/
-	if ($(e.srcElement).is('input') && !($(e.srcElement).is('.add-tracks-input'))) {
+	if ($(e.srcElement).is('input') && !($(e.srcElement).is('.add-tracks-input')) && !($(e.srcElement).is('#search-field'))) {
 		return;
 	}
 	e.preventDefault();
@@ -441,6 +457,11 @@ var keys 				= function(e) {
 		if ($('.add-tracks-dropdown').is(':visible')) {
 			e.preventDefault();
 			addtrackskeys(key)
+			return;
+		}
+		if ($('#search-field').is(':focus')) {
+			e.preventDefault();
+			searchkeys(key)
 			return;
 		}
 		var thissong = $('.song.selected')
@@ -456,6 +477,11 @@ var keys 				= function(e) {
 	if (key == 13) {
 		if ($('.add-tracks-dropdown').is(':visible')) {
 			addtrackskeys(key)
+			return;
+		}
+		if ($('#search-results').is(':visible')) {
+			e.preventDefault();
+			searchkeys(key)
 			return;
 		}
 		var songs 		= $('.song.selected.recognized');
