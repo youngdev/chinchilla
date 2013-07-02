@@ -616,6 +616,15 @@ var mkplnwatbottom 		= function() {
 var closenotification 	= function() {
 	$('#statusbar').hide();
 }
+var playallsongs 		= function() {
+	var songs 			= $('.song'),
+		firstsong 		= songs.splice(0,1)[0];
+	player.queue2.clear();
+	$.each(songs, function(k, song) {
+		player.queue2.add(song);
+	});
+	player.playSong(firstsong);
+}
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -658,6 +667,7 @@ $(document)
 .on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
 .on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
 .on('click',		'.close-notification', 				closenotification 	) // Dismiss popup messages
+.on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
 

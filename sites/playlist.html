@@ -3,6 +3,9 @@
 </div>
 <h1 class="oncoverstack">{{playlist.name}}</h1>
 <div class="playlistdescription coverstack-description">
+	<p class="play-all-songs list-view-button">
+		<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
+	</p>
 	{% if playlist.public %}
 	<p class="playlist-privacy playlist-public list-view-button">
 		<img src="/api/svg/public"><span>Public</span>
