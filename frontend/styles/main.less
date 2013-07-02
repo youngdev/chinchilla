@@ -895,7 +895,7 @@ img {
 		}
 		.home-body {
 			padding: 10px 40px;
-			max-width: 1220px;
+			max-width: 1250px;
 			margin: auto;
 			margin-top: 186px;
 
@@ -1510,6 +1510,9 @@ img {
 }
 [data-route='/library'] {
 	.add-tracks-quickly, .add-tracks-dropdown {
+		margin-left: 280px !important;
+	}
+	.play-all-songs {
 		margin-left: 180px !important;
 	}
 	.add-tracks-dropdown {
@@ -1617,8 +1620,9 @@ img {
 }
 .reddit-box {
 	width: 202px;
-	display: inline-block ;
-	margin-left: 23px;
+	display: inline-block;
+	margin-bottom: 20px;
+	margin-right: 23px;
 	cursor: pointer;
 	background: rgb(235,235,235);
 	border: 1px solid rgba(0,0,0,0.2);
@@ -1765,6 +1769,8 @@ img {
 	.playlist-privacy {
 		width: 100px;
 		display: inline-block;
+		position: absolute;
+		left: 100px;
 	}
 	.list-view-button {
 		img {
@@ -1781,6 +1787,13 @@ img {
 			height: 17px;
 			padding-left: 2px;
 			margin-left: 2px;
+		}
+		img.list-header-play-icon {
+			width: 20px;
+			height: 19px;
+			padding-left: 2px;
+			padding-top: 3px;
+			padding-bottom: 3px;
 		}
 		background: transparent;
 		border: 1px solid transparent;
@@ -1813,7 +1826,7 @@ img {
 		opacity: 0.6;
 		color: black;
 		width: 200px;
-		margin-left: 235px;
+		margin-left: 335px;
 		padding-top: 10px;
 		text-shadow: 0 0 25px black;
 	}
@@ -1844,7 +1857,7 @@ img {
 	}
 	.add-tracks-quickly {
 		position: absolute;
-		margin-left: 100px;
+		margin-left: 200px;
 		padding-top: 6px;
 		padding-bottom: 6px;
 	}
