@@ -189,12 +189,12 @@ var autocomplete        = function(e) {
 		Hide/show suggestions
 	*/
 	if (value === "") {
-		results.slideUp();
+		results.slideUp(300);
 		clearinput.hide();
 
 	}
 	else {
-		results.slideDown();
+		results.slideDown(300);
 		clearinput.show();
 	}
 };
@@ -454,13 +454,13 @@ var keys 				= function(e) {
 		Down key
 	*/
 	if (key == 40 || key == 38) {
+		e.preventDefault();
+		e.stopPropagation();
 		if ($('.add-tracks-dropdown').is(':visible')) {
-			e.preventDefault();
 			addtrackskeys(key)
 			return;
 		}
 		if ($('#search-field').is(':focus')) {
-			e.preventDefault();
 			searchkeys(key)
 			return;
 		}
@@ -651,6 +651,11 @@ var playallsongs 		= function() {
 	});
 	player.playSong(firstsong);
 }
+var hoversearchresult 	= function() {
+	var classname = 'search-selected';
+	$('.' + classname).removeClass(classname);
+	$(this).addClass(classname);
+}
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -694,6 +699,7 @@ $(document)
 .on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
 .on('click',		'.close-notification', 				closenotification 	) // Dismiss popup messages
 .on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
+.on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
 

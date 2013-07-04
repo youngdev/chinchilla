@@ -53,9 +53,17 @@ search = {
 				if (key == 0) {
 					var html 	= $(html).addClass('search-selected')
 				}
+				endLoadingIndicator();
 				$('#search-results-wrapper').append(html);
 			});
 		}
+		var startLoadingIndicator 	= function() {
+			$('#search-spinner').show()
+		}
+		var endLoadingIndicator 	= function() {
+			$('#search-spinner').hide();
+		}
+		startLoadingIndicator();
 		$.each(types, function(type, info) 
 			{
 				var ajax = $.ajax(
