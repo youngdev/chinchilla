@@ -76,6 +76,14 @@ loader = {
 }
 navigation = {
 	to: function(path, prevent) {
+		/*
+			Highlight current view in menu
+		*/
+		var classname = 'menuselected';
+		$('.' + classname).removeClass(classname);
+		$('#sidebar').find('[data-navigate="' + path + '"]').addClass(classname);
+
+
 		var currentroute = {
 			path: path,
 			timestamp: Date.now()
@@ -101,12 +109,6 @@ navigation = {
 				$('#view').attr('data-route', path);
 			}
 		});
-		/*
-			Highlight current view in menu
-		*/
-		var selector = '[data-navigate="' + path + '"]';
-		$('.menuselected').removeClass('menuselected');
-		$(selector).addClass('menuselected');
 	}
 };
 window.onpopstate = function() {
