@@ -189,12 +189,12 @@ var autocomplete        = function(e) {
 		Hide/show suggestions
 	*/
 	if (value === "") {
-		results.hide();
+		results.slideUp();
 		clearinput.hide();
 
 	}
 	else {
-		results.show();
+		results.slideDown();
 		clearinput.show();
 	}
 };
