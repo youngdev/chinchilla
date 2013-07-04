@@ -44,8 +44,8 @@ search = {
 			});
 			var results = _.map(results, function (result) {
 				var regex 		= new RegExp(query, 'gi');
-				result.title 	= result.title.replace(regex, '<b>' + result.title + '</b>');
-				result.sub 		= result.sub.replace(regex, '<b>' + result.sub + '</b>');
+				//result.title 	= result.title.replace(regex, '<b>' + query + '</b>');
+				//result.sub 		= result.sub.replace(regex, '<b>' + query + '</b>');
 				return result;
 			})
 			_.each(results, function (result, key) {
