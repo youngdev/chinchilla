@@ -5,17 +5,7 @@ views = {
 				url: "/api/artist/" + artist,
 				dataType: "html",
 				success: function(data) {
-					/*
-						Define view
-					*/
-					var view = $("#view");
-					/*
-						Add data to the view
-					*/
-					view.html(data);
-					/*
-						Hide the loading icon
-					*/
+					$("#view").html(data);
 					views.loadingindicator.hide()
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')
