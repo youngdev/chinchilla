@@ -49,8 +49,8 @@ var	parseduration 	= 		helpers.parsetime,
 var templates 		= 		{
     registration:           dirup + '/sites/registration.html',
     newuser:                dirup + '/sites/new-user.html',
-    wrapper: 				dirup + '/frontend/index.html',
-    startup: 				dirup + '/frontend/infoscreen.html',
+    wrapper: 				dirup + '/sites/index.html',
+    startup: 				dirup + '/sites/infoscreen.html',
     library: 				dirup + '/sites/library.html',
     tracklist: 				dirup + '/sites/tracklist.html',
     settings: 				dirup + '/sites/settings.html',
@@ -507,7 +507,7 @@ this.lyrics	 					= function(request, response) {
 			else {
 				views.error({params: {code: 494}}, response);
 			}
-			render()
+			render();
 		},
 		afterLyricsValidated = function(obj) {
 			obj.lyrics = obj.lyrics.replace(/\n/g, "<br>");
