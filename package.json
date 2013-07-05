@@ -26,12 +26,5 @@
     "node": "0.6.x"
   },
   "devDependencies": {
-    //Comment out for server-side!
-    //"grunt": "~0.4.1",
-    //"grunt-contrib-concat": "~0.3.0",
-    //"grunt-contrib-watch": "~0.4.4",
-    //"grunt-forever": "~0.4.1",
-    //"grunt-contrib-less": "~0.6.2",
-    //"grunt-develop": "~0.1.0"
   }
 }
