@@ -31,7 +31,6 @@
     "grunt-contrib-watch": "~0.4.4",
     "grunt-forever": "~0.4.1",
     "grunt-contrib-less": "~0.6.2",
-    "grunt-develop": "~0.1.0",
-    "grunt-express-server": "~0.4.1"
+    "grunt-develop": "~0.1.0"
   }
 }
