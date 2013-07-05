@@ -299,7 +299,7 @@ this.connection = function (socket) {
 						playlist.tracks = _.reject(playlist.tracks, function(song) {return song == parseFloat(data.songid)});
 						db.savePlaylist(playlist);
 						db.getSingleTrack(data.songid, function(song) {
-							socket.emit('playlist-song-removed', {songid: data.songid, view: data.url, trackcount: playlist.tracks.length, lengthdifference: (0 - song[0].duration)});
+							socket.emit('playlist-song-removed', {songid: parseFloat(data.songid), view: data.url, trackcount: playlist.tracks.length, lengthdifference: (0 - song[0].duration)});
 						});
 					}
 				});

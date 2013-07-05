@@ -588,6 +588,7 @@ var addsongtopl 		= function() {
 var remsongfrompl 		= function() {
 	var data = this.dataset;
 	data.token = chinchilla.token;
+	data.songid = parseFloat(data.songid);
 	socket.emit('remove-song-from-playlist', data);
 }
 var pldropdown 			= function() {
@@ -630,14 +631,27 @@ var mkplprivate 		= function() {
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': false});
 }
 var mkplnwattop 		= function() {
-	var playlist 	= $('#view').attr('data-route');
+	var url 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
-	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': true});
+	socket.emit('change-playlist-order', {playlist: url, token: chinchilla.token, 'newestattop': true});
+	chinchilla.playlists = _.map(chinchilla.playlists, function (playlist) {
+		if (playlist.url == url) {
+			playlist.newestattop = true;
+		}
+		return playlist;
+	});
 }
 var mkplnwatbottom 		= function() {
-	var playlist 	= $('#view').attr('data-route');
+	var url 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
-	socket.emit('change-playlist-order', {playlist: playlist, token: chinchilla.token, 'newestattop': false});
+	socket.emit('change-playlist-order', {playlist: url, token: chinchilla.token, 'newestattop': false});
+	chinchilla.playlists = _.map(chinchilla.playlists, function (playlist) {
+		if (playlist.url == url) {
+			playlist.newestattop = false;
+		}
+		console.log(playlist, url)
+		return playlist;
+	});
 }
 var closenotification 	= function() {
 	$('#statusbar').hide();
