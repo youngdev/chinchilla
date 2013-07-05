@@ -547,7 +547,17 @@ this.wrapper       				= function(request, response) {
 		},
 		afterLibraryFetched = function(user) {
 			data.collection = user.collections;
-			data.library = JSON.stringify(user.collections.library);
+			data.library 	= JSON.stringify(user.collections.library);
+			if (data.collection.playlists.length == 0) {
+				data.playlists = [];
+				render();
+			}
+			else {
+				dbquery.getPlaylistsFromUserId(data.user.id, afterPlaylistsFetched);
+			}
+		},
+		afterPlaylistsFetched = function(playlists) {
+			data.playlists = JSON.stringify(playlists);
 			render();
 		},
  		render 	= function() {

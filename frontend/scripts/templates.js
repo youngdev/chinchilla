@@ -9,7 +9,21 @@ templates.buildLibrary = function(data) {
 						10);
 	data.showartistalbum = true;
 	data.tracks = _.map(data.tracks, function(song) { song.inlib = true; return song; });
-	data.tracklist 	= templates.buildTrackList(data)
+	data.tracklist 	= templates.buildTrackList(data);
+	return template(data);
+}
+templates.buildPlaylist = function(data) {
+	var template = _.template(
+		$('#template-playlist').html()
+	)
+	data.coverstack = _.first(
+							_.pluck(data.tracks, 'image'),
+						10);
+	data.showartistalbum = true;
+	data.tracklist = templates.buildTrackList(data);
+	data.playlist.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
+	data.playlist.duration = helpers.parsehours(data.playlist.rawduration);
+	data.playlist.trackcount = data.tracks.length;
 	return template(data);
 }
 templates.buildTrackList = function(data) {

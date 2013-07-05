@@ -98,6 +98,7 @@ socket.on('playlist-song-removed', function (data) {
 	var trackcountlabel2 = $("[data-url='" + data.view + "']").addClass("add-song-to-playlist-button not-in-playlist").removeClass("remove-song-from-playlist-button in-playlist contains-song").find('.song-page-playlist-trackcount').text(data.trackcount);
 	var view = $('[data-route="' + data.view + '"]');
 	view.find('[data-id="' + data.songid + '"]').remove();
+	libdom.removeSongsFromPlaylistLocal(data.view, [data.songid])
 });
 socket.on('playlist-song-added', function (data) {
 	var table = listChanged(data);
@@ -119,6 +120,7 @@ socket.on('multiple-playlist-songs-added', function (data) {
 			table.append(div);
 		}
 	});
+	libdom.addSongsToPlaylistLocal(data.view, data.tracks)
 	_.each(data.tracks, function (trackid) {
 		$('[data-route="/song/' + trackid + '"]')
 		.find("[data-url='" + data.view + "']")
@@ -132,7 +134,8 @@ socket.on('multiple-playlist-songs-added', function (data) {
 
 socket.on('multiple-playlist-songs-removed', function (data) {
 	var table = listChanged(data);
-	$.each(data.tracks, function (key, song) {
+	libdom.removeSongsFromPlaylistLocal(data.view, data.tracks)
+	_.each(data.tracks, function (song) {
 		table.find('[data-id="' + song + '"]').remove();
 	});
 	notifications.create(data.notification);

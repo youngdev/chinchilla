@@ -17,20 +17,6 @@ views = {
 			})
 		}
 	},
-	playlist: {
-		load: function(url) {
-			$.ajax({
-				url: '/api' + url,
-				dataType: 'html',
-				success: function(data) {
-					$('#view').html(data);
-					$.publish('new-tracks-entered-dom');
-					views.loadingindicator.hide();
-					$.publish('view-got-loaded')
-				}
-			})
-		}
-	},
 	song: {
 		load: function(song) {
 			$.ajax({
@@ -164,7 +150,56 @@ views = {
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')
 				}
-				DB.getTracks({ids: library, callback: afterLocalTracksFetched});
+			DB.getTracks({ids: library, callback: afterLocalTracksFetched});
+		}
+	},
+	playlist: {
+		load: function(url) {
+			var playlist = _.where(chinchilla.playlists, {url: url})[0],
+				data = {user: chinchilla.loggedin, playlist: playlist},
+				afterLocalTracksFetched = function(data) {
+					var fetched = data;
+					var tofetch = _.difference(playlist.tracks, _.pluck(fetched, 'id'));
+					if (tofetch.length != 0) {
+						socket.emit ('/api/tracks/get', {tracks: tofetch});
+						socket.on 	('/api/tracks/get/response', function (tracks) {
+							var alltracks = _.union(tracks, fetched);
+							var alltracksmapped = _.map(alltracks, function(track) { track.inlib = _.contains(chinchilla.library, track.id); return track });
+							afterAllTracksFetched(alltracksmapped);
+							_.each(tracks, function (track) {
+								DB.addTrack(track)
+							})
+						});
+					}
+					else {
+						afterAllTracksFetched(fetched);
+					}
+				},
+				afterAllTracksFetched 	= function(tracks) {
+					data.tracks = (helpers.sortTracks(playlist.tracks, tracks))
+					if (playlist.newestattop) { data.tracks = data.tracks.reverse(); };
+					var html = templates.buildPlaylist(data);
+					$('#view').html(html);
+					views.loadingindicator.hide();
+					$.publish('new-tracks-entered-dom');
+					$.publish('view-got-loaded')
+				}
+			if (playlist) {
+				DB.getTracks({ids: playlist.tracks, callback: afterLocalTracksFetched});
+			}
+			else {
+				$.ajax({
+					url: '/api' + url,
+					dataType: 'html',
+					success: function(data) {
+						var view = $('#view');
+						view.html(data);
+						views.loadingindicator.hide();
+						$.publish('new-tracks-entered-dom');
+						$.publish('view-got-loaded');
+					}
+				})
+			}
 		}
 	},
 	lyrics: {
