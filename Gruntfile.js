@@ -52,10 +52,9 @@ module.exports = function(grunt) {
       }
     },
     forever: {
-        options: {
-            index: 'app.js',
-            logDir: 'node_modules/trash'
-        }
+    	options: {
+    		index: 'app.js'
+    	}
     },
     less: {
       production: {
