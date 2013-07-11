@@ -192,6 +192,45 @@ helpers = {
 			}
 		});
 		return songs;
+	},
+	makeAlbum: function(data, _) {
+		return {
+			id: 		data.album.collectionId,
+			tracks: 	data.songs.length,
+			artist: 	data.album.artistName,
+			release: 	data.album.releaseDate,
+			image: 		data.album.artworkUrl100,
+			name: 		data.album.collectionName,
+			hours: 		_.reduce(_.pluck(data.songs, 'duration'), function(memo, num) {return memo + parseFloat(num)}, 0)
+		}
+	},
+	parseReleaseLeft: function(time) {
+		var release = new Date(time);
+		if (release == 'Invalid Date') {
+			return '';
+		}
+		else {
+			var timeleft = release - new Date(),
+				secleft  = timeleft/1000;
+			if (secleft < 3600) {
+				return 'Album will be released within 1 hour';
+			}
+			else {
+				var hoursleft = secleft/3600;
+				if (hoursleft < 24) {
+					return 'Album will be available in ' + Math.floor(hoursleft) + ' hours';
+				}
+				else {
+					var daysleft = Math.floor(hoursleft/24);
+					if (daysleft == 1) {
+						return 'Album will be available tomorrow';
+					}
+					else {
+						return 'Album will be available in ' + ' days'; 
+					}
+				}
+			}
+		}
 	}
 };
 this.helpers = helpers;

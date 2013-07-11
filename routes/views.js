@@ -41,7 +41,8 @@ var dirup = __dirname.substr(0, __dirname.length - 7);
 var	parseduration 	= 		helpers.parsetime,
 	parsehours 		= 		helpers.parsehours,
 	parsetext 		= 		helpers.parsetext,
-	parseyear 		= 		helpers.parseyear;
+	parseyear 		= 		helpers.parseyear,
+	parseReleaseLeft=		helpers.parseReleaseLeft;
 		
 /*
 	Views
@@ -85,7 +86,8 @@ this.artist 					= function(request, response) {
 	 		parseduration: 	parseduration,
 	 		parsetext: 		parsetext,
 	 		parseyear: 		parseyear,
-	 		templates: 		templates
+	 		templates: 		templates,
+	 		parseReleaseLeft: parseReleaseLeft
 	 	},
 	 	tmpl 					= swig.compileFile(templates.artist),
 	 	afterUserFetch 			= function(user) {
@@ -194,7 +196,8 @@ this.artist 					= function(request, response) {
 	 				release: 	albumarray[0].release,
 	 				image: 		albumarray[0].image,
 	 				name: 		albumarray[0].album,
-	 				hours: 		_.reduce(_.pluck(albumarray, 'duration'), function(memo, num) {return memo + parseFloat(num)}, 0)
+	 				hours: 		_.reduce(_.pluck(albumarray, 'duration'), function(memo, num) {return memo + parseFloat(num)}, 0),
+	 				released: 	(new Date(albumarray[0].release) - new Date()) < 0
 	 			}
 	 			var albuminfo 	= helpers.albumRelevance(albuminfo, _);
 	 			collections.push(albuminfo);
@@ -364,10 +367,16 @@ this.track 						= function(request, response) {
 this.album 						= function(request, response) {
 	var tmpl 			= swig.compileFile(templates.albumpage),
 		id 				= parseFloat(request.params.id),
-		data 			= { parseduration: parseduration , templates: templates, parsetext: parsetext, parseyear: parseyear},
+		data 			= { 
+			parseduration: parseduration , 
+			templates: templates, 
+			parsetext: parsetext, 
+			parseyear: parseyear, 
+			parsehours: parsehours, 
+			parseReleaseLeft: parseReleaseLeft
+		},
 		onlynumbers		= new RegExp('^[0-9]+$'),
 		render 			= function() {
-			console.log(data)
 			var output 	= tmpl.render(data);
 			response.end(output);
 		},
@@ -392,15 +401,7 @@ this.album 						= function(request, response) {
 					}
 					data.album = info.splice(0,1)[0];
 					data.songs = _.map(info, function(song) { return itunes.remap(song)});
-					data.album = {
-	 					id: 		data.album.collectionId,
-	 					tracks: 	data.songs.length,
-	 					artist: 	data.album.artistName,
-	 					release: 	data.album.releaseDate,
-	 					image: 		data.album.artworkUrl100,
-	 					name: 		data.album.collectionName,
-	 					hours: 		_.reduce(_.pluck(data.songs, 'duration'), function(memo, num) {return memo + parseFloat(num)}, 0)
-	 				}
+					data.album = helpers.makeAlbum(data, _);
 	 				dbquery.addAlbum(data.album, function() {
 	 					console.log('Album added', data.album.name);
 	 				});
@@ -411,12 +412,13 @@ this.album 						= function(request, response) {
 		},
 		afterAlbumTracksFetched 		= function(songs) {
 			data.songs = songs;
+			data.album.released = (new Date(data.album.release) - new Date()) < 0;
+			console.log(data.album.released)
 			data.songs = _.uniq(data.songs, function(song) { return song.id });
 			remapAlbums();
 		},
 		remapAlbums 					= function() {
 			if (data.user) {
-				console.log(data.user);
 				data.songs = _.map(data.songs, function(song) { song.inlib = _.contains(data.user.collections.library, song.id); return song;})
 			}
 			data.album.cds = _.values(_.groupBy(_.sortBy(data.songs, function(song) { return song.numberinalbum }), function(song) { return  song.cdinalbum }));
