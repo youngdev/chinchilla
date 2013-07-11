@@ -736,6 +736,57 @@ img {
 		padding: 5px;
 	}
 	.coverstack {
+		.covers {
+			width: 150px;
+			margin-left: 15px;
+			margin-top: 15px;
+			@-webkit-keyframes showup {
+				from {
+					-webkit-transform: scale(0);
+				}
+				to {
+					-webkit-transform: none;
+				}
+			}
+			img {
+				display: block;
+				float: left;
+				margin-right: 3px;
+				margin-bottom: 3px;
+				height: 47px;
+				width: 47px;
+				-webkit-animation: showup 0.35s;
+				-webkit-transform: scale(0);
+				-webkit-animation-fill-mode: forwards;
+				border: 1px solid rgba(0,0,0,0.2);
+			}
+			img:nth-child(1) {
+			}
+			img:nth-child(2) {
+				-webkit-animation-delay: 0.07s;
+			}
+			img:nth-child(3) {
+				-webkit-animation-delay: 0.14s;
+			}
+			img:nth-child(4) {
+				-webkit-animation-delay: 0.21s;
+			}
+			img:nth-child(5) {
+				-webkit-animation-delay: 0.28s;
+			}
+			img:nth-child(6) {
+				-webkit-animation-delay: 0.35s;
+			}
+			img:nth-child(7) {
+				-webkit-animation-delay: 0.42s;
+			}
+			img:nth-child(8) {
+				-webkit-animation-delay: 0.49s;
+			}
+			img:nth-child(9) {
+				-webkit-animation-delay: 0.56s;
+			}
+		}
 		.artist-header-image {
 			width: auto;
 			height: auto;
@@ -746,76 +797,13 @@ img {
 		width: -webkit-calc(~"100% + 20px");
 		width: -moz-calc(~"100% + 20px");
 		width: -ms-calc(~"100% + 20px");
-		background: @sidebarbg;
+		background: lighten(@sidebarbg, 1%);
 		//background-image: url(@light-noise-100);
 		height: 186px;
 		padding-bottom: -3px;
 		white-space: nowrap;
 		overflow: hidden;
 		border-bottom: 1px solid @bordercolor;
-		img {
-			margin: 0;
-			padding: 5px;
-			margin: 5px;
-			height: 140px;
-			width: 140px;
-			left: 15px;
-			top: 15px;
-			background: rgb(248,248,248);
-			box-shadow: 0 0 3px rgba(0,0,0,0.3);
-			position: absolute;
-			-webkit-animation: zoomin 1s;
-			opacity: 0;
-			-webkit-animation-fill-mode: forwards;
-		}
-		@-webkit-keyframes zoomin {
-			from {
-				opacity: 0;
-				height: 200px;
-				width: 200px;
-				margin-left: -30px;
-				margin-top: -30px;
-			}	
-			to {
-				opacity: 1;
-			}
-		}
-		img:nth-child(2) {
-			-webkit-animation-delay: 3s;
-			-webkit-transform: rotate(4deg);
-		}
-		img:nth-child(3) {
-			-webkit-animation-delay: 7s;
-			-webkit-transform: rotate(-3deg);
-		}
-		img:nth-child(4) {
-			-webkit-animation-delay: 12s;
-			-webkit-transform: rotate(2deg);
-		}
-		img:nth-child(5) {
-			-webkit-animation-delay: 17s;
-			-webkit-transform: rotate(-6deg);
-		}
-		img:nth-child(6) {
-			-webkit-animation-delay: 22s;
-			-webkit-transform: rotate(-1deg);
-		}
-		img:nth-child(7) {
-			-webkit-animation-delay: 27s;
-			-webkit-transform: rotate(5deg);
-		}
-		img:nth-child(8) {
-			-webkit-animation-delay: 32s;
-			-webkit-transform: rotate(-7deg);
-		}
-		img:nth-child(9) {
-			-webkit-animation-delay: 37s;
-			-webkit-transform: rotate(1deg);
-		}
-		img:nth-child(10) {
-			-webkit-animation-delay: 42s;
-			-webkit-transform: rotate(-5deg);
-		}
 	}
 	.coverstack:after {
 		content: '';
@@ -828,7 +816,7 @@ img {
 	.coverstack-description {
 		position: absolute;
 		top: 65px;
-		left: 185px;
+		left: 180px;
 		color: rgba(0,0,0,0.5);
 		a {
 			color: black;
@@ -838,10 +826,6 @@ img {
 			border-bottom: 1px solid black;
 			cursor: pointer;
 		}
-		p {
-			margin-top: 3px;
-			margin-bottom: 3px;
-		}
 		span[data-navigate]:hover {
 			text-decoration: underline;
 			cursor: pointer;
@@ -850,7 +834,7 @@ img {
 	}
 	h1.oncoverstack {
 		position: absolute;
-		left: 185px;
+		left: 180px;
 		color: @sidebarcolor;
 		text-shadow: 0px 1px white;
 		top: 20px;
@@ -1539,21 +1523,6 @@ img {
 		opacity: 0.3;
 	}
 }
-[data-route='/library'] {
-	.add-tracks-quickly, .add-tracks-dropdown {
-		margin-left: 280px !important;
-	}
-	.play-all-songs {
-		margin-left: 180px !important;
-	}
-	.add-tracks-dropdown {
-		top: 52px !important;
-		color: black;
-	}
-	.add-tracks-header {
-		height: 37px !important;
-	}
-}
 .settings {
 	.setting {
 		input {
@@ -1795,18 +1764,9 @@ img {
 }
 .playlistdescription {
 	position: absolute;
-	top: 60px;
+	top: 70px;
+	left: 180px;
 	color: white;
-	.playlist-privacy {
-		width: 100px;
-		display: inline-block;
-		position: absolute;
-		left: 100px;
-		img {
-			height: 20px;
-			width: 20px;
-		}
-	}
 	.list-view-button {
 		img {
 			vertical-align: middle;
@@ -1840,7 +1800,6 @@ img {
 		opacity: 0.8;
 		position: absolute;
 		font-size: 0.8em;
-		text-shadow: 0 0 25px black;
 		padding-top: 5px;
 		width: 100px;
 		top: 3px;
@@ -1861,9 +1820,8 @@ img {
 		opacity: 0.6;
 		color: black;
 		width: 200px;
-		margin-left: 335px;
-		padding-top: 10px;
-		text-shadow: 0 0 25px black;
+		padding-left: 2px;
+		margin: 5px 0;
 	}
 	.playlist-options-dropdown {
 		position: absolute;
@@ -1872,9 +1830,9 @@ img {
 		min-height: 50px;
 		color: black;
 		top: 0;
-		left: 0;
+		left: 198px;
 		z-index: 1;
-		top: 42px;
+		top: 58px;
 		display: none;
 		padding-top: 3px;
 		padding-bottom: 3px;
@@ -1885,20 +1843,14 @@ img {
 		.basic;
 		position: absolute;
 		background: white;
-		top: 42px;
+		top: 58px;
 		width: 200px;
-		margin-left: 100px;
+		margin-left: 85px;
 		display: none;
-	}
-	.add-tracks-quickly {
-		position: absolute;
-		margin-left: 200px;
-		padding-top: 6px;
-		padding-bottom: 6px;
+		border-radius: 2px;
 	}
 	.add-tracks-input {
 		border: 0;
-		border-bottom: 1px solid @bordercolor;
 		outline: none;
 		padding: 11px;
 		padding-left: 5px;
@@ -1934,6 +1886,53 @@ img {
 				background: rgba(0,0,0,0.1);
 			}
 		}
+		color: black;
+	}
+	.play-all-songs {
+		img {
+			width: 15px;
+			height: 15px;
+		}
+	}
+	.add-tracks-quickly {
+		img {
+			width: 15px;
+		}
+	}
+	.playlist-privacy {
+		img {
+			width: 15px;
+		}
+	}
+	button {
+		img {
+			vertical-align: middle;
+			margin-right: 7px;
+			opacity: 0.6;
+			cursor: pointer;
+		}
+		span {
+			position: relative;
+			top: 1px;
+			font-family: Arial;
+			font-weight: bold;
+			color: rgba(0,0,0,0.75);
+			cursor: pointer;
+		}
+		background: rgba(255,255,255,0.75);
+		background: -webkit-linear-gradient(bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+		border-radius: 2px;
+		border: 1px solid rgba(0,0,0,0.3);
+		padding: 5px 7px;
+	}
+	button:hover {
+		-webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+		-moz-box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+		box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+		cursor: pointer;
+	}
+	button:active {
+		background: -webkit-linear-gradient(top, rgba(255,255,255,0), rgba(255,255,255,1));
 	}
 }
 .dropdownoption {

@@ -529,11 +529,14 @@ var newplaylist 		= function() {
 		e.stopPropagation();
 	});
 	$('.new-playlist-input-field').on('keypress', submitplaylist);
+
 }
 var submitplaylist 		= function(e) {
 	if (e.keyCode == 13) {
-		$('.new-playlist-input-field').off();
-		socket.emit('add-playlist', {name: $('.new-playlist-input-field').val(), token: chinchilla.token});
+		var inputfield 	= $('.new-playlist-input-field'),
+			input 		= inputfield.val()
+		inputfield.off();
+		socket.emit('add-playlist', {name: input, token: chinchilla.token});
 	}
 }
 var renameplaylist 		= function() {

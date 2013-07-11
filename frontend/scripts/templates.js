@@ -6,8 +6,11 @@ templates.buildLibrary = function(data) {
 	)
 	data.coverstack = 	_.first(
 							_.pluck(data.tracks, 'image'), 
-						10);
+						9);
 	data.showartistalbum = true;
+	data.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
+	data.duration = helpers.parsehours(data.rawduration);
+	data.trackcount = data.tracks.length;
 	data.tracks = _.map(data.tracks, function(song) { song.inlib = true; return song; });
 	data.tracklist 	= templates.buildTrackList(data);
 	return template(data);
@@ -18,7 +21,7 @@ templates.buildPlaylist = function(data) {
 	)
 	data.coverstack = _.first(
 							_.pluck(data.tracks, 'image'),
-						10);
+						9);
 	data.showartistalbum = true;
 	data.tracklist = templates.buildTrackList(data);
 	data.playlist.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)

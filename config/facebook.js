@@ -82,7 +82,7 @@ this.addPlaylist 		= function(name, user, callback) {
 				db.createPlaylist(dbpl, function() {
 					db.saveUserCollections(collections, function(collection) {
 						console.log('Didnt exist before. Added.', collection.playlists);
-						callback({fail: false}, playlist);
+						callback({fail: false}, dbpl);
 					});
 				});
 				

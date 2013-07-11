@@ -16,9 +16,10 @@ var pladdfail = function(reason) {
 	var error = $('<div>', {class: 'playlist-addition-failed'}).text(reason)
 	error.prependTo('.playlists-menu').delay(3000).slideUp();
 }
-var pladded = function(div) {
+var pladded = function(data) {
 	$('.new-playlist-input').hide();
-	$('.playlists-menu').prepend(div);
+	$('.playlists-menu').prepend(data.div);
+	chinchilla.playlists.push(data.playlist);
 }
 socket.on('connected', function() {
 	sockets.connected = true;
