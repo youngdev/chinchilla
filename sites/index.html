@@ -154,6 +154,7 @@
 
     	chinchilla = {
     						loggedin: 		{% if user %} 	true 						{% else %} false 	{% endif %},
+    						user: 			{% if user %}	{{user.id}}					{% else %} null 	{% endif %},
     						token: 			{% if user %} 	'{{user.token}}' 			{% else %} false 	{% endif %},
     		{% if user %}	library:  						[{{collection.library}}], 						{% endif %}
     		{% if user %}	playlists: 						{% autoescape false %}{{playlists}}{%endautoescape%},{% endif %}
@@ -170,18 +171,27 @@
 <script type="text/template" id="template-library">
 		<% if (tmpl.user) { %>
 			<div class="coverstack nomargin">
-				<% _.each(tmpl.coverstack, function(image) { %>
-					<img src="<%- image %>" border="0">
-				<% }); %>
+				<div class="covers">
+					<% _.each(tmpl.coverstack, function(image) { %>
+						<img src="<%- image %>" border="0">
+					<% }); %>
+				</div>
 			</div>
 			<h1 class="oncoverstack">Your library</h1>
 			<div class="playlistdescription">
-				<p class="play-all-songs list-view-button">
+				<p class="playlist-info">
+				  <% if (tmpl.trackcount) { %>
+					<span class="playlist-trackcount"><%- tmpl.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.trackcount == 1) { %>track<% } else { %>tracks<% } %></span> - <span data-duration="<%- tmpl.rawduration %>" class="playlist-duration"><%- tmpl.duration %></span>
+				  <% } else { %>
+					<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span> - <span data-duration="0" class="playlist-duration">0 minutes</span>
+				  <% } %>
+				</p>
+				<button class="play-all-songs">
 					<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
-				</p>
-				<p class="add-tracks-quickly list-view-button">
+				</button>
+				<button class="add-tracks-quickly">
 					<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
-				</p>
+				</button>
 				<div class="add-tracks-dropdown">
 					<div class="add-tracks-header">
 						<input type="text" class="add-tracks-input" autofocus placeholder='Search for songs'>
@@ -201,19 +211,14 @@
 
 	<script type="text/template" id="template-playlist">
 		<div class="coverstack nomargin">
-			<% _.each(tmpl.coverstack, function(image) { %>
-				<img src="<%- image %>" border="0">
-			<% }); %>
+			<div class="covers">
+				<% _.each(tmpl.coverstack, function(image) { %>
+					<img src="<%- image %>" border="0">
+				<% }); %>
+			</div>
 		</div>
 		<h1 class="oncoverstack"><%- tmpl.playlist.name %></h1>
 		<div class="playlistdescription coverstack-description">
-			<p class="play-all-songs list-view-button">
-				<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
-			</p>
-			<p class="playlist-privacy playlist-private list-view-button">
-				<img src="/api/svg/settings" class="lock-icon"><span>Settings</span>
-			</p>
-			<div class="playlist-options-dropdown"></div>
 			<p class="playlist-info">
 			  <% if (tmpl.playlist.trackcount) { %>
 				<span class="playlist-trackcount"><%- tmpl.playlist.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.playlist.trackcount == 1) { %>track<% } else { %>tracks<% } %></span> - <span data-duration="<%- tmpl.playlist.rawduration %>" class="playlist-duration"><%- tmpl.playlist.duration %></span>
@@ -221,9 +226,12 @@
 				<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span> - <span data-duration="0" class="playlist-duration">0 minutes</span>
 			  <% } %>
 			</p>
-			<p class="add-tracks-quickly list-view-button">
+			<button class="play-all-songs">
+				<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
+			</button>
+			<button class="add-tracks-quickly">
 				<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
-			</p>
+			</button>
 			<div class="add-tracks-dropdown">
 				<div class="add-tracks-header">
 					<input type="text" class="add-tracks-input" autofocus placeholder='Search for songs'>
@@ -232,6 +240,10 @@
 					
 				</div>
 			</div>
+			<button class="playlist-privacy playlist-private">
+				<img src="/api/svg/settings" class="lock-icon"><span>Settings</span>
+			</button>
+			<div class="playlist-options-dropdown"></div>
 		</div>
 		<div class="extendedtable">
 			<div class="album-tracks">

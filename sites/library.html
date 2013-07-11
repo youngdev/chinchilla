@@ -10,7 +10,10 @@
 -->
 {% if user %}
 <div class="coverstack nomargin">
-	{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+	<div class="covers">
+		{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+	</div>
+	
 </div>
 <h1 class="oncoverstack">Your library</h1>
 <div class="playlistdescription">

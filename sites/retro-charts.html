@@ -1,6 +1,8 @@
 {% if year %}
 <div class="coverstack nomargin">
-	{% for track in coverstack %}<img src="{{track.image}}" border="0">{% endfor %}
+	<div class="covers">
+		{% for track in coverstack %}<img src="{{track.image}}" border="0">{% endfor %}
+	</div>
 </div>
 
 <h1 class="oncoverstack">Retro Charts: {{year}}</h1>

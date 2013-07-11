@@ -73,5 +73,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-forever');
-  grunt.registerTask('default', ['concat', 'less']);
+  grunt.registerTask('default', ['forever:start', 'watch']);
 };

@@ -257,7 +257,7 @@ this.connection = function (socket) {
 			var afterPlaylistCreationEvaluated = function(state, playlist) {
 				if (!state.fail) {
 					var div = menutemplates.playlist.render({playlist: playlist});
-					socket.emit('playlist-added', div);
+					socket.emit('playlist-added', {div: div, playlist: playlist});
 				}
 				else {
 					socket.emit('playlist-addition-failed', state.fail);

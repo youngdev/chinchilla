@@ -1,21 +1,10 @@
 <div class="coverstack nomargin">
-	{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+	<div class="covers">
+		{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+	</div>
 </div>
 <h1 class="oncoverstack">{{playlist.name}}</h1>
 <div class="playlistdescription coverstack-description">
-	<p class="play-all-songs list-view-button">
-		<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
-	</p>
-	{% if playlist.public %}
-	<p class="playlist-privacy playlist-public list-view-button">
-		<img src="/api/svg/public"><span>Public</span>
-	</p>
-	{% else %}
-	<p class="playlist-privacy playlist-private list-view-button">
-		<img src="/api/svg/lock" class="lock-icon"><span>Private</span>
-	</p>
-	{% endif %}
-	<div class="playlist-options-dropdown"></div>
 	<p class="playlist-info">
 	  {% if playlist.trackcount %}
 		<span class="playlist-trackcount">{{playlist.trackcount}}</span> <span class="playlist-plural-singular-tracks">{% if playlist.trackcount == 1 %}track{% else %}tracks{% endif %}</span> - <span data-duration="{{playlist.rawduration}}" class="playlist-duration">{{playlist.duration}}</span>
@@ -23,9 +12,22 @@
 		<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span> - <span data-duration="0" class="playlist-duration">0 minutes</span>
 	  {% endif %}
 	</p>
-	<p class="add-tracks-quickly list-view-button">
+	<button class="play-all-songs">
+		<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
+	</button>
+	{% if playlist.public %}
+	<button class="playlist-privacy playlist-public">
+		<img src="/api/svg/public"><span>Settings</span>
+	</button>
+	{% else %}
+	<button class="playlist-privacy playlist-private">
+		<img src="/api/svg/lock" class="lock-icon"><span>Settings</span>
+	</button>
+	{% endif %}
+	<div class="playlist-options-dropdown"></div>
+	<button class="add-tracks-quickly">
 		<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
-	</p>
+	</button>
 	<div class="add-tracks-dropdown">
 		<div class="add-tracks-header">
 			<input type="text" class="add-tracks-input" autofocus placeholder='Search for songs'>

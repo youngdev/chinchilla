@@ -1,6 +1,8 @@
 {% if artist %}
-	<div class="coverstack">
-		{% if artist.lastfm.image %}<img class="artist-header-image" src="{{artist.lastfm.image}}" border="0">{% endif%}{% for song in coverstack %}<img src="{{song.image}}" border="0">{% endfor %}
+	<div class="coverstack nomargin">
+		<div class="covers">
+			{% for song in coverstack %}<img src="{{song.image}}" border="0">{% endfor %}
+		</div>
 	</div>
 	<h1 class="oncoverstack">{{artist.name}}</h1>
 

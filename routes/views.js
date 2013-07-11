@@ -206,7 +206,7 @@ this.artist 					= function(request, response) {
 	 		var collections 	= _.filter(collections, function(album) { return album.tracks > 3 });
 	 		var collections 	= _.map(collections, function(album) { return helpers.parseAlbumTitle(album) });
 	 		var collections 	= _.uniq(collections, false, function(album) { return album.name });
-	 		data.coverstack		= _.first(_.pluck(collections, 'image'), 10);
+	 		data.coverstack		= _.first(_.pluck(collections, 'image'), 9);
 	 		data.albums 		= collections;
 	 		freebaseSearch();
 	 		
@@ -412,8 +412,6 @@ this.album 						= function(request, response) {
 		},
 		afterAlbumTracksFetched 		= function(songs) {
 			data.songs = songs;
-			data.album.released = (new Date(data.album.release) - new Date()) < 0;
-			console.log(data.album.released)
 			data.songs = _.uniq(data.songs, function(song) { return song.id });
 			remapAlbums();
 		},
@@ -421,6 +419,7 @@ this.album 						= function(request, response) {
 			if (data.user) {
 				data.songs = _.map(data.songs, function(song) { song.inlib = _.contains(data.user.collections.library, song.id); return song;})
 			}
+			data.album.released = (new Date(data.album.release) - new Date()) < 0;
 			data.album.cds = _.values(_.groupBy(_.sortBy(data.songs, function(song) { return song.numberinalbum }), function(song) { return  song.cdinalbum }));
 			data.hqimage   = helpers.getHQAlbumImage(data.album, 400);
 			data.background= workers.returnAlbumCovers() 
@@ -588,7 +587,7 @@ this.charts         			= function(request, response) {
 						parseduration:      parseduration,
 						parsetext: 			parsetext,
 						showartistalbum:    true,
-						coverstack:         _.first(table, 10),
+						coverstack:         _.first(table, 9),
 						user: 				user,
 						type: 				'charts',
 						templates: 			templates
@@ -699,7 +698,7 @@ this.library 					= function(request, response) {
 		},
 		afterSongListIsReceived 		= function(songs) {
 			var tracks = _.map(songs.reverse(), function(song) { song.inlib = true; return song; });
-			data.coverstack = helpers.coverArrayToHQ(_.first(_.uniq(_.pluck(_.first(tracks, 15), 'image')), 10), 150);
+			data.coverstack = helpers.coverArrayToHQ(_.first(_.uniq(_.pluck(_.first(tracks, 15), 'image')), 9), 150);
 			data.album = {cds: [tracks]};
 			render();
 		},
@@ -847,7 +846,7 @@ this.reddit 					= function(request, response) {
 			});
 			var arrays = _.pluck(data.music, 'songs'),
 				tracksonly = _.pluck(_.reduceRight(arrays, function(a, b) { return a.concat(b); }, []), 'song');
-			data.coverstack = _.first(_.pluck(tracksonly, 'image'), 10);
+			data.coverstack = _.first(_.pluck(tracksonly, 'image'), 9);
 			render();
 		},
 		render 				= function() {
@@ -925,7 +924,7 @@ this.playlist 					= function(request, response) {
 		data.playlist.rawduration = _.reduce(tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
 		data.playlist.duration = helpers.parsehours(data.playlist.rawduration);
 		data.playlist.trackcount = tracks.length;
-		data.coverstack = _.first(_.pluck(tracks, 'image'), 10);
+		data.coverstack = _.first(_.pluck(tracks, 'image'), 9);
 		render();
 	},
 	render 					= function() {
