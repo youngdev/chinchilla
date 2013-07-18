@@ -14,6 +14,7 @@ var app         = require('express').createServer(),
 	Listen to the fifty-one-fifty-one port!
 */
 var port = process.env.PORT || 5000;
+module.exports = app;
 app.listen(port);
 console.log("App started on port", port);
 
