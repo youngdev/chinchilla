@@ -720,11 +720,9 @@ this.main 						= function(request, response) {
 			parsehours: parsehours
 		},
 		afterlogin 			= function(user) {
-			console.timeEnd('Login query')
 			data.user 		= user;
 			if (user) {
 				data.user.loggedin = true;
-				console.time('Fetch collections')
 				dbquery.getUserCollections(user, afterCollection)
 			}
 			else {
@@ -732,8 +730,6 @@ this.main 						= function(request, response) {
 			}
 		},
 		afterCollection 	= function(collections) {
-			console.timeEnd('Fetch collections')
-			console.time('First 5')
 			var library 	= collections.library,
 				first5 		= _.last(library, 5).reverse();
 			data.inlibrary  = library;
@@ -741,8 +737,6 @@ this.main 						= function(request, response) {
 				fetchCharts();
 			}
 			else {
-				console.timeEnd('First 5')
-				console.time('Library DB Query')
 				dbquery.getSongsByIdList(first5, afterIdList);
 			}
 		},
@@ -750,8 +744,6 @@ this.main 						= function(request, response) {
 			/*
 				Add inlib to all songs
 			*/
-			console.timeEnd('Library DB Query')
-			console.time('Lib map')
 			var songs 		= _.map(songs, function(song) {song.inlib = true; return song;});
 			data.library = _.map(songs, function(song) {
 				return {
@@ -759,15 +751,12 @@ this.main 						= function(request, response) {
 					hqimg: helpers.getHQAlbumImage(song, 200)
 				}
 			});
-			console.timeEnd('Lib map');
 			fetchCharts();
 		},
 		fetchCharts 		= function() {
-			console.time('Fetch charts')
 			charts.getCharts(afterCharts);
 		},
 		afterCharts 		= function(charts) {
-			console.timeEnd('Fetch charts')
 			var top5 		= _.first(charts, 5);
 			var top5 		= _.map(top5, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
 			var top5 		= _.compact(top5);
@@ -779,7 +768,6 @@ this.main 						= function(request, response) {
 			});
 			var range 		= workers.getYearRange();
 			data.randomyear  = range[Math.floor(Math.random()*range.length)];
-			console.time('Get retro charts')
 			dbquery.getRetroCharts(data.randomyear, evaluateRetroCharts);
 		},
 		evaluateRetroCharts = function(charts) {
@@ -792,7 +780,6 @@ this.main 						= function(request, response) {
 			
 		},
 		throwtogether		= function(topanno) {
-			console.timeEnd('Get retro charts');
 			data.topanno 	= _.map(topanno, function(song) {
 				return {
 					song: song,
@@ -820,17 +807,9 @@ this.main 						= function(request, response) {
 			render();
 		}
 		render 				= function() {
-			console.time('render')
 			var output 		= tmpl.render(data);
-			console.timeEnd('render');
-			console.time('sending')
 			response.end(output);
-			console.timeEnd('sending')
-			console.timeEnd('everything')
 		}
-	console.time('everything')
-	console.time('Login query')
-	console.log('hi')
 	facebook.checkLoginState(request, afterlogin);
 };
 this.reddit 					= function(request, response) {

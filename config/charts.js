@@ -50,8 +50,10 @@ this.getCharts = function(callback) {
 		query 	 = _.pluck(topsongs, 'id'),
 		haveytid = _.reject(topsongs, function(item) {return item.ytid == undefined}),
 		notAllTracksInDB = function(items) {
+			console.log('not all tracks are in the cache')
 			tracksInDB = _.pluck(items, 'id');
 			var tofetch = _.reject(charts.iTunesIDs, function (item) { return _.contains(tracksInDB, item) }).join(",");
+			console.time('http request')
 			json.get("https://itunes.apple.com/lookup?id=" + tofetch + "&entity=song", function(err, result) {
 				if (!err) {
 					_.each(result.results, function(track) {
@@ -59,6 +61,7 @@ this.getCharts = function(callback) {
 						db.addTrack(song, function() { console.log('Track added through charts')});
 						items.push(song);
 					});
+					console.timeEnd('http request')
 					AllTracksInDB(items);
 				}
 			});
@@ -78,6 +81,7 @@ this.getCharts = function(callback) {
 				AllTracksInDB(items)
 			}
 		}
+	console.log(haveytid.length, ' have ytid')
 	if (haveytid.length < charts.limit) {
 		db.getSongsByIdList(charts.iTunesIDs, afterDBQuery);
 	}
