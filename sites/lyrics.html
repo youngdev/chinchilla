@@ -11,8 +11,11 @@
 				<h1 data-navigate="/song/{{song.id}}">{{lyricfind.title}}</h1>
 				<h2 data-navigate="/artist/{{song.artistid}}">{{lyricfind.artist.name}}</h2>
 			</div>
-			<div class="play-button visual-play-button recognized" data-album="{{song.album}}" data-name="{{song.name}}" data-duration="{{song.duration}}" data-albumid="{{song.albumid}}" data-artist="{{song.artist}}" data-artistid="{{song.artistid}}" data-image="{{song.image}}" data-id="{{song.id}}" data-explicit="{{song.explicit}}" data-genre="{{song.genre}}" data-numberinalbum="{{song.numberinalbum}}" data-cdinalbum="{{song.cdinalbum}}" data-tracks="{{song.tracks}}" data-cdcount="{{song.cdcount}}" data-preview="{{song.preview}}" data-release="{{song.release}}" {% if song.ytid %} data-ytid="{{song.ytid}}" {% endif %}>
-			<div class="play-icon"></div></div>
+			<div class="song" data-album="{{song.album}}" data-name="{{song.name}}" data-duration="{{song.duration}}" data-albumid="{{song.albumid}}" data-artist="{{song.artist}}" data-artistid="{{song.artistid}}" data-image="{{song.image}}" data-id="{{song.id}}" data-explicit="{{song.explicit}}" data-genre="{{song.genre}}" data-numberinalbum="{{song.numberinalbum}}" data-cdinalbum="{{song.cdinalbum}}" data-tracks="{{song.tracks}}" data-cdcount="{{song.cdcount}}" data-preview="{{song.preview}}" data-release="{{song.release}}" {% if song.ytid %} data-ytid="{{song.ytid}}" {% endif %}>
+				<div class="visual-play-button recognized findandplay" data-id="{{song.id}}">
+					<div class="play-icon"></div>
+				</div>
+			</div>
 		</div>
 		<div class="lyrics-body">
 			<iframe class="lyricfind-ringtone" src='data:text/html,<script src="http://lyricfind.rotator.hadj7.adjuggler.net/servlet/ajrotator/297856/0/vj?z=lyricfind&dim=35518&click=&kw={{lyricfind.artist.name}},{{lyricfind.title}},{{lyricfind.album.name}},{{song.genre}}&artist={{lyricfind.artist.name}}&song={{lyricfind.title}}&album={{lyricfind.album.name}}&genre={{song.genre}}"></script><noscript><a href="http://lyricfind.rotator.hadj7.adjuggler.net/servlet/ajrotator/297856/0/cc?z=lyricfind"><img src="http://lyricfind.rotator.hadj7.adjuggler.net/servlet/ajrotator/297856/0/vc?z=lyricfind&dim=35518&click=&kw={{lyricfind.artist.name}},{{lyricfind.title}},{{lyricfind.album.name}},{{song.genre}}&artist={{lyricfind.artist.name}}&song={{lyricfind.title}}&album={{lyricfind.album.name}}&genre={{song.genre}}&abr=$imginiframe" width="300" height="50" border="0"></a></noscript>' frameborder="0"></iframe>
