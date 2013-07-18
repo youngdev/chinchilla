@@ -21,6 +21,7 @@ this.get = function (request, response) {
 this.images = {
 	get: function(request, response) {
 		response.setHeader("Content-Type", "image/png");
+		response.setHeader("Cache-Control", "public, max-age=345600");
 		response.sendfile(dirup + "/frontend/images/" + request.params.filename + ".png");
 	}
 }
@@ -63,6 +64,9 @@ this.svg = {
 					response.end(data);
 				}
 				
+			}
+			else {
+				response.end('File doesn\'t exist.')
 			}
 		})
 	}

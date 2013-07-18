@@ -622,15 +622,11 @@ var addtracksdd 		= function() {
 var mkplpublic 			= function() {
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy')
-	label.find('span').text('Public');
-	label.find('img').attr('src', '/api/svg/public');
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': true});
 }
 var mkplprivate 		= function() {
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
-	label.find('span').text('Private');
-	label.find('img').attr('src', '/api/svg/lock');
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': false});
 }
 var mkplnwattop 		= function() {

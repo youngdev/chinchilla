@@ -86,10 +86,10 @@
 		</div>
 		<ul>
 			<h2>My music</h2>
-			<li data-navigate="/home"><a><img src="/api/svg/house">Home</a></li>
-			<li data-navigate="/library" class="librarymenuitem"><a><img src="/api/svg/music">Library</a></li>
+			<li data-navigate="/home"><a><img src="/api/i/pixel" class="svg-house-black">Home</a></li>
+			<li data-navigate="/library" class="librarymenuitem"><a><img src="/api/i/pixel" class="svg-music-black">Library</a></li>
 			<h2>Playlists</h2>
-			<li class="add-new-playlist"><a><img src="/api/svg/plus">New playlist</a></li>
+			<li class="add-new-playlist"><a><img src="/api/i/pixel" class="svg-plus-black">New playlist</a></li>
 			<div class="new-playlist-input">
 				<input type="text" class="new-playlist-input-field">
 			</div>
@@ -99,17 +99,16 @@
 				{% endfor %}
 			</div>
 			<h2>Discover</h2>
-			<li data-navigate="/charts"><a><img src="/api/svg/star">Charts</a></li>
-			<li data-navigate="/reddit"><a><img src="/api/svg/upvote">Reddit</a></li>
-			<!--- <li data-navigate="/about"><a><img src="/api/svg/info">About</a></li> -->
+			<li data-navigate="/charts"><a><img src="/api/i/pixel" class="svg-star-black">Charts</a></li>
+			<li data-navigate="/reddit"><a><img src="/api/i/pixel" class="svg-upvote-black">Reddit</a></li>
 			<h2>Tunechilla</h2>
-			<li data-navigate="/settings"><a><img src="/api/svg/settings">Settings</a></li>
+			<li data-navigate="/settings"><a><img src="/api/i/pixel" class="svg-wheel-black">Settings</a></li>
 			{% if user %}
 			<h2>{{user.first}} {{user.last}}</h2>
-			<li data-navigate="/logout"><a><img src="/api/svg/logout">Logout</a></li>
+			<li data-navigate="/logout"><a><img src="/api/i/pixel" class="svg-logout-black">Logout</a></li>
 			{% else %}
 			<h2>You</h2>
-			<li data-navigate="/login"><a><img src="/api/svg/key">Login with Facebook</a></li>
+			<li data-navigate="/login"><a><img src="/api/i/pixel" class="svg-key-black">Login with Facebook</a></li>
 			{% endif %}
 		</ul>
 	</div>
@@ -187,10 +186,10 @@
 				  <% } %>
 				</p>
 				<button class="play-all-songs">
-					<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
+					<img src="/api/i/pixel" class="list-header-play-icon svg-play-black"><span>Play all</span>
 				</button>
 				<button class="add-tracks-quickly">
-					<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
+					<img class="plus-icon svg-plus-black" src="/api/i/pixel"><span>Add tracks</span>
 				</button>
 				<div class="add-tracks-dropdown">
 					<div class="add-tracks-header">
@@ -227,10 +226,10 @@
 			  <% } %>
 			</p>
 			<button class="play-all-songs">
-				<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
+				<img class="list-header-play-icon svg-play-black" src="/api/i/pixel"><span>Play all</span>
 			</button>
 			<button class="add-tracks-quickly">
-				<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
+				<img class="plus-icon svg-plus-black" src="/api/i/pixel"><span>Add tracks</span>
 			</button>
 			<div class="add-tracks-dropdown">
 				<div class="add-tracks-header">
@@ -240,8 +239,8 @@
 					
 				</div>
 			</div>
-			<button class="playlist-privacy playlist-private">
-				<img src="/api/svg/settings" class="lock-icon"><span>Settings</span>
+			<button class="playlist-privacy">
+				<img class="lock-icon svg-wheel-black" src="/api/i/pixel"><span>Settings</span>
 			</button>
 			<div class="playlist-options-dropdown"></div>
 		</div>

@@ -1,7 +1,7 @@
 search = {
 	calls: [],
 	autocomplete: function(query) {
-		$('#search-results-wrapper').empty();
+		var wrapper = $('#search-results-wrapper');
 		search.calls = [];
 		var types = {
 			artist: {
@@ -11,7 +11,7 @@ search = {
 				element: 	$('#results-artists'),
 				link: 		'/artist/$1',
 				id: 		'artistId',
-				image: 		'/api/svg/artist'
+				image: 		'svg-artist-black'
 			},
 			album: {
 				iTunesName: 'album',
@@ -20,7 +20,7 @@ search = {
 				element: 	$('#results-albums'),
 				link: 		'/album/$1',
 				id: 		'collectionId',
-				image: 		'/api/svg/album'
+				image: 		'svg-album-black'
 			},
 			track: {
 				iTunesName: 'song',
@@ -29,7 +29,7 @@ search = {
 				element: 	$('#results-tracks'),
 				link: 		'/song/$1',
 				id: 		'trackId',
-				image: 		'/api/svg/playlist'
+				image: 		'svg-music-black'
 			}
 		}
 		var results = {
@@ -47,14 +47,15 @@ search = {
 				//result.title 	= result.title.replace(regex, '<b>' + query + '</b>');
 				//result.sub 		= result.sub.replace(regex, '<b>' + query + '</b>');
 				return result;
-			})
+			});
+			wrapper.empty();
 			_.each(results, function (result, key) {
-				var html 		= $('<li data-navigate="' + result.link + '"><a><img src="' + result.image + '"><span>' + result.title + '</span><span class="search-result-sub">' + result.sub + '</span></a></li>');
+				var html 		= $('<li data-navigate="' + result.link + '"><a><img src="/api/i/pixel" class="' + result.image + '"><span>' + result.title + '</span><span class="search-result-sub">' + result.sub + '</span></a></li>');
 				if (key == 0) {
 					var html 	= $(html).addClass('search-selected')
 				}
 				endLoadingIndicator();
-				$('#search-results-wrapper').append(html);
+				wrapper.append(html);
 			});
 		}
 		var startLoadingIndicator 	= function() {
