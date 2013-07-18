@@ -52,7 +52,7 @@ var getRedditTracks 	= function(subreddit) {
 						hqimg: helpers.getHQAlbumImage(dbsong, 200)
 					});
 					db.addTrack(dbsong, function() {
-						console.log("Track added through " + subreddit + ". ")
+						//console.log("Track added through " + subreddit + ". ")
 					});
 					i++;
 					if (i != max) {
