@@ -13,20 +13,14 @@
 	  {% endif %}
 	</p>
 	<button class="play-all-songs">
-		<img src="/api/svg/play" class="list-header-play-icon"><span>Play all</span>
+		<img class="list-header-play-icon svg-play-black" src="/api/i/pixel"><span>Play all</span>
 	</button>
-	{% if playlist.public %}
-	<button class="playlist-privacy playlist-public">
-		<img src="/api/svg/public"><span>Settings</span>
+	<button class="playlist-privacy">
+		<img class="lock-icon svg-wheel-black" src="/api/i/pixel"><span>Settings</span>
 	</button>
-	{% else %}
-	<button class="playlist-privacy playlist-private">
-		<img src="/api/svg/lock" class="lock-icon"><span>Settings</span>
-	</button>
-	{% endif %}
 	<div class="playlist-options-dropdown"></div>
 	<button class="add-tracks-quickly">
-		<img src="/api/svg/plus" class="plus-icon"><span>Add tracks</span>
+		<img class="plus-icon svg-plus-black" src="/api/i/pixel"><span>Add tracks</span>
 	</button>
 	<div class="add-tracks-dropdown">
 		<div class="add-tracks-header">

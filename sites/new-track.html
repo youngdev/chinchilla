@@ -37,10 +37,10 @@
 					{% if playlists %}
 						{% for playlist in playlists %}
 							<div data-url="{{playlist.url}}" data-songid="{{song.id}}" class="song-page-playlist {% if !playlist.containssong %}add-song-to-playlist-button not-in-playlist {% else %} remove-song-from-playlist-button in-playlist contains-song {% endif %}">
-								<img src="/api/svg/playlist" class="song-page-playlist-icon">
+								<img class="svg-music-black song-page-playlist-icon" src="/api/i/pixel" class="song-page-playlist-icon">
 								<div class="song-page-playlist-title">{{playlist.name}}</div>
 								<div class="song-page-playlist-tracks"><span class="song-page-playlist-trackcount">{{playlist.tracks.length}}</span> songs</div>
-								<img class="song-page-playlist-check" src="/api/svg/check/white">
+								<img class="song-page-playlist-check svg-check-white" src="/api/i/pixel">
 							</div>
 						{% endfor %}
 					{% else %}
