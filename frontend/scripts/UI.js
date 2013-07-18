@@ -389,6 +389,7 @@ var findindom 			= function(dom) {
 }
 var findandplay 		= function() {
 	var song = findindom(this);
+	console.log('finadandplay')
 	player.playSong(song);
 }
 var findandqueue 		= function() {

@@ -64,6 +64,7 @@ player.nowPlaying = {
 		var oldsong = player.nowPlaying.get();
 		var song = helpers.parseDOM(song);
 		localStorage['nowPlaying'] = JSON.stringify(song);
+		console.log(song)
 		$("#track-title a").text(song.name).attr('data-navigate', '/song/' + song.id);
 		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
 		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
