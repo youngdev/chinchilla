@@ -726,7 +726,7 @@ this.main 						= function(request, response) {
 				dbquery.getUserCollections(user, afterCollection)
 			}
 			else {
-				fetchCharts();
+				getCharts();
 			}
 		},
 		afterCollection 	= function(collections) {
@@ -734,7 +734,7 @@ this.main 						= function(request, response) {
 				first5 		= _.last(library, 5).reverse();
 			data.inlibrary  = library;
 			if (first5.length == 0) {
-				fetchCharts();
+				getCharts();
 			}
 			else {
 				dbquery.getSongsByIdList(first5, afterIdList);
@@ -751,13 +751,10 @@ this.main 						= function(request, response) {
 					hqimg: helpers.getHQAlbumImage(song, 200)
 				}
 			});
-			fetchCharts();
+			getCharts();
 		},
-		fetchCharts 		= function() {
-			charts.getCharts(afterCharts);
-		},
-		afterCharts 		= function(charts) {
-			var top5 		= _.first(charts, 5);
+		getCharts 		 	= function() {
+			var top5 		= _.first(charts.getFirstFive(), 5);
 			var top5 		= _.map(top5, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
 			var top5 		= _.compact(top5);
 			data.charts 	= _.map(top5, function(song) {
