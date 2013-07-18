@@ -387,10 +387,30 @@ var findindom 			= function(dom) {
 	var id = $(dom).attr("data-id");
 	return ($('.song[data-id='+id+']').eq(0))[0];
 }
-var findandplay 		= function() {
+var findandplay 		= function(e) {
 	var song = findindom(this);
-	console.log('finadandplay')
+	if ($(e.currentTarget).hasClass('visual-play-button')) {
+		playbutton(song, e);
+		return;
+	}
 	player.playSong(song);
+}
+var playbutton 			= function(song, event) {
+	var track = helpers.parseDOM(song), playing = player.nowPlaying.get();
+	if (track.id == playing.id) {
+		var state = ytplayer.getPlayerState();
+		if (state == 1) {
+			ytplayer.pauseVideo();
+		}
+		else {
+			ytplayer.playVideo();
+			$('.now-playing').addClass('hearable');
+		}
+	}
+	else {
+		player.playSong(track);
+		$('.now-playing').addClass('hearable');
+	}
 }
 var findandqueue 		= function() {
 	var duration 		= _.pluck(player.queue1.get(), 'duration'),
@@ -729,7 +749,11 @@ $(document).ready(function() {
 		});
 		var nowPlaying = player.nowPlaying.get();
 		if (nowPlaying) {
-			$('.song[data-id="' + nowPlaying.id + '"]').addClass('now-playing');
+			var song = $('.song[data-id="' + nowPlaying.id + '"]')
+			song.addClass('now-playing');
+			if (ytplayer.getPlayerState() == 1) {
+				song.addClass('hearable')
+			}
 		}
 		
 	});

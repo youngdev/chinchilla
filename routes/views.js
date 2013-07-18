@@ -709,7 +709,6 @@ this.library 					= function(request, response) {
 	facebook.checkLoginState(request, afterFacebookLoginStateChecked)
 };
 this.main 						= function(request, response) {
-	console.log('main')
 	var tmpl = swig.compileFile(templates.main),
 		data = {
 			templates: templates, 

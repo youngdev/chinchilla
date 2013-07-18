@@ -25,7 +25,7 @@ player.playSong = function(song, noautoplay, nohistory) {
 		/*
 			Add old song to history
 		*/
- 		player.nowPlaying.replace(songobj);
+ 		player.nowPlaying.replace(songobj, noautoplay);
  		/*
 			Change the title of the page
  		*/
@@ -60,7 +60,7 @@ updateHints = function() {
 		$("#rewind").attr("data-tooltip", "<div class='prev-update'>" + prevlabel + "</div>");
 }
 player.nowPlaying = {
-	replace: function(song) {
+	replace: function(song, noautoplay) {
 		var oldsong = player.nowPlaying.get();
 		var song = helpers.parseDOM(song);
 		localStorage['nowPlaying'] = JSON.stringify(song);
@@ -85,7 +85,7 @@ player.nowPlaying = {
 				});
 			}
 		}
-		$('.song').removeClass('now-playing')
+		$('.song').removeClass('now-playing hearable')
 		$(".song[data-id='" + song.id + "']").addClass('now-playing');
 		updateHints();
 	},
@@ -135,14 +135,21 @@ player.queue2  = new Queue('queue2');
 player.history = new Queue('history');
 player.automaticseekblocked = false;
 var stateChange = function(state) {
+	/*
+		var states = {0: ended, 1: playing, 2: paused, 3: buffering, 5: video cued}
+	*/
 	if (state == 1) {
 		$("#play").hide();
 		$("#pause").show();
 		$('#seek-bar').removeClass('buffering');
+		$('.now-playing').addClass('hearable');
 	}
 	else {
 		if (state == 0) {
 			player.playNext()
+		}
+		if (state == 2) {
+			$('.now-playing').removeClass('hearable')
 		}
 		$("#pause").hide();
 		$("#play").show();
