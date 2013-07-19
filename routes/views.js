@@ -632,7 +632,7 @@ this.retrocharts 				= function(request, response) {
 				data.table = _.map(data.table, function(song) { song.inlib = _.contains(user.collections.library, song.id); return song});
 			}
 			data.album = {cds: [data.table]};
-			data.coverstack = _.first(data.table, 10);
+			data.coverstack = _.first(data.table, 9);
 			render();
 		},
 		render 				= function() {
