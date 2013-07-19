@@ -97,7 +97,7 @@ navigation = {
 			return;
 		}
 		$.each(routes, function (route, callback) {
-			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-]+)').replace(/:[id]+/g, '([\\d]+)')),
+			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-.]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
 			if ((match && match != '/') || (match == '/' && path == '/')) {
 				$('#drop-target-label').text('your library')
