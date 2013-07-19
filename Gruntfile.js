@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-  var server = require('./app.js')
   grunt.initConfig({
     watch: {
         src: {
@@ -7,12 +6,20 @@ module.exports = function(grunt) {
             tasks: ['concat']
         },
         backend: {
-            files: ['routes/*', 'sites/*', 'db/*', 'config/*', 'auth/*'],
-            tasks: ['stop-server']
+            files: ['routes/*', 'sites/*', 'db/*', 'config/*', 'auth/*']
+        },
+        less: {
+            files: ['frontend/styles/*.less'],
+            tasks: ['less'],
+            options: {
+              livereload: false
+            }
         },
         css: {
-            files: ['frontend/styles/*.less'],
-            tasks: ['less']
+            files: ['frontend/css/main.css'],
+            options: {
+              livereload: true
+            }
         },
         options: {
             livereload: true
@@ -59,6 +66,23 @@ module.exports = function(grunt) {
             "frontend/css/main.css": "frontend/styles/main.less"
         }
       }
+    },
+    nodemon: {
+      prod: {
+        file: 'app.js',
+        ignoredFiles: ['README.md', 'node_modules/**'],
+        watchedFolders: ['routes', 'sites', 'db', 'config', 'auth'],
+        watchedExtensions: ['js', 'html']
+      }
+    },
+    concurrent: {
+      target: {
+        tasks: ['nodemon', 'watch'],
+        options: {
+          logConcurrentOutput: true
+        },
+        cwd: __dirname
+      }
     }
   });
 
@@ -66,12 +90,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.registerTask('default', ['watch', 'start-server']);
-  grunt.registerTask('start-server', 'Start Tunechilla', function() {
-    var done = this.async();
-    server.listen(5000).on('close', done);
-  });
-  grunt.registerTask('stop-server', 'Stop Tunechilla', function() {
-    require('child_process').exec('killall node');
-  });
+  grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-concurrent');
+  grunt.registerTask('default', ['concurrent']);
 };
