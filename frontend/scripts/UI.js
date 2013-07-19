@@ -336,7 +336,7 @@ var setchange			= function() {
 	$.each(dom, function(a, setting) {
 		var setting = {
 			key: setting.dataset.setting,
-			label: $(setting).find('p').text(),
+			label: $(setting).find('span').text(),
 			value: $(setting).find('input').is(':checked')
 		}
 		settings.push(setting);
