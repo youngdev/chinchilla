@@ -198,6 +198,7 @@ helpers = {
 			id: 		data.album.collectionId,
 			tracks: 	data.songs.length,
 			artist: 	data.album.artistName,
+			artistid: 	data.album.artistId,
 			release: 	data.album.releaseDate,
 			image: 		data.album.artworkUrl100,
 			name: 		data.album.collectionName,

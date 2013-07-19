@@ -373,7 +373,8 @@ this.album 						= function(request, response) {
 			parsetext: parsetext, 
 			parseyear: parseyear, 
 			parsehours: parsehours, 
-			parseReleaseLeft: parseReleaseLeft
+			parseReleaseLeft: parseReleaseLeft,
+			type: 'album'
 		},
 		onlynumbers		= new RegExp('^[0-9]+$'),
 		render 			= function() {

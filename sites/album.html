@@ -4,21 +4,27 @@
 			<img src="{{ album.image }}" title="{{ album.name }}" class="album-cover image-op0" onload="$(this).removeClass('image-op0')">
 			<div class="album-name" title="{{album.name}}">{{ album.name }}</div>
 			<div class="album-releaseyear">
-			{% if album.released %}
-				{{parseyear(album.release)}}
-			{% else %}
-				{{parseReleaseLeft(album.release)}}
-			{% endif %}
-			{%  if album.subtitle%} • {{album.subtitle}}{% endif %}</div>
+			{% if type == 'album' %} {{album.artist}} • {% endif %}
+			
+			{% if album.released %} {{parseyear(album.release)}} {% else %} {{parseReleaseLeft(album.release)}} {% endif %}
+
+			{% if album.subtitle %} • {{album.subtitle}}{% endif %}</div>
 		</div>
 		<div class="album-actions">
 			<div class="play-all-album album-action-button"><img src="/api/i/pixel" class="icon-16 svg-play-black"><div class="album-action-button-label">Play all</div></div>
+			
 			{% if user %}
 			<div class="add-all-album album-action-button"><img src="/api/i/pixel" class="icon-16 svg-library-black"><div class="album-action-button-label">Add all to library</div></div>
 			{% endif %}
+			
 			{% if type == 'artist' %}
 			<div class="album-action-button" data-navigate="/album/{{album.id}}"><img src="/api/i/pixel" class="icon-16 svg-album-black"><div class="album-action-button-label">Show album page</div></div>
 			{% endif %}
+			
+			{% if type == 'album' %}
+			<div class="album-action-button" data-navigate="/artist/{{album.artistid}}"><img src="/api/i/pixel" class="icon-16 svg-artist-black"><div class="album-action-button-label">Show artist page</div></div>
+			{% endif %}
+
 			<div class="album-total-length">{{album.tracks}} tracks{% if album.hours %} - {{parsehours(album.hours)}}{% endif %}</div>
 		</div>
 		<div class="album-tracks">
