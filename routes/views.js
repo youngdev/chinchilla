@@ -526,7 +526,7 @@ this.wrapper       				= function(request, response) {
 		cookie 	= new cookies(request, response),
 		token   = cookie.get('token'),
 		data 	= {startup: templates.startup},
-		betatesters = ['jonnyburger', 'loewe1000'];
+		betatesters = ['jonnyburger', 'loewe1000', 'benni.burger.7'];
 		afterUserFetch = function(user) {
 			data.user = user;
 			if (user) {
@@ -550,7 +550,7 @@ this.wrapper       				= function(request, response) {
 			data.collection = user.collections;
 			data.library 	= JSON.stringify(user.collections.library);
 			if (data.collection.playlists.length == 0) {
-				data.playlists = [];
+				data.playlists = '[]';
 				render();
 			}
 			else {

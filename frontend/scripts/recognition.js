@@ -172,7 +172,6 @@ recognition = {
                 minuspoints     = difference === 0 ? 0 : (difference-1),
                 durpoints       = minuspoints;
             video.points -= durpoints;
-            console.log('Duration', durpoints)
 
             /*
                 50 Points: View count

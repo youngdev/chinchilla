@@ -7,9 +7,15 @@
 		<div class="dropdownoption make-playlist-newest-at-bottom {% if !playlist.newestattop %} dropdown-check {% else %} dropdown-no-check {% endif %}">Newest at bottom</div>
 	{% endif %}
 	
-	{% if !owns %}
+	{% if !owns and playlist %}
 		<div class="footnote">
 			Everybody can see this playlist. Just copy the URL and send it to your friends!
+		</div>
+	{% endif %}
+
+	{% if !playlist %}
+		<div class="footnote">
+			This playlist was just deleted. You can't change settings anymore.
 		</div>
 	{% endif %}
 </div>
