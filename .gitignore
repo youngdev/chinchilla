@@ -1,3 +1,4 @@
 node_modules
 forever
 auth
+auth/auth.js
