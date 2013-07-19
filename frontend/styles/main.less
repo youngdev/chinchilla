@@ -20,7 +20,7 @@ html, body {
 	font-size: 0.8em;
 	padding: 8px;
 }
-input, [contenteditable] {
+input[type=text], [contenteditable] {
 	-webkit-user-select: auto;
 	-moz-user-select: auto;
 	-ms-user-select: auto;
@@ -32,6 +32,9 @@ input[type=range] {
 }
 img {
 	-webkit-user-drag: none;
+}
+button:focus {
+	outline: none;
 }
 #browsetable {
 	table {
@@ -1527,16 +1530,16 @@ img {
 .settings {
 	.setting {
 		input {
-			float: left;
 		}
-		p {
+		span {
 			font-size: 0.8em;
-			padding-left: 30px;
-		}
-		p:after {
-			clear: left;
+			padding-left: 10px;
+			opacity: 0.8;
 		}
 	}
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-left: 145px;
 	padding: 5px;
 }
 .icon-16 {
@@ -2467,4 +2470,10 @@ img {
 }
 .loading-indicator-visible {
 	opacity: 1 !important;
+}
+.big-icon-header {
+	background-size: 120px 120px;
+	margin-left: 30px;
+	margin-top: 20px;
+	opacity: 0.7;
 }

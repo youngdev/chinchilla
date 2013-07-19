@@ -751,7 +751,7 @@ $(document).ready(function() {
 		if (nowPlaying) {
 			var song = $('.song[data-id="' + nowPlaying.id + '"]')
 			song.addClass('now-playing');
-			if (ytplayer.getPlayerState() == 1) {
+			if (ytplayer.getPlayerState && ytplayer.getPlayerState() == 1) {
 				song.addClass('hearable')
 			}
 		}

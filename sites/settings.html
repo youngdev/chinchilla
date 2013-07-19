@@ -1,9 +1,15 @@
+<div class="coverstack nomargin">
+	<img src="api/i/pixel" class="svg-wheel-black big-icon-header" height="120" width="120">
+</div>
+<h1 class="oncoverstack">Settings</h1>
+<div class="coverstack-description">
+	<p>Here are some tweaks that you can enable/disable. If you have ideas for more settings, <a href="mailto:info@tunechilla.com">send it in!</a></p>
+</div>
 <div class="settings">
-	<h1>Settings</h1>
 	{% for setting in user.settings %}
 	<div class="setting" data-setting="{{setting.key}}">
 		<input type="checkbox" {% if setting.value %} checked {% endif %}>
-		<p>{{setting.label}}</p>
+		<span>{{setting.label}}</span>
 	</div>
 	{% endfor %}
 </div>
