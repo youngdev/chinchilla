@@ -1,5 +1,4 @@
 var mongo       = require("mongoskin"),
-	auth        = require("../auth/auth"),
 	_			= require("underscore"),
 	connection  = mongo.db('jonny:' + process.env.password + '@127.0.0.1:27017/chinchilla', {safe: true}),
     options     = {safe: true, upsert: true},
