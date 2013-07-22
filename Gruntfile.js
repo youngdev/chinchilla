@@ -6,7 +6,7 @@ module.exports = function(grunt) {
             tasks: ['concat', 'uglify']
         },
         backend: {
-            files: ['routes/*', 'sites/*', 'db/*', 'config/*', 'auth/*']
+            files: ['routes/*', 'sites/*', 'db/*', 'config/*', 'auth/*', 'admin/*']
         },
         less: {
             files: ['frontend/styles/*.less'],

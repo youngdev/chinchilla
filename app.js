@@ -1,22 +1,22 @@
 /*
 	Require the basic stuff like the express framework
 */
-var app         = require('express').createServer(),
+var express     = require('express')
+    app         = express.createServer(),
     io          = require('socket.io').listen(app),
     views       = require('./routes/views'),
     scripts     = require('./routes/scripts'),
     styles      = require('./routes/styles'),
+    admin       = require('./admin/admin'),
     events      = require('./config/events'),
     charts      = require('./config/charts'),
     fb          = require('./config/facebook');
     
 /*
-	Listen to the fifty-one-fifty-one port!
+	Listen to port 5000, or, in production, 80;
 */
-var port = process.env.PORT || 5000;
-module.exports = app;
-app.listen(port);
-console.log("App started on port", port);
+app.listen(process.env.PORT || 5000);
+
 /*
 	These are the routes, they control what is sent to the user
 */
@@ -65,6 +65,11 @@ app.get('/api/reddit',                  views.reddit            );
 app.get('/auth/facebook',               fb.login                );
 app.get('/auth/facebook/token',         fb.token                );
 app.get('/logout',                      fb.logout               );
+
+/*
+    Set up admin routes
+*/
+app.get('/admin/',                       admin.home              );
 
 /*
 	Configure Websockets. Through websockets, users can receive live updates and submit to the database.
