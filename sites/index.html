@@ -6,8 +6,13 @@
 	<title>Tunechilla</title>
 	<link id="favicon" rel="shortcut icon" type="image/png" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script src="http://localhost:35729/livereload.js"></script>
+	{% if live %}
 	<script src="/api/script/app.min"></script>
+	{% else %}
+	<script src="http://localhost:35729/livereload.js"></script>
+	<script src="/api/script/app"></script>
+	{% endif %}
+
 	<link rel="stylesheet" href="/api/styles/main">
 </head>
 <body>

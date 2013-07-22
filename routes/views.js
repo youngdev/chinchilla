@@ -566,6 +566,7 @@ this.wrapper       				= function(request, response) {
  			var output  = tmpl.render(data);
  			response.end(output);
  		};
+ 	data.live = process.env.server == 'production';
  	data.templates = templates;
 	dbquery.getUser(token, afterUserFetch);
 }

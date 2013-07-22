@@ -3,7 +3,7 @@ module.exports = function(grunt) {
     watch: {
         src: {
             files: ['frontend/scripts/*', '!frontend/scripts/app.min.js'],
-            tasks: ['concat']
+            tasks: ['concat', 'uglify']
         },
         backend: {
             files: ['routes/*', 'sites/*', 'db/*', 'config/*', 'auth/*']
@@ -55,7 +55,7 @@ module.exports = function(grunt) {
         'frontend/scripts/pubsub.js',
         'frontend/scripts/local.js'
         ],
-        dest: 'frontend/scripts/app.min.js'
+        dest: 'frontend/scripts/app.js'
       }
     },
     less: {
@@ -84,13 +84,19 @@ module.exports = function(grunt) {
         },
         cwd: __dirname
       }
+    },
+    uglify: {
+      target: {
+        files: {
+          'frontend/scripts/app.min.js': ['frontend/scripts/app.js']
+        }
+      }
     }
   });
-
-  // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-concurrent');
   grunt.registerTask('default', ['concurrent']);
