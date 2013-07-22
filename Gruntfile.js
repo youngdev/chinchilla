@@ -31,6 +31,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: [
+        'frontend/scripts/idbstore.js',
         'frontend/scripts/underscore.js',
         'frontend/scripts/helpers.js',
         'frontend/scripts/underscore.js',
