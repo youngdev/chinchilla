@@ -100,8 +100,8 @@ var getRetroCharts		= function(year, callback) {
 			charts 	= _.compact(charts);
 			retrocharts[year] = [];
 		function lookUpOne(song) {
-			itunes.search(song.title + ' ' + song.artist, {entity: 'song', limit: 1}, function(json) {
-				if (json.results.length != 0) {
+			itunes.search(song.title + ' ' + song.artist, {entity: 'song', limit: 1}, function (json) {
+				if (json && json.results.length != 0) {
 					var itsong = itunes.remap(json.results[0]);
 					retrocharts[year].push(itsong);
 					db.addTrack(itsong, function() {
