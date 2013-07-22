@@ -317,10 +317,9 @@ var contextmenu 		= function(obj) {
 		/*
 			Fetch context menu
 		*/
-		socket.emit('get-contextmenu', {song: song, state: chinchilla});
-		socket.once('contextmenu', function(data) {
-			menu.html(data.html);
-		});
+		var output = templates.buildSongContextMenu({song: song, inlib: _.contains(chinchilla.library, parseFloat(song.id)), loggedin: chinchilla.loggedin})
+		menu.html(output);
+		
 	}
 	else if (obj.playlist) {
 		var playlist = obj.playlist.dataset.navigate;

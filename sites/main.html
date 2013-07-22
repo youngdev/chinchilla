@@ -14,12 +14,12 @@
 		</div>
 	</div>
 	<div class="home-body">
-		{% if user %}
+		{% if user and library.length != 0%}
 				<div class="box-wrapper">
 					<h3>Newest songs in your library<span class="main-link" data-navigate="/library">Go to library</span></h3>
-						{% for reddit in library %}
-							{% include templates.redditbox %}
-						{% endfor %}
+							{% for reddit in library %}
+								{% include templates.redditbox %}
+							{% endfor %}
 				</div>
 		{% endif %}
 			<div class="box-wrapper">

@@ -32,11 +32,13 @@ helpers = {
 	},
 	parseDOM: function(obj) {
 		/*
-		This does not work well enough! jQuery's .data() sucks!
-		return (obj instanceof HTMLElement) ? $(obj).data() : obj;
+		Don't use jQuery .data() here, it breaks everything
 		*/
+		var song =  (obj instanceof HTMLElement) ? obj.dataset : obj;
+		
+		song.id = parseFloat(song.id);
 
-		return (obj instanceof HTMLElement) ? obj.dataset : obj;
+		return song;
 	},
 	parsetime: function(number) {
 		var divide = (number > 5000) ? 1000 : 1

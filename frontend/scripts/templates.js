@@ -46,3 +46,10 @@ templates.buildSongsInList = function(tracks, flags) {
 	})
 	return template(data);
 }
+templates.buildSongContextMenu = function(data) {
+	console.log(data);
+	var template = _.template(
+		$('#template-contextmenu').html()
+	)
+	return template(data);
+}
