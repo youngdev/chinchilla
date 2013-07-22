@@ -30,23 +30,3 @@ DB.addTrack = function(obj) {
 		setTimeout(function() { DB.addTrack(obj) }, 100);
 	}
 }
-DB.getPlaylist = function(obj) {
-	if (PlaylistCollection) {
-		pldb.query(function (playlists) {
-			var matches			= _.map(playlists, function (playlist) { return _.contains(obj.urls, playlist.url) ? playlist : null });
-			var flattened 		= _.compact(matches);
-			obj.callback(flattened[0]);
-		});
-	}
-	else {
-		setTimeout(function() { DB.getPlaylist(obj) }, 100);
-	}
-}
-DB.addPlaylist = function(obj) {
-	if (PlaylistCollection) {
-		pldb.put(obj);
-	}
-	else {
-		setTimeout(function() { DB.addPlaylist(obj) }, 100);
-	}
-}
