@@ -191,6 +191,10 @@ var exchange 			= function(code, request, response) {
 var getUserInfo	 		= function(access_token, request, response) {
 	var client = fbapi.user(access_token);
 	client.me.info(function(err, json) {
+		if (err) {
+			response.end('A Facebook authentication error occured. This has most likely something to do with Facebook. Please try again in a few minutes.');
+			return;
+		}
 		var token = helpers.createID();
 		var user  = {
 			id: 			json.id,
