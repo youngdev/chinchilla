@@ -21,7 +21,8 @@ var swig        = 			require('swig'),
     views   	= 			this,
     lyricfind 	= 			require('../config/lyricfind'),
     freebase 	= 			require('freebase'),
-    freebtools  = 			require('../config/freebase');
+    freebtools  = 			require('../config/freebase'),
+    metatags 	= 			require('../config/metatags');
 
 /*
     Underscore config
@@ -560,7 +561,14 @@ this.wrapper       				= function(request, response) {
 		},
 		afterPlaylistsFetched = function(playlists) {
 			data.playlists = JSON.stringify(playlists);
-			render();
+			getMetaTags(request);
+		},
+		getMetaTags = function() {
+			metatags.get(request, afterMetaTags);
+		},
+		afterMetaTags = function(metatags) {
+			data.metatags = metatags;
+			dbquery.getUser(token, afterUserFetch);
 		},
  		render 	= function() {
  			var output  = tmpl.render(data);
@@ -568,7 +576,7 @@ this.wrapper       				= function(request, response) {
  		};
  	data.live = process.env.server == 'production';
  	data.templates = templates;
-	dbquery.getUser(token, afterUserFetch);
+ 	getMetaTags(request);
 }
 this.charts         			= function(request, response) {
 	facebook.getLibraryFromRequest(request, function(user) {

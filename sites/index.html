@@ -1,6 +1,7 @@
 <!doctype html>
 {% if user || allowed %}
-<html lang="en">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/"
+xmlns:fb="http://www.facebook.com/2008/fbml">
 <head>
 	<meta charset="UTF-8">
 	<title>Tunechilla</title>
@@ -12,7 +13,9 @@
 	<script src="http://localhost:35729/livereload.js"></script>
 	<script src="/api/script/app"></script>
 	{% endif %}
-
+	{% autoescape false %}
+		{{metatags}}
+	{% endautoescape %}
 	<link rel="stylesheet" href="/api/styles/main">
 </head>
 <body>
