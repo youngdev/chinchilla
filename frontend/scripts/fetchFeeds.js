@@ -99,10 +99,10 @@ views = {
 			})
 		}
 	},
-	about: {
+	info: {
 		load: function() {
 			$.ajax({
-				url: "/api/about",
+				url: "/api/info",
 				dataType: "html",
 				success: function(data) {
 					var view = $("#view");

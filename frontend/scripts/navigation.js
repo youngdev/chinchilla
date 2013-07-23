@@ -50,6 +50,9 @@ routes = {
 	},
 	'/login': 					function(match) {
 		window.location = '/auth/facebook'
+	},
+	'/info': 					function(match) {
+		views.info.load();
 	}
 };
 $(document)

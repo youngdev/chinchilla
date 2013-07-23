@@ -70,7 +70,7 @@ var templates 		= 		{
     lyrics: 				dirup + '/sites/lyrics.html',
     charts: 				dirup + '/sites/charts.html',
     retrocharts: 			dirup + '/sites/retro-charts.html',
-    about: 					dirup + '/sites/about.html',
+    info: 					dirup + '/sites/info.html',
     artistfreebase: 		dirup + '/sites/artistfreebase.html',
     templates: 				dirup + '/sites/templates.html'
 };
@@ -665,8 +665,8 @@ this.error          			= function(request, response) {
         output      = tmpl.render({error: phrase});
 	response.end(output);
 };
-this.about          			= function(request, response) {
-	var tmpl 	= swig.compileFile(templates.about),
+this.info          			= function(request, response) {
+	var tmpl 	= swig.compileFile(templates.info),
 		output 	= tmpl.render({});
 	response.end(output);
 };

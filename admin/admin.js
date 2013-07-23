@@ -7,19 +7,37 @@ var swig 	= require('swig'),
 this.home = function (request, response) {
 	var tmpl = swig.compileFile(dirup + '/admin/templates/main.html');
 	var output = tmpl.render();
-	var afterVerification = function(user) {
-		if (user.username == 'jonnyburger') {
-		}
-		else {
-			response.end('You cannot access the admin section.')
-		}
+	var data = {};
+	var afterVerification = function() {
+		db.getSongCount(afterSongCount);
 	}
-	admin.auth(request, response, afterVerification);
+	var afterSongCount = function(count) {
+		data.songCount = count;
+		db.getUserCount(afterUserCount);
+	}
+	var afterUserCount = function(count) {
+		data.userCount = count;
+		render();
+	}
+	var render = function() {
+		response.end(tmpl.render(data));
+	}
+	admin.auth(request, response, afterVerification, admin.notAuthenticated);
 }
 
-this.auth = function(request, response, callback) {
+this.auth = function(request, response, callback, failCallback) {
 	var cookie = new cookies(request, response);
 	db.getUser(cookie.get('token'), function(user) {
 		callback(user);
+		if (user.username == 'jonnyburger') {
+			callback()
+		}
+		else {
+			failCallback(response);
+		}
 	});
+}
+
+this.notAuthenticated = function(response) {
+	response.redirect('/')
 }

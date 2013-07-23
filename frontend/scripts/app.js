@@ -2215,10 +2215,10 @@ this.helpers = helpers;;views = {
 			})
 		}
 	},
-	about: {
+	info: {
 		load: function() {
 			$.ajax({
-				url: "/api/about",
+				url: "/api/info",
 				dataType: "html",
 				success: function(data) {
 					var view = $("#view");
@@ -2435,6 +2435,9 @@ this.helpers = helpers;;views = {
 	},
 	'/login': 					function(match) {
 		window.location = '/auth/facebook'
+	},
+	'/info': 					function(match) {
+		views.info.load();
 	}
 };
 $(document)

@@ -325,3 +325,13 @@ this.getRetroCharts 		= function(year, callback) {
 		}
 	});
 }
+this.getSongCount 			= function(callback) {
+	connection.collection("tracks").count({}, function (err, count) {
+		callback(count);
+	});
+}
+this.getUserCount			= function(callback) {
+	connection.collection("users").count({}, function (err, count) {
+		callback(count);
+	});
+}
