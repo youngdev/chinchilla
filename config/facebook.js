@@ -205,10 +205,11 @@ var getUserInfo	 		= function(access_token, request, response) {
 			settings: 		standards.settings
 		}
 		db.addUser(user, function() {
-			console.log("User added successful!");
+			console.log("User added successful!", user);
 			var cookie = new cookies(request, response);
 			cookie.set('token', token, {expires: new Date(2030, 10, 1, 1, 1, 1, 1)});
 			response.redirect('/');
+			console.log('Redirect!')
 		});
 	})
 }
