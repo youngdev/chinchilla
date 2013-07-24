@@ -561,6 +561,7 @@ this.wrapper       				= function(request, response) {
 		},
 		afterPlaylistsFetched = function(playlists) {
 			data.playlists = JSON.stringify(playlists);
+			render();
 		},
 		getMetaTags = function() {
 			metatags.get(request, afterMetaTags);
