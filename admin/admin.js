@@ -26,16 +26,22 @@ this.home = function (request, response) {
 }
 
 this.auth = function(request, response, callback, failCallback) {
-	var cookie = new cookies(request, response);
-	db.getUser(cookie.get('token'), function(user) {
-		callback(user);
-		if (user.username == 'jonnyburger') {
-			callback()
-		}
-		else {
-			failCallback(response);
-		}
-	});
+	var cookie = new cookies(request, response),
+		token = cookie.get('token');
+	if (token) {
+		db.getUser(token, function (user) {
+			callback(user);
+			if (user.username == 'jonnyburger') {
+				callback()
+			}
+			else {
+				failCallback(response);
+			}
+		});
+	}
+	else {
+		failCallback(response);
+	}
 }
 
 this.notAuthenticated = function(response) {
