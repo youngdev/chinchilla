@@ -1,16 +1,19 @@
 /*
 	Require the basic stuff like the express framework
 */
-var express     = require('express')
-    app         = express.createServer(),
-    io          = require('socket.io').listen(app),
-    views       = require('./routes/views'),
-    scripts     = require('./routes/scripts'),
-    styles      = require('./routes/styles'),
-    admin       = require('./admin/admin'),
-    events      = require('./config/events'),
-    charts      = require('./config/charts'),
-    fb          = require('./config/facebook');
+var express     	= require('express')
+    app         	= express(),
+    http 			= require('http'),
+    socketserver	= http.createServer(app),
+    io          	= require('socket.io').listen(socketserver),
+    views       	= require('./routes/views'),
+    scripts     	= require('./routes/scripts'),
+    styles      	= require('./routes/styles'),
+    admin       	= require('./admin/admin'),
+    events      	= require('./config/events'),
+    charts      	= require('./config/charts'),
+    fb          	= require('./config/facebook'),
+    webhook 		= require('./config/webhook');
     
 /*
 	Listen to port 5000, or, in production, 80;
@@ -53,7 +56,6 @@ app.get('/api/svg/:filename/:color',    styles.svg.getColor     );
 app.get('/api/main',                    views.main              );
 app.get('/api/error/:code',             views.error             );
 app.get('/api/info',                    views.info              );
-app.get('/api/track/:id',               views.drawtrack         );
 app.get('/api/u/:username/p/:playlist', views.playlist          );
 app.get('/api/library',                 views.library           );
 app.get('/api/settings',                views.settings          );
@@ -70,6 +72,7 @@ app.get('/logout',                      fb.logout               );
     Set up admin routes
 */
 app.get('/admin/',                       admin.home              );
+app.get('/webhook/push',				 webhook.push			 );
 
 /*
 	Configure Websockets. Through websockets, users can receive live updates and submit to the database.
