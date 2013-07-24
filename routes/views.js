@@ -528,7 +528,7 @@ this.wrapper       				= function(request, response) {
 		cookie 	= new cookies(request, response),
 		token   = cookie.get('token'),
 		data 	= {startup: templates.startup},
-		betatesters = ['jonnyburger', 'loewe1000', 'benni.burger.7', 'kopfnick', 'william.armstrong.963', 'marianon1'];
+		betatesters = ['jonnyburger', 'loewe1000', 'benni.burger.7', 'kopfnick', 'william.armstrong.963', 'marianon1', 'markus.fromm.94', 'mchlkll', 'nabil.ledmi'];
 		afterUserFetch = function(user) {
 			data.user = user;
 			if (user) {
