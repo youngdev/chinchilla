@@ -4,8 +4,8 @@
 var express     	= require('express')
     app         	= express(),
     http 			= require('http'),
-    socketserver	= http.createServer(app),
-    io          	= require('socket.io').listen(socketserver),
+    server	        = http.createServer(app),
+    io          	= require('socket.io').listen(server),
     views       	= require('./routes/views'),
     scripts     	= require('./routes/scripts'),
     styles      	= require('./routes/styles'),
@@ -18,7 +18,7 @@ var express     	= require('express')
 /*
 	Listen to port 5000, or, in production, 80;
 */
-app.listen(process.env.PORT || 5000);
+server.listen(process.env.PORT || 5000);
 
 /*
 	These are the routes, they control what is sent to the user
