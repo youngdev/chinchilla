@@ -240,7 +240,7 @@ helpers = {
 		return _.chain(
 			title
 				.toLowerCase()
-				.split(/[.&()\[\]-\s]/g)
+				.split(/[.&()\[\]\-\s]/g)
 		).compact().without('ft', 'feat', 'lyric', 'lyrics', 'official', 'hd', 'music', 'audio', 'hq', 'video')._wrapped;
 	}
 };

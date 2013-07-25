@@ -18,7 +18,8 @@ var select      = function(e)   {
 	/*
 		If user just wants to fav songs, don't select
 	*/
-	if ($(e.srcElement).hasClass('heart') || e.srcElement.dataset.navigate != undefined) {
+	var srcElement = e.srcElement || e.target;
+	if ($(srcElement).hasClass('heart') || srcElement.dataset.navigate != undefined) {
 		return;
 	}
 	/*
@@ -92,7 +93,7 @@ window.playSong = function(e)    {
 		/*
 			If user just dblclicked on the heart, don't play the song.
 		*/
-		if ($(e.srcElement).hasClass('heart')) {
+		if ($(e.srcElement || e.target).hasClass('heart')) {
 			return
 		}
 		/*
@@ -466,7 +467,8 @@ var keys 				= function(e) {
 	/*
 		Don't trigger this function when focus is in input
 	*/
-	if ($(e.srcElement).is('input') && !($(e.srcElement).is('.add-tracks-input')) && !($(e.srcElement).is('#search-field'))) {
+	var srcElement = e.srcElement || e.target;
+	if ($(srcElement).is('input') && !($(srcElement).is('.add-tracks-input')) && !($(srcElement).is('#search-field'))) {
 		return;
 	}
 	e.preventDefault();
