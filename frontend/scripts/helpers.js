@@ -35,8 +35,9 @@ helpers = {
 		Don't use jQuery .data() here, it breaks everything
 		*/
 		var song =  (obj instanceof HTMLElement) ? obj.dataset : obj;
-		
-		song.id = parseFloat(song.id);
+		if (song) {
+			song.id = parseFloat(song.id);
+		}
 
 		return song;
 	},

@@ -524,7 +524,9 @@ var keys 				= function(e) {
 		player.playLast();
 	}
 	if (key == 32) {
-		player.togglePlayState()
+		if (!$('input').is(':focus')) {
+			player.togglePlayState()
+		}
 	} 
 
 }

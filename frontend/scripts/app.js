@@ -1906,8 +1906,9 @@ for(b in c)d=c[b],d!==l[b]&&d!==a[b]&&(a[b]=d);return a};h.version=h.prototype.v
 		Don't use jQuery .data() here, it breaks everything
 		*/
 		var song =  (obj instanceof HTMLElement) ? obj.dataset : obj;
-		
-		song.id = parseFloat(song.id);
+		if (song) {
+			song.id = parseFloat(song.id);
+		}
 
 		return song;
 	},
@@ -5953,7 +5954,15 @@ player.playSong = function(song, noautoplay, nohistory) {
 			ytplayer.cueVideoById(songobj.ytid);
 		}
 		else {
-			ytplayer.loadVideoById(songobj.ytid);
+			if (ytplayer.loadVideoById) {
+				ytplayer.loadVideoById(songobj.ytid);
+			}
+			else {
+				setTimeout(function() {
+					player.playSong(song, noautoplay, nohistory);
+				}, 250);
+				
+			}
 			$('#seek-bar').addClass('buffering');
 		}
 		/*
@@ -7515,7 +7524,9 @@ var keys 				= function(e) {
 		player.playLast();
 	}
 	if (key == 32) {
-		player.togglePlayState()
+		if (!$('input').is(':focus')) {
+			player.togglePlayState()
+		}
 	} 
 
 }

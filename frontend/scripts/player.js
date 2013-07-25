@@ -13,7 +13,15 @@ player.playSong = function(song, noautoplay, nohistory) {
 			ytplayer.cueVideoById(songobj.ytid);
 		}
 		else {
-			ytplayer.loadVideoById(songobj.ytid);
+			if (ytplayer.loadVideoById) {
+				ytplayer.loadVideoById(songobj.ytid);
+			}
+			else {
+				setTimeout(function() {
+					player.playSong(song, noautoplay, nohistory);
+				}, 250);
+				
+			}
 			$('#seek-bar').addClass('buffering');
 		}
 		/*
