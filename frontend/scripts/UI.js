@@ -397,7 +397,7 @@ var findandplay 		= function(e) {
 }
 var playbutton 			= function(song, event) {
 	var track = helpers.parseDOM(song), playing = player.nowPlaying.get();
-	if (track.id == playing.id) {
+	if (playing && track.id == playing.id) {
 		var state = ytplayer.getPlayerState();
 		if (state == 1) {
 			ytplayer.pauseVideo();
