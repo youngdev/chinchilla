@@ -532,7 +532,7 @@ this.wrapper       				= function(request, response) {
 		afterUserFetch = function(user) {
 			data.user = user;
 			if (user) {
-				if (_.contains(betatesters, user.username)) {
+				if (_.contains(betatesters, user.username) || 1 == 1) {
 					facebook.getLibraryFromRequest(request, afterLibraryFetched);
 				}
 				else {
@@ -542,12 +542,13 @@ this.wrapper       				= function(request, response) {
 				}
 			}
 			else {
-				if (request.query.secretaccess == 'royhennig') {
-					data.allowed = true;
-				}
-				else if (request.params.username == 'jonnyburger') {
-					data.allowed = true
-				}
+				//if (request.query.secretaccess == 'royhennig') {
+				//	data.allowed = true;
+				//}
+				//else if (request.params.username == 'jonnyburger') {
+				//	data.allowed = true
+				//}
+				data.allowed = true;
 				render();
 			}
 		},
