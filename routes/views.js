@@ -71,7 +71,7 @@ var templates 		= 		{
     settings: 				dirup + '/sites/settings.html',
     song: 					dirup + '/sites/song.html',
     startup: 				dirup + '/sites/infoscreen.html',
-    templates: 				dirup + '/sites/templates.html'
+    templates: 				dirup + '/sites/templates.html',
     track: 					dirup + '/sites/track.html',
     tracklist: 				dirup + '/sites/tracklist.html',
     wrapper: 				dirup + '/sites/index.html'
