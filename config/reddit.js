@@ -58,6 +58,7 @@ exports.observeThread = function(thread_id) {
 				trackids: [],
 				thread_id: thread_id
 			};
+			db.saveRedditThread(thread);
 		}
 		exports.getComments(thread, thread_id)
 	});
@@ -87,7 +88,7 @@ exports.getComments = function(thread, thread_id) {
 		});
 		exports.addTracksToThread(newcomments, comments, thread);
 		if (hours < 1) {
-			var timeout = 2;
+			var timeout = 1;
 		} else if (hours < 3) {
 			var timeout = 5;
 		} else if (hours < 6) {
@@ -152,8 +153,8 @@ exports.replyToComment = function(thread, comment, callback, song) {
 	var lastRequest = new Date - exports.lastRequest;
 	if (lastRequest > 6000 && data.acc) {
 		exports.lastRequest = new Date;
-		console.log('request made');
-		Reddit.reply(comment.name, exports.writeReply(song, thread.trackids.length)).as(data.acc).end(function (err, res) {
+		console.log('request made', thread);
+		Reddit.reply(comment.name, exports.writeReply(song, thread.trackids.length, thread.thread_id)).as(data.acc).end(function (err, res) {
 			if (!err) {
 				if (res.json.ratelimit) {
 					console.log(res)
@@ -207,14 +208,12 @@ exports.iTunesSearch = function(string, callback) {
 		callback(null, json);
 	});
 }
-exports.writeReply = function(song, pllength) {
+exports.writeReply = function(song, pllength, thread_id) {
 	var template = [
-		'I\'ve added the following song to the playlist:  ',
-		'>   Song: [<%= song.name %>](http://tunechilla.com/song/<%= song.id %>)  ',
+		'I\'ve added the following song to the [playlist](http://tunechilla.com/thread/<%= thread_id %>) (now has <%= pllength %> tracks):  ',
+		'>   Song: [<%= song.name %>](http://tunechilla.com/song/<%= song.id %>) ^<%= song.release.substr(0,4) %>, [Lyrics](http://tunechilla.com/lyrics/<%= song.id %>)  ',
 		'>   Artist: [<%= song.artist %>](http://tunechilla.com/artist/<%= song.artistid %>)  ',
-		'>   Album: [<%= song.album %>](http://tunechilla.com/album/<%= song.albumid %>)  ',
-		'>   [Cover](<%= song.image %>) || [Lyrics](http://tunechilla.com/lyrics/<%= song.id %>)  ',
-		'The playlist has now <%= pllength %> tracks.  '
+		'>   Album: [<%= song.album %>](http://tunechilla.com/album/<%= song.albumid %>) ^[Cover](<%= helpers.getHQAlbumImage(song, 300) %>)  '
 	].join('\n');
-	return _.template(template, {song: song, pllength: pllength});
+	return _.template(template, {song: song, pllength: pllength, thread_id: thread_id});
 }

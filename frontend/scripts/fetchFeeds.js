@@ -219,7 +219,7 @@ views = {
 	redditpl: {
 		load: function(id) {
 			$.ajax({
-				url: '/api/reddit-playlist/' + id,
+				url: '/api/thread/' + id,
 				dataType: 'html',
 				success: function(data) {
 					var view = $('#view');

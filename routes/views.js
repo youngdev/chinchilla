@@ -899,7 +899,7 @@ this.redditpl 				= function(request,response) {
 			return;
 		}
 		data.playlist 		= playlist;
-		var tracks 			= playlist.tracks;
+		var tracks 			= playlist.trackids;
 		if (tracks.length 	== 0) {
 			data.album 		= {cds: [[]]};
 			render();
@@ -910,12 +910,12 @@ this.redditpl 				= function(request,response) {
 	},
 	afterTracksFetched 		= function(tracks) {
 		if (data.user) {
-			var tracks 		= _.map(tracks, function(track) {track.inlib = _.contains(data.library, track.id); return track; });
+			_.map(tracks, function(track) {track.inlib = _.contains(data.library, track.id); return track; });
 		}
 		data.album 			= {cds: [tracks]};
 		data.playlist.rawduration 	= _.reduce(tracks, function (a,b) { return a + parseFloat(b.duration) }, 0);
 		data.playlist.duration 		= helpers.parsehours(data.playlist.rawduration);
-		data.playlist.trackcount 	= tracks.lengthM
+		data.playlist.trackcount 	= tracks.length;
 		data.coverstack 	= _.first(_.pluck(tracks, 'image'), 9);
 		render();
 	},

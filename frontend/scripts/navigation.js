@@ -33,8 +33,8 @@ routes = {
 		views.playlist.load(match[0]);
 		$('#drop-target-label').text('this playlist')
 	},
-	'/reddit-playlist/:name': 	function(match) {
-		views.redditpl.load(match[0]);
+	'/thread/:name': 			function(match) {
+		views.redditpl.load(match[1]);
 	},
 	'/reddit': 					function(match) {
 		views.reddit.load();

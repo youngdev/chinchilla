@@ -2336,7 +2336,7 @@ this.helpers = helpers;;views = {
 	redditpl: {
 		load: function(id) {
 			$.ajax({
-				url: '/api/reddit-playlist/' + id,
+				url: '/api/thread/' + id,
 				dataType: 'html',
 				success: function(data) {
 					var view = $('#view');
@@ -2434,8 +2434,8 @@ this.helpers = helpers;;views = {
 		views.playlist.load(match[0]);
 		$('#drop-target-label').text('this playlist')
 	},
-	'/reddit-playlist/:name': 	function(match) {
-		views.redditpl.load(match[0]);
+	'/thread/:name': 			function(match) {
+		views.redditpl.load(match[1]);
 	},
 	'/reddit': 					function(match) {
 		views.reddit.load();
