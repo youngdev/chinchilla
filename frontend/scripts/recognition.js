@@ -143,9 +143,9 @@ recognition = {
             /*
                 300 Points: Levenshtein distance
             */
-            var vtfragments     = helpers.titleMatcher(video.title.$t),
+            var vtfragments     = helpers.titleMatcher(video.title.$t, _),
                 vtitle          = vtfragments.join(' '),
-                tfragments      = helpers.titleMatcher(song.artist + ' ' + song.name),
+                tfragments      = helpers.titleMatcher(song.artist + ' ' + song.name, _),
                 matches = [], unmatches = [];
             _.each(tfragments, function (fragment) {
                 var index = vtitle.indexOf(fragment);

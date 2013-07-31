@@ -2,6 +2,7 @@ var swig 	= require('swig'),
 	dirup 	= __dirname.substr(0, __dirname.length - 6),
 	cookies = require('cookies'),
 	db 		= require('../db/queries'),
+	reddit 	= require('../config/reddit'),
 	admin 	= this;
 
 this.home = function (request, response) {
@@ -17,6 +18,10 @@ this.home = function (request, response) {
 	}
 	var afterUserCount = function(count) {
 		data.userCount = count;
+		db.getWatchIds(afterWatchIds);
+	}
+	var afterWatchIds = function(item) {
+		data.watchIds = item.values;
 		render();
 	}
 	var render = function() {
@@ -30,9 +35,8 @@ this.auth = function(request, response, callback, failCallback) {
 		token = cookie.get('token');
 	if (token) {
 		db.getUser(token, function (user) {
-			callback(user);
 			if (user.username == 'jonnyburger') {
-				callback()
+				callback(user)
 			}
 			else {
 				failCallback(response);
@@ -46,4 +50,27 @@ this.auth = function(request, response, callback, failCallback) {
 
 this.notAuthenticated = function(response) {
 	response.redirect('/')
+}
+this.redditadd 		= function(request, response) {
+	var afterVerification = function() {
+		var id = request.query.id
+		if (id) {
+			db.addWatchId(id, function() {
+				response.redirect('/admin/')
+			});
+			reddit.observeThread(id);
+		}
+	}
+	admin.auth(request, response, afterVerification, admin.notAuthenticated);
+}
+this.redditremove	= function(request, response) {
+	var afterVerification = function() {
+		var id = request.params.id;
+		if (id) {
+			db.removeWatchId(id, function() {
+				response.redirect('/admin/')
+			});
+		}
+	}
+	admin.auth(request, response, afterVerification, admin.notAuthenticated);
 }

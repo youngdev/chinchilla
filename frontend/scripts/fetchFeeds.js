@@ -216,6 +216,21 @@ views = {
 			})
 		}
 	},
+	redditpl: {
+		load: function(id) {
+			$.ajax({
+				url: '/api/reddit-playlist/' + id,
+				dataType: 'html',
+				success: function(data) {
+					var view = $('#view');
+					view.html(data);
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded');
+					$.publish('new-tracks-entered-dom');
+				} 
+			})
+		}
+	},
 	reddit: {
 		load: function() {
 			$.ajax({

@@ -16,7 +16,10 @@
     "cookies": "0.3.6",
     "facebook-api": "0.1.2",
     "sanitizer": "0.0.15",
-    "freebase": "2.1.9"
+    "freebase": "2.1.9",
+    "rereddit": "~0.1.0",
+    "get-youtube-id": "~0.1.3",
+    "async": "~0.2.9"
   },
   "main": "app.js",
   "scripts": {

@@ -49,31 +49,32 @@ var	parseduration 	= 		helpers.parsetime,
 	Views
 */
 var templates 		= 		{
-    registration:           dirup + '/sites/registration.html',
-    newuser:                dirup + '/sites/new-user.html',
-    wrapper: 				dirup + '/sites/index.html',
-    startup: 				dirup + '/sites/infoscreen.html',
-    library: 				dirup + '/sites/library.html',
-    tracklist: 				dirup + '/sites/tracklist.html',
-    settings: 				dirup + '/sites/settings.html',
-    main: 					dirup + '/sites/main.html',
-    login: 					dirup + '/sites/login.html',
-    artist: 				dirup + '/sites/new-artist.html',
     album: 					dirup + '/sites/album.html',
     albumpage: 				dirup + '/sites/album-page.html',
-    playlistmenuitem: 		dirup + '/sites/playlistmenuitem.html',
-    playlist: 				dirup + '/sites/playlist.html',
-    song: 					dirup + '/sites/song.html',
-    redditbox: 				dirup + '/sites/reddit-box.html',
-    track: 					dirup + '/sites/track.html',
-    newtrack: 				dirup + '/sites/new-track.html',
-    reddit: 				dirup + '/sites/reddit.html',
-    lyrics: 				dirup + '/sites/lyrics.html',
-    charts: 				dirup + '/sites/charts.html',
-    retrocharts: 			dirup + '/sites/retro-charts.html',
-    info: 					dirup + '/sites/info.html',
+    artist: 				dirup + '/sites/new-artist.html',
     artistfreebase: 		dirup + '/sites/artistfreebase.html',
+    charts: 				dirup + '/sites/charts.html',
+    info: 					dirup + '/sites/info.html',
+    library: 				dirup + '/sites/library.html',
+    login: 					dirup + '/sites/login.html',
+    lyrics: 				dirup + '/sites/lyrics.html',
+    main: 					dirup + '/sites/main.html',
+    newtrack: 				dirup + '/sites/new-track.html',
+    newuser:                dirup + '/sites/new-user.html',
+    playlist: 				dirup + '/sites/playlist.html',
+    playlistmenuitem: 		dirup + '/sites/playlistmenuitem.html',
+    reddit: 				dirup + '/sites/reddit.html',
+    redditbox: 				dirup + '/sites/reddit-box.html',
+    redditplaylist: 		dirup + '/sites/redditplaylist.html',
+    registration:           dirup + '/sites/registration.html',
+    retrocharts: 			dirup + '/sites/retro-charts.html',
+    settings: 				dirup + '/sites/settings.html',
+    song: 					dirup + '/sites/song.html',
+    startup: 				dirup + '/sites/infoscreen.html',
     templates: 				dirup + '/sites/templates.html'
+    track: 					dirup + '/sites/track.html',
+    tracklist: 				dirup + '/sites/tracklist.html',
+    wrapper: 				dirup + '/sites/index.html'
 };
 
 /*
@@ -866,10 +867,68 @@ this.reddit 					= function(request, response) {
 		}
 	facebook.checkLoginState(request, afterlogin);	
 }
+this.redditpl 				= function(request,response) {
+	var tmpl 				= swig.compileFile(templates.redditplaylist),
+	cookie 					= new cookies(request, response),
+	token 					= cookie.get('token'),
+	data 					= {
+		templates: 				templates,
+		parseduration: 			parseduration,
+		parsetext: 				parsetext,
+		showartistalbum: 		true
+	};
+	var afterUserFetched 	= function(user) {
+		if (user) {
+			data.user 		= user;
+			dbquery.getUserCollections(user, afterLibraryFetched);
+		}
+		else {
+			afterLibraryFetched()
+		}
+	},
+	afterLibraryFetched		= function(collections) {
+		if (data.user) {
+			data.library 	= collections.library;
+		}
+		var playlist 		= '/reddit-playlist/' + request.params.id;
+		dbquery.getRedditThread(request.params.id, afterPlaylistFetched);
+	},
+	afterPlaylistFetched 	= function(playlist) {
+		if (!playlist) {
+			views.error({params: {code: 502}}, response);
+			return;
+		}
+		data.playlist 		= playlist;
+		var tracks 			= playlist.tracks;
+		if (tracks.length 	== 0) {
+			data.album 		= {cds: [[]]};
+			render();
+		}
+		else {
+			dbquery.getSongsByIdList(tracks, afterTracksFetched);
+		}
+	},
+	afterTracksFetched 		= function(tracks) {
+		if (data.user) {
+			var tracks 		= _.map(tracks, function(track) {track.inlib = _.contains(data.library, track.id); return track; });
+		}
+		data.album 			= {cds: [tracks]};
+		data.playlist.rawduration 	= _.reduce(tracks, function (a,b) { return a + parseFloat(b.duration) }, 0);
+		data.playlist.duration 		= helpers.parsehours(data.playlist.rawduration);
+		data.playlist.trackcount 	= tracks.lengthM
+		data.coverstack 	= _.first(_.pluck(tracks, 'image'), 9);
+		render();
+	},
+	render 					= function() {
+		var output 			= tmpl.render(data);
+		response.end(output);
+	}
+	dbquery.getUser(token, afterUserFetched)
+}
 this.playlist 					= function(request, response) {
 	var tmpl 				= swig.compileFile(templates.playlist),
-	cookie = new cookies(request, response),
-	token = cookie.get('token'),
+	cookie 					= new cookies(request, response),
+	token 					= cookie.get('token'),
 	data 					= {
 		templates: 				templates,
 		parseduration: 			parseduration,

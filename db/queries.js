@@ -124,7 +124,9 @@ var addTrack = function(track, callback) 	{
 			console.log(err);
 		}
 		else {
-			callback();
+			if (callback) {
+				callback();
+			}
 		}
 	});
 };
@@ -333,5 +335,45 @@ this.getSongCount 			= function(callback) {
 this.getUserCount			= function(callback) {
 	connection.collection("users").count({}, function (err, count) {
 		callback(count);
+	});
+}
+this.getRedditThread		= function(id, callback) {
+	connection.collection("thread").findOne({thread_id: id}, function(err, item) {
+		callback(item);
+	});
+}
+this.saveRedditThread 		= function(thread, callback) {
+	connection.collection("thread").update({thread_id: thread.thread_id}, thread, options, function(err, callback) {
+		console.log(thread);
+	});
+}
+var getWatchIds 			= function(callback) {
+	connection.collection("settings").findOne({id: 'watchIds'}, function (err, item) {
+		if (!item) {
+			var item = {
+				id: 'watchIds',
+				values: []
+			}
+		}
+		callback(item);
+	});
+}
+this.getWatchIds = getWatchIds;
+this.addWatchId 			= function(id, callback) {
+	getWatchIds (function (item) {
+		item.values.push(id);
+		connection.collection("settings").update({id: 'watchIds'}, item, options, function (err) {
+			console.log('Added to watch list:', id, item);
+			callback()
+		});
+	})
+}
+this.removeWatchId 	= function(id, callback) {
+	getWatchIds(function (item) {
+		item.values = _.without(item.values, id);
+		connection.collection("settings").update({id: 'watchIds'}, item, options, function (err) {
+			console.log('Removed from watch list:', id, item);
+			callback();
+		});
 	});
 }

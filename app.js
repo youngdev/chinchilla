@@ -13,7 +13,8 @@ var express     	= require('express')
     events      	= require('./config/events'),
     charts      	= require('./config/charts'),
     fb          	= require('./config/facebook'),
-    webhook 		= require('./config/webhook');
+    webhook 		= require('./config/webhook'),
+    reddit          = require('./config/reddit');
     
 /*
 	Listen to port 5000, or, in production, 80;
@@ -30,6 +31,7 @@ app.get('/song/:id',                    views.wrapper           );
 app.get('/charts',                      views.wrapper           );
 app.get('/retro-charts/:id',            views.wrapper           );
 app.get('/u/:username/p/:playlist',     views.wrapper           );
+app.get('/reddit-playlist/:id',         views.wrapper           );
 app.get('/album/:id',                   views.wrapper           );
 app.get('/info',                        views.wrapper           );
 app.get('/track/:id',                   views.wrapper           );
@@ -57,6 +59,7 @@ app.get('/api/main',                    views.main              );
 app.get('/api/error/:code',             views.error             );
 app.get('/api/info',                    views.info              );
 app.get('/api/u/:username/p/:playlist', views.playlist          );
+app.get('/api/reddit-playlist/:id',     views.redditpl          );
 app.get('/api/library',                 views.library           );
 app.get('/api/settings',                views.settings          );
 app.get('/api/reddit',                  views.reddit            );
@@ -72,7 +75,9 @@ app.get('/logout',                      fb.logout               );
     Set up admin routes
 */
 app.get('/admin/',                       admin.home              );
-app.get('/webhook/push',				 webhook.push			 );
+app.get('/admin/redditbot/add',          admin.redditadd         );
+app.get('/admin/redditbot/remove/:id',   admin.redditremove      );
+app.get('/webhook/push',                 webhook.push            );
 
 /*
 	Configure Websockets. Through websockets, users can receive live updates and submit to the database.
@@ -84,3 +89,8 @@ io.sockets.on('connection', events.connection);
     Fetch iTunes feeds every hour
 */
 charts.refresh();
+
+/*
+    Start reddit bot
+*/
+reddit.startBot();

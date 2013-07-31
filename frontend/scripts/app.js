@@ -2107,7 +2107,7 @@ for(b in c)d=c[b],d!==l[b]&&d!==a[b]&&(a[b]=d);return a};h.version=h.prototype.v
 			}
 		}
 	},
-	titleMatcher: function(title) {
+	titleMatcher: function(title, _) {
 		return _.chain(
 			title
 				.toLowerCase()
@@ -2333,6 +2333,21 @@ this.helpers = helpers;;views = {
 			})
 		}
 	},
+	redditpl: {
+		load: function(id) {
+			$.ajax({
+				url: '/api/reddit-playlist/' + id,
+				dataType: 'html',
+				success: function(data) {
+					var view = $('#view');
+					view.html(data);
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded');
+					$.publish('new-tracks-entered-dom');
+				} 
+			})
+		}
+	},
 	reddit: {
 		load: function() {
 			$.ajax({
@@ -2418,6 +2433,9 @@ this.helpers = helpers;;views = {
 	'/u/:name/p/:name': 		function(match) {
 		views.playlist.load(match[0]);
 		$('#drop-target-label').text('this playlist')
+	},
+	'/reddit-playlist/:name': 	function(match) {
+		views.redditpl.load(match[0]);
 	},
 	'/reddit': 					function(match) {
 		views.reddit.load();
@@ -6775,9 +6793,9 @@ recognition = {
             /*
                 300 Points: Levenshtein distance
             */
-            var vtfragments     = helpers.titleMatcher(video.title.$t),
+            var vtfragments     = helpers.titleMatcher(video.title.$t, _),
                 vtitle          = vtfragments.join(' '),
-                tfragments      = helpers.titleMatcher(song.artist + ' ' + song.name),
+                tfragments      = helpers.titleMatcher(song.artist + ' ' + song.name, _),
                 matches = [], unmatches = [];
             _.each(tfragments, function (fragment) {
                 var index = vtitle.indexOf(fragment);

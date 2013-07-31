@@ -236,7 +236,7 @@ helpers = {
 			}
 		}
 	},
-	titleMatcher: function(title) {
+	titleMatcher: function(title, _) {
 		return _.chain(
 			title
 				.toLowerCase()

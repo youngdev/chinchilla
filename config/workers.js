@@ -42,7 +42,7 @@ var getRedditTracks 	= function(subreddit) {
 			var title = song.data.title;
 			var title = (title.indexOf('(') != -1) ? title.substr(0, title.indexOf('(')) : title;
 			var title = (title.indexOf('[') != -1) ? title.substr(0, title.indexOf('[')) : title;
-			itunes.search(title, {entity: 'song', limit: 1}, function(json) {
+			itunes.search(title, {entity: 'song', limit: 1}, function (json) {
 				if (json && json.results && json.results.length != 0 && song.data.media.oembed.url != undefined) {
 					var dbsong = itunes.remap(json.results[0]);
 					dbsong.ytid = song.data.media.oembed.url.substr(-11);
