@@ -1,0 +1,5 @@
+<h1>Remote</h1>
+<p>Use your phone to control Tunechilla. Got to <a href="http://tunechilla.com/rmt">www.tunechilla.com/rmt</a> and enter the code {{code}}</p>
+<script>
+	socket.emit('/pairing/register', { code: '{{code}}'});
+</script>

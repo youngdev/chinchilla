@@ -1951,11 +1951,11 @@ for(b in c)d=c[b],d!==l[b]&&d!==a[b]&&(a[b]=d);return a};h.version=h.prototype.v
     parseYTId: function(video) {
     	return (video == undefined) ? null : video.id.$t.substr(-11);
     },
-    createID: function() {
+    createID: function(l) {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     
-        for( var i=0; i < 64; i++ )
+        for( var i=0; i < l; i++ )
             text += possible.charAt(Math.floor(Math.random() * possible.length));
     
         return text;
@@ -2377,7 +2377,7 @@ this.helpers = helpers;;views = {
 					$.publish('view-got-loaded')
 				},
 				error: function() {
-					errors.draw(4040);
+					errors.draw(404);
 				}
 			})
 		}
@@ -2396,7 +2396,23 @@ this.helpers = helpers;;views = {
 				error: function() {
 					errors.draw(404);
 				}
-			})
+			});
+		}
+	},
+	remote: {
+		get: function() {
+			$.ajax({
+				url: '/api/remote',
+				dataType: 'html',
+				success: function(data) {
+					$('#view').html(data);
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded');
+				},
+				error: function() {
+					errors.draw(404);
+				}
+			});
 		}
 	}
 };;routes = {
@@ -2457,6 +2473,9 @@ this.helpers = helpers;;views = {
 	},
 	'/info': 					function(match) {
 		views.info.load();
+	},
+	'/remote': 					function(match) {
+		views.remote.get();
 	}
 };
 $(document)
@@ -5903,7 +5922,28 @@ socket.on('multiple-playlist-songs-removed', function (data) {
 	});
 	notifications.create(data.notification);
 });
-;_.templateSettings.variable = "tmpl";
+
+socket.on('/pairing/other-device-disconnected', function () {
+	console.log('Mobile disconnected');
+});
+socket.on('/pairing/receive-action', function(data) {
+	switch (data.action) {
+		case 'play':
+			player.play();
+			break;
+		case 'pause':
+			player.pause();
+			break;
+		case 'previous':
+			player.playLast();
+			break;
+		case 'next':
+			player.playNext();
+			break;
+		default:
+			break;
+	}
+});;_.templateSettings.variable = "tmpl";
 templates = {};
 templates.buildLibrary = function(data) {
 	var template = _.template(

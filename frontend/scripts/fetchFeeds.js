@@ -260,7 +260,7 @@ views = {
 					$.publish('view-got-loaded')
 				},
 				error: function() {
-					errors.draw(4040);
+					errors.draw(404);
 				}
 			})
 		}
@@ -279,7 +279,23 @@ views = {
 				error: function() {
 					errors.draw(404);
 				}
-			})
+			});
+		}
+	},
+	remote: {
+		get: function() {
+			$.ajax({
+				url: '/api/remote',
+				dataType: 'html',
+				success: function(data) {
+					$('#view').html(data);
+					views.loadingindicator.hide();
+					$.publish('view-got-loaded');
+				},
+				error: function() {
+					errors.draw(404);
+				}
+			});
 		}
 	}
 };

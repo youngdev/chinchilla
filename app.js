@@ -39,7 +39,9 @@ app.get('/lyrics/:id',                  views.wrapper           );
 app.get('/register',                    views.wrapper           );
 app.get('/library',                     views.wrapper           );
 app.get('/settings',                    views.wrapper           );
-app.get('/reddit',                      views.wrapper           ); 
+app.get('/reddit',                      views.wrapper           );
+app.get('/remote',                      views.wrapper           );
+app.get('/rmt',                         views.rmt               ); 
 
 /*
     Backend routes
@@ -61,6 +63,7 @@ app.get('/api/info',                    views.info              );
 app.get('/api/u/:username/p/:playlist', views.playlist          );
 app.get('/api/thread/:id',              views.redditpl          );
 app.get('/api/library',                 views.library           );
+app.get('/api/remote',                  views.remote            );
 app.get('/api/settings',                views.settings          );
 app.get('/api/reddit',                  views.reddit            );
 

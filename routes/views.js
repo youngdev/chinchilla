@@ -66,6 +66,7 @@ var templates 		= 		{
     reddit: 				dirup + '/sites/reddit.html',
     redditbox: 				dirup + '/sites/reddit-box.html',
     redditplaylist: 		dirup + '/sites/redditplaylist.html',
+    rmt: 					dirup + '/sites/rmt.html',
     registration:           dirup + '/sites/registration.html',
     retrocharts: 			dirup + '/sites/retro-charts.html',
     settings: 				dirup + '/sites/settings.html',
@@ -74,7 +75,8 @@ var templates 		= 		{
     templates: 				dirup + '/sites/templates.html',
     track: 					dirup + '/sites/track.html',
     tracklist: 				dirup + '/sites/tracklist.html',
-    wrapper: 				dirup + '/sites/index.html'
+    wrapper: 				dirup + '/sites/index.html',
+    remote:					dirup + '/sites/remote.html'
 };
 
 /*
@@ -678,7 +680,7 @@ this.error          			= function(request, response) {
         output      = tmpl.render({error: phrase});
 	response.end(output);
 };
-this.info          			= function(request, response) {
+this.info          				= function(request, response) {
 	var tmpl 	= swig.compileFile(templates.info),
 		output 	= tmpl.render({});
 	response.end(output);
@@ -867,7 +869,7 @@ this.reddit 					= function(request, response) {
 		}
 	facebook.checkLoginState(request, afterlogin);	
 }
-this.redditpl 				= function(request,response) {
+this.redditpl 					= function(request,response)  {
 	var tmpl 				= swig.compileFile(templates.redditplaylist),
 	cookie 					= new cookies(request, response),
 	token 					= cookie.get('token'),
@@ -924,6 +926,17 @@ this.redditpl 				= function(request,response) {
 		response.end(output);
 	}
 	dbquery.getUser(token, afterUserFetched)
+}
+this.rmt 						= function(request, response) {
+	var tmpl 		= swig.compileFile(templates.rmt),
+		output		= tmpl.render();
+	response.end(output);
+}
+this.remote 					= function(request, response) {
+	var tmpl 		= swig.compileFile(templates.remote),
+		data 		= { code: helpers.createID(5) },
+		output		= tmpl.render(data);
+	response.end(output);
 }
 this.playlist 					= function(request, response) {
 	var tmpl 				= swig.compileFile(templates.playlist),

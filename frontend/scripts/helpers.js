@@ -80,11 +80,11 @@ helpers = {
     parseYTId: function(video) {
     	return (video == undefined) ? null : video.id.$t.substr(-11);
     },
-    createID: function() {
+    createID: function(l) {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     
-        for( var i=0; i < 64; i++ )
+        for( var i=0; i < l; i++ )
             text += possible.charAt(Math.floor(Math.random() * possible.length));
     
         return text;

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Tunechilla Remote</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+	<h1>Tunechilla remote</h1>
+	<div id="pair">
+		<p>You can find a pairing code under http://tunechilla.com/remote </p>
+		<input type="text" placeholder="Type in code" id="code-input">
+		<button id="pairbutton">Pair</button>
+	</div>
+	<div id="controls">
+		<button data-action="play">Play</button>
+		<button data-action="pause">Pause</button>
+		<button data-action="previous">Previous track</button>
+		<button data-action="next">Next track</button>
+	</div>
+
+	<script>
+	// Connect to the socket server (tunechilla.com);
+	var socket = io.connect(window.location.origin);
+	//Listen to the button click event
+	$('#pairbutton').on('click', function () {
+		var code = $('#code-input').val();
+		if (code.length != 5) {
+			alert('The code must be 5 characters long.');
+		}
+		else {
+			socket.emit('/pairing/add-device', { code: code });
+			$('#controls button').on('click', function() {
+				var action = this.dataset.action;
+				socket.emit('/pairing/remote/action', { action: action, code: code});
+			});
+			socket.on('/pairing/device-added', function (data) {
+				alert(data.message);
+				$('#pair').hide();
+			});
+
+			socket.on('/pairing/other-device-disconnected', function () {
+				alert('Other device disconnected!');
+			});
+
+			socket.on('/pairing/device-failed', function (data) {
+				alert(data.message);
+			});
+		}
+	})
+	</script>
+</body>
+</html>

@@ -141,3 +141,25 @@ socket.on('multiple-playlist-songs-removed', function (data) {
 	});
 	notifications.create(data.notification);
 });
+
+socket.on('/pairing/other-device-disconnected', function () {
+	console.log('Mobile disconnected');
+});
+socket.on('/pairing/receive-action', function(data) {
+	switch (data.action) {
+		case 'play':
+			player.play();
+			break;
+		case 'pause':
+			player.pause();
+			break;
+		case 'previous':
+			player.playLast();
+			break;
+		case 'next':
+			player.playNext();
+			break;
+		default:
+			break;
+	}
+});

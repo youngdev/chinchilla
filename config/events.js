@@ -535,4 +535,44 @@ this.connection = function (socket) {
 				});
 			}
 		});
+		socket.on('/pairing/register', 				function (data) {
+			pairingconnections.push({
+				code: data.code,
+				desktop: socket
+			});
+			socket.once('disconnect', function() {
+				var pairing = _.where(pairingconnections, {code: data.code})[0];
+				if (pairing && pairing.mobile) {
+					pairing.mobile.emit('/pairing/other-device-disconnected');
+					pairingconnections = _.reject(pairingconnections, function (connection) { connection.code == data.code });
+				}
+			});
+		});
+		socket.on('/pairing/add-device', function (data) {
+			var pairing = _.where(pairingconnections, {code: data.code})[0];
+			if (pairing) {
+				pairing.mobile = socket;
+				//TODO: make this better, this replaces the connection in pairingconnections[].
+				pairingconnections = _.reject(pairingconnections, function (connection) { connection.code == data.code });
+				pairingconnections.push(pairing);
+				socket.emit('/pairing/device-added', {message: 'Your device is now paired.' });
+				socket.once('disconnect', function() {
+					console.log('disconnected');
+					if (pairing && pairing.desktop) {
+						pairing.desktop.emit('/pairing/other-device-disconnected');
+						pairingconnections = _.reject(pairingconnections, function (connection) { connection.code == data.code });
+					}
+				});
+			}
+			else {
+				socket.emit('/pairing/device-failed', {message: 'The code is wrong.'});
+			}
+		});
+		socket.on('/pairing/remote/action', function (data) {
+			var pairing = _.where(pairingconnections, {code: data.code})[0];
+			if (pairing && pairing.desktop) {
+				pairing.desktop.emit('/pairing/receive-action', { action: data.action });
+			}
+		});
 };
+var pairingconnections = []

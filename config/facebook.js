@@ -195,7 +195,7 @@ var getUserInfo	 		= function(access_token, request, response) {
 			response.end('A Facebook authentication error occured. This has most likely something to do with Facebook. Please try again in a few minutes.');
 			return;
 		}
-		var token = helpers.createID();
+		var token = helpers.createID(64);
 		var user  = {
 			id: 			json.id,
 			first: 			json.first_name,

@@ -56,6 +56,9 @@ routes = {
 	},
 	'/info': 					function(match) {
 		views.info.load();
+	},
+	'/remote': 					function(match) {
+		views.remote.get();
 	}
 };
 $(document)
