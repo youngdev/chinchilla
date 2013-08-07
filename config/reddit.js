@@ -193,7 +193,7 @@ exports.fetchSong = function(comment, callback) {
 }
 exports.fetchSongsByString = function(matches, callback) {
 	_.each(matches, function (match) {
-		exports.iTunesSearch(match, function(err, results) {
+		exports.iTunesSearch(match, function(err, result) {
 			if (result && result.resultCount != 0) {
 				callback([itunes.remap(result.results[0])])
 			}
