@@ -184,7 +184,7 @@ exports.fetchSong = function(comment, callback) {
 	});
 	console.log(10)
 	exports.fetchSongsByString(matches, function(songs) {
-		console.log('b', song)
+		console.log('b', songs)
 		_.each(songs, function(song) {
 			db.addTrack(song);
 		});
