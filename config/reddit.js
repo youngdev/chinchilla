@@ -183,7 +183,9 @@ exports.fetchSong = function(comment, callback) {
 	var matches = _.map(comment.match(/\*(.*?)\*/g), function(match) {
 		return match.substr(1).substr(0, match.length - 2)
 	});
+	console.log(10)
 	exports.fetchSongsByString(matches, function(songs) {
+		console.log(20)
 		_.each(songs, function(song) {
 			db.addTrack(song);
 		});
