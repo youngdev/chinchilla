@@ -111,7 +111,9 @@ exports.getComments = function(thread, thread_id) {
 }
 exports.addTracksToThread = function(newcomments, comments, thread) {
 	var i = 0;
+	console.log('e');
 	var loop = function() {
+		console.log('f')
 		var comment = _.where(comments, {
 			'name': newcomments[i]
 		})[0];
@@ -135,6 +137,7 @@ exports.addTracksToThread = function(newcomments, comments, thread) {
 			loop();
 		}
 	}
+	console.log(newcomments);
 	if (newcomments.length != 0) {
 		loop();
 	}
@@ -160,16 +163,16 @@ exports.replyToComment = function(thread, comment, callback, song) {
 	if (lastRequest > 6000 && data.acc) {
 		exports.lastRequest = new Date;
 		console.log('request made', thread);
-		Reddit.reply(comment.name, exports.writeReply(song, thread.trackids.length, thread.thread_id)).as(data.acc).end(function (err, res) {
-			if (!err) {
-				if (res.json.ratelimit) {
-					console.log(res)
-					setTimeout(function() {
-						exports.replyToComment(thread, comment, callback, song)
-					}, res.json.ratelimit*1000);
-				}
-			}
-		});
+		//Reddit.reply(comment.name, exports.writeReply(song, thread.trackids.length, thread.thread_id)).as(data.acc).end(function (err, res) {
+		//	if (!err) {
+		//		if (res.json.ratelimit) {
+		//			console.log(res)
+		//			setTimeout(function() {
+		//				exports.replyToComment(thread, comment, callback, song)
+		//			}, res.json.ratelimit*1000);
+		//		}
+		//	}
+		//});
 	}
 	else {
 		setTimeout(function() {
@@ -185,6 +188,7 @@ exports.fetchSong = function(comment, callback) {
 	});
 	console.log(10)
 	exports.fetchSongsByString(matches, function(songs) {
+		console.log('b', son)
 		_.each(songs, function(song) {
 			db.addTrack(song);
 		});
@@ -193,7 +197,9 @@ exports.fetchSong = function(comment, callback) {
 }
 exports.fetchSongsByString = function(matches, callback) {
 	_.each(matches, function (match) {
+		console.log('a', match)
 		exports.iTunesSearch(match, function(err, result) {
+			console.log('b')
 			if (result && result.resultCount != 0) {
 				callback([itunes.remap(result.results[0])])
 			}
