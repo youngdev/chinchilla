@@ -192,6 +192,7 @@ exports.fetchSong = function(comment, callback) {
 	});
 }
 exports.fetchSongsByString = function(matches, callback) {
+	console.log('a')
 	_.each(matches, function (match) {
 		console.log(30)
 		exports.iTunesSearch(match, function(err, result) {
