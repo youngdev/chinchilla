@@ -85,8 +85,9 @@ exports.getComments = function(thread, thread_id) {
 		var newcomments = _.difference(commentids, old);
 		console.log(newcomments, response);
 		_.each(newcomments, function(comment) {
-			thread.commentids.push(comment)
+			thread.commentids.push(comment);
 		});
+		db.saveRedditThread(thread);
 		exports.addTracksToThread(newcomments, comments, thread);
 		if (hours < 1) {
 			var timeout = 1;
@@ -192,11 +193,8 @@ exports.fetchSong = function(comment, callback) {
 	});
 }
 exports.fetchSongsByString = function(matches, callback) {
-	console.log(matches)
 	_.each(matches, function (match) {
-		console.log(30)
 		exports.iTunesSearch(match, function(err, result) {
-			console.log(result)
 			if (result && result.resultCount != 0) {
 				callback([itunes.remap(result.results[0])])
 			}
