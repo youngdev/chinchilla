@@ -97,6 +97,16 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 			<li data-navigate="/login"><a><img src="/api/i/pixel" class="svg-key-black">Login with Facebook</a></li>
 			{% endif %}
 		</ul>
+		<h2>Like it on Facebook</h2>
+		<div id="fb-root"></div>
+		<script>(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) return;
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=212482748876564";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));</script>
+		<div class="fb-like" style="padding-left: 15px" data-href="http://facebook.com/tunechilla" data-layout="button_count" data-send="false" data-width="450" data-show-faces="false" data-font="arial"></div>
 	</div>
 	<div id="loading-indicator">
 		<svg width="30" height="30" viewBox="0 0 300 300"
