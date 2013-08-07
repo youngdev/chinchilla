@@ -140,10 +140,14 @@ exports.addTracksToThread = function(newcomments, comments, thread) {
 	}
 }
 exports.addTrackToThread = function(thread, comment, callback) {
+	console.log(1)
 	var song = exports.fetchSong(comment.body, function(songs) {
+		console.log(2)
 		_.each(songs, function(song) {
+			console.log(3)
 			thread.trackids.push(song.id);
 			if (data.acc) {
+				console.log(4)
 				exports.replyToComment(thread, comment, callback, song);
 			}
 		});
@@ -152,6 +156,7 @@ exports.addTrackToThread = function(thread, comment, callback) {
 }
 exports.replyToComment = function(thread, comment, callback, song) {
 	var lastRequest = new Date - exports.lastRequest;
+	console.log(lastRequest);
 	if (lastRequest > 6000 && data.acc) {
 		exports.lastRequest = new Date;
 		console.log('request made', thread);
