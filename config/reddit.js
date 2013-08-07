@@ -11,7 +11,7 @@ var Reddit = require('rereddit'),
 	}
 exports.lastRequest = new Date;
 exports.startBot = function() {
-	Reddit.login('jonnyburger', process.env.password).end(function(err, user) {
+	Reddit.login('playlistbot', process.env.password).end(function(err, user) {
 		exports.lastRequest = new Date;
 		data.acc = user;
 		if (!err) {
@@ -213,7 +213,7 @@ exports.writeReply = function(song, pllength, thread_id) {
 		'I\'ve added the following song to the [playlist](http://tunechilla.com/thread/<%= thread_id %>) (now has <%= pllength %> tracks):  ',
 		'>   Song: [<%= song.name %>](http://tunechilla.com/song/<%= song.id %>) ^<%= song.release.substr(0,4) %>, [Lyrics](http://tunechilla.com/lyrics/<%= song.id %>)  ',
 		'>   Artist: [<%= song.artist %>](http://tunechilla.com/artist/<%= song.artistid %>)  ',
-		'>   Album: [<%= song.album %>](http://tunechilla.com/album/<%= song.albumid %>) ^[Cover](<%= helpers.getHQAlbumImage(song, 300) %>)  '
+		'>   Album: [<%= song.album %>](http://tunechilla.com/album/<%= song.albumid %>) ^[Cover](<%= helpers.getHQAlbumImage(song, 200) %>)  '
 	].join('\n');
 	return _.template(template, {song: song, pllength: pllength, thread_id: thread_id});
 }
