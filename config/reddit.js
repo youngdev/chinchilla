@@ -197,6 +197,7 @@ exports.fetchSongsByString = function(matches, callback) {
 		exports.iTunesSearch(match, function(err, result) {
 			console.log('b')
 			if (result && result.resultCount != 0) {
+				console.log('called back')
 				callback([itunes.remap(result.results[0])])
 			}
 		});
