@@ -92,7 +92,7 @@ exports.getComments = function(thread, thread_id) {
 			var timeout = 2;
 		} else if (hours < 12) {
 			var timeout = 5;
-		} else if (hours < 24) {
+		} else if (hours < 72) {
 			var timeout = 10
 		} else {
 			var timeout = null;
