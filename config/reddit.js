@@ -190,7 +190,7 @@ exports.fetchSongsByString = function(matches, callback) {
 		var songs =
 			_.chain(results)
 			.map(function(result) {
-				if (result.resultCount == 0) {
+				if (result == undefined || result.resultCount == 0) {
 					return null;
 				} else {
 					return itunes.remap(result.results[0]);
