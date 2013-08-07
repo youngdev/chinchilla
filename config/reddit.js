@@ -83,10 +83,6 @@ exports.getComments = function(thread, thread_id) {
 		});
 		var old = thread.commentids;
 		var newcomments = _.difference(commentids, old);
-		_.each(newcomments, function(comment) {
-			thread.commentids.push(comment);
-		});
-		db.saveRedditThread(thread);
 		exports.addTracksToThread(newcomments, comments, thread);
 		if (hours < 1) {
 			var timeout = 1;
@@ -149,6 +145,8 @@ exports.addTrackToThread = function(thread, comment, callback) {
 		_.each(songs, function(song) {
 			console.log(3)
 			thread.trackids.push(song.id);
+			thread.commentids.push(comment.name);
+			db.saveRedditThread(thread);
 			if (data.acc) {
 				console.log(4)
 				exports.replyToComment(thread, comment, callback, song);
