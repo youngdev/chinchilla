@@ -185,7 +185,6 @@ exports.fetchSong = function(comment, callback) {
 	});
 	console.log(10)
 	exports.fetchSongsByString(matches, function(songs) {
-		console.log(20)
 		_.each(songs, function(song) {
 			db.addTrack(song);
 		});
@@ -193,18 +192,12 @@ exports.fetchSong = function(comment, callback) {
 	});
 }
 exports.fetchSongsByString = function(matches, callback) {
-	var i = 0;
-	async.map(matches, exports.iTunesSearch, function(err, results) {
-		var songs =
-			_.chain(results)
-			.map(function(result) {
-				if (result == undefined || result.resultCount == 0) {
-					return null;
-				} else {
-					return itunes.remap(result.results[0]);
-				}
-			}).compact().value();
-		callback(songs);
+	_.each(matches, function (match) {
+		exports.iTunesSearch(match, function(err, results) {
+			if (result && result.resultCount != 0) {
+				callback([itunes.remap(result.results[0])])
+			}
+		});
 	});
 }
 exports.iTunesSearch = function(string, callback) {
