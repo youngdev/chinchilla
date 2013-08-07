@@ -96,6 +96,7 @@ player.nowPlaying = {
 		$('.song').removeClass('now-playing hearable')
 		$(".song[data-id='" + song.id + "']").addClass('now-playing');
 		updateHints();
+		remote.updateTrack();
 	},
 	get: function(song) {
 		helpers.localStorageSafety('nowPlaying');

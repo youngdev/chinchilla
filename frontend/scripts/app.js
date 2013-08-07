@@ -5925,6 +5925,7 @@ socket.on('multiple-playlist-songs-removed', function (data) {
 
 socket.on('/pairing/other-device-disconnected', function () {
 	console.log('Mobile disconnected');
+	chinchilla.paired = false;
 });
 socket.on('/pairing/receive-action', function(data) {
 	switch (data.action) {
@@ -5943,6 +5944,9 @@ socket.on('/pairing/receive-action', function(data) {
 		default:
 			break;
 	}
+});
+socket.on('/pairing/registered', function (data) {
+	chinchilla.paired = data.code;
 });;_.templateSettings.variable = "tmpl";
 templates = {};
 templates.buildLibrary = function(data) {
@@ -6095,6 +6099,7 @@ player.nowPlaying = {
 		$('.song').removeClass('now-playing hearable')
 		$(".song[data-id='" + song.id + "']").addClass('now-playing');
 		updateHints();
+		remote.updateTrack();
 	},
 	get: function(song) {
 		helpers.localStorageSafety('nowPlaying');
@@ -7873,5 +7878,12 @@ DB.addTrack = function(obj) {
 	}
 	else {
 		setTimeout(function() { DB.addTrack(obj) }, 100);
+	}
+};remote = {
+	updateTrack: function() {
+		if (chinchilla.paired) {
+			console.log('Paired');
+			socket.emit('/pairing/update-info', { playing: player.nowPlaying.get(), code: chinchilla.paired });
+		}
 	}
 }

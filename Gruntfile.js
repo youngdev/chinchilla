@@ -53,7 +53,8 @@ module.exports = function(grunt) {
         'frontend/scripts/library.js',
         'frontend/scripts/UI.js',
         'frontend/scripts/pubsub.js',
-        'frontend/scripts/local.js'
+        'frontend/scripts/local.js',
+        'frontend/scripts/remote.js'
         ],
         dest: 'frontend/scripts/app.js'
       }

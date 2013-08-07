@@ -8,12 +8,18 @@
 </head>
 <body>
 	<h1>Tunechilla remote</h1>
+	<div id="player">
+		<img>
+		<p id="title"></p>
+		<p id="artist"></p>
+		<p id="album"></p>
+	</div>
 	<div id="pair">
 		<p>You can find a pairing code under http://tunechilla.com/remote </p>
 		<input type="text" placeholder="Type in code" id="code-input">
 		<button id="pairbutton">Pair</button>
 	</div>
-	<div id="controls">
+	<div id="controls" style="display: none">
 		<button data-action="play">Play</button>
 		<button data-action="pause">Pause</button>
 		<button data-action="previous">Previous track</button>
@@ -36,16 +42,25 @@
 				socket.emit('/pairing/remote/action', { action: action, code: code});
 			});
 			socket.on('/pairing/device-added', function (data) {
-				alert(data.message);
+				console.log(data.message);
 				$('#pair').hide();
-			});
+				$('#controls').show();
 
-			socket.on('/pairing/other-device-disconnected', function () {
-				alert('Other device disconnected!');
-			});
+				socket.on('/pairing/other-device-disconnected', function () {
+					alert('Other device disconnected!');
+				});
 
-			socket.on('/pairing/device-failed', function (data) {
-				alert(data.message);
+				socket.on('/pairing/device-failed', function (data) {
+					alert(data.message);
+				});
+				socket.on('/pairing/push-info', function (data) {
+					if (data.playing) {
+						$('#player img').attr('src', data.playing.image);
+						$('#title').text(data.playing.name);
+						$('#artist').text(data.playing.artist);
+						$('#album').text(data.playing.album);
+					}
+				});
 			});
 		}
 	})

@@ -144,6 +144,7 @@ socket.on('multiple-playlist-songs-removed', function (data) {
 
 socket.on('/pairing/other-device-disconnected', function () {
 	console.log('Mobile disconnected');
+	chinchilla.paired = false;
 });
 socket.on('/pairing/receive-action', function(data) {
 	switch (data.action) {
@@ -162,4 +163,7 @@ socket.on('/pairing/receive-action', function(data) {
 		default:
 			break;
 	}
+});
+socket.on('/pairing/registered', function (data) {
+	chinchilla.paired = data.code;
 });

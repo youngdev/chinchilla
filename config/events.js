@@ -11,7 +11,8 @@ var fs 		= require('fs'),
 	itunes 	= require('../config/itunes'),
 	swig 	= require('swig'),
 	_ 		= require('underscore');
-	helpers = require('../frontend/scripts/helpers').helpers;
+	helpers = require('../frontend/scripts/helpers').helpers,
+	remote 	= require('../config/remote');
 /*
 	Specifies the parent directory path in a string.
 */
@@ -536,31 +537,29 @@ this.connection = function (socket) {
 			}
 		});
 		socket.on('/pairing/register', 				function (data) {
-			pairingconnections.push({
+			remote.pairingconnections.push({
 				code: data.code,
 				desktop: socket
 			});
+			socket.emit('/pairing/registered', { code: data.code });
 			socket.once('disconnect', function() {
-				var pairing = _.where(pairingconnections, {code: data.code})[0];
+				var pairing = remote.getPairing(data.code);
 				if (pairing && pairing.mobile) {
 					pairing.mobile.emit('/pairing/other-device-disconnected');
-					pairingconnections = _.reject(pairingconnections, function (connection) { connection.code == data.code });
+					remote.removePairing(data.code);
 				}
 			});
 		});
 		socket.on('/pairing/add-device', function (data) {
-			var pairing = _.where(pairingconnections, {code: data.code})[0];
+			var pairing = remote.getPairing(data.code)
 			if (pairing) {
 				pairing.mobile = socket;
-				//TODO: make this better, this replaces the connection in pairingconnections[].
-				pairingconnections = _.reject(pairingconnections, function (connection) { connection.code == data.code });
-				pairingconnections.push(pairing);
+				remote.updatePairing(pairing, data.code);
 				socket.emit('/pairing/device-added', {message: 'Your device is now paired.' });
 				socket.once('disconnect', function() {
-					console.log('disconnected');
 					if (pairing && pairing.desktop) {
 						pairing.desktop.emit('/pairing/other-device-disconnected');
-						pairingconnections = _.reject(pairingconnections, function (connection) { connection.code == data.code });
+						remote.removePairing(data.code);
 					}
 				});
 			}
@@ -569,10 +568,15 @@ this.connection = function (socket) {
 			}
 		});
 		socket.on('/pairing/remote/action', function (data) {
-			var pairing = _.where(pairingconnections, {code: data.code})[0];
+			var pairing = remote.getPairing(data.code)
 			if (pairing && pairing.desktop) {
 				pairing.desktop.emit('/pairing/receive-action', { action: data.action });
 			}
 		});
+		socket.on('/pairing/update-info', function (data) {
+			var pairing = remote.getPairing(data.code);
+			if (pairing && pairing.mobile) {
+				pairing.mobile.emit('/pairing/push-info', data);
+			}
+		});
 };
-var pairingconnections = []
