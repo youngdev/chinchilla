@@ -70,7 +70,7 @@ exports.getComments = function(thread, thread_id) {
 		}, 5000);
 		return;
 	}
-	json.get('http://www.reddit.com/comments/' + thread_id + '.json?limit=50' + '&sort=new' + '&timestamp=' + (new Date).getTime(), function(err, response) {
+	json.get('http://www.reddit.com/comments/' + thread_id + '.json?limit=1000' + '&sort=new' + '&timestamp=' + (new Date).getTime(), function(err, response) {
 		exports.lastRequest = new Date;
 		var post = response.splice(0, 1);
 		var hours = (new Date - (post[0].data.children[0].data.created_utc * 1000)) / 3600000;
