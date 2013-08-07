@@ -344,7 +344,6 @@ this.getRedditThread		= function(id, callback) {
 }
 this.saveRedditThread 		= function(thread, callback) {
 	connection.collection("thread").update({thread_id: thread.thread_id}, thread, options, function(err, callback) {
-		console.log(thread);
 	});
 }
 var getWatchIds 			= function(callback) {

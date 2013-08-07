@@ -83,7 +83,6 @@ exports.getComments = function(thread, thread_id) {
 		});
 		var old = thread.commentids;
 		var newcomments = _.difference(commentids, old);
-		console.log(newcomments, response);
 		_.each(newcomments, function(comment) {
 			thread.commentids.push(comment);
 		});
