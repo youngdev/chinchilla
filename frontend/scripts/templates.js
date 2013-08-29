@@ -53,3 +53,12 @@ templates.buildSongContextMenu = function(data) {
 	)
 	return template(data);
 }
+templates.buildFilter 			= function() {
+	var template = [
+		"<div>",
+			//"<input type='checkbox'>Hip Hop/Rap",
+			"<p style='color: black'>Coming soon!</p>",
+		"</div>"
+	].join('\n')
+	return template
+}

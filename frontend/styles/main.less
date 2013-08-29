@@ -922,7 +922,7 @@ button:focus {
 		}
 		.home-body {
 			padding: 10px 40px;
-			max-width: 1250px;
+			max-width: 985px;
 			margin: auto;
 			margin-top: 186px;
 
@@ -1633,29 +1633,31 @@ button:focus {
 	}
 }
 .reddit-box {
-	width: 202px;
+	width: 150px;
 	display: inline-block;
 	margin-bottom: 20px;
 	margin-right: 23px;
 	cursor: pointer;
 	background: rgb(235,235,235);
 	border: 1px solid rgba(0,0,0,0.2);
+	font-family: Arial;
 	.reddit-song-name {
-		font-size: 0.9em;
+		font-size: 1em;
 		font-weight: bold;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
 	}
 	.reddit-song-artist {
-		font-size: 0.8em;
+		font-size: 0.7em;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
+		padding-bottom: 1px;
 	}
 	.reddit-song-upvotes {
-		font-size: 0.8em;
-		opacity: 0.4;
+		font-size: 0.7em;
+		opacity: 0.7;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
@@ -1663,16 +1665,31 @@ button:focus {
 	img {
 		left: 50%;
 		position: relative;
-		margin-left: -100px;
-		height: 200px;
-		width: 200px;
+		margin-left: -74px;
+		height: 148px;
+		width: 148px;
 		border-bottom: 1px solid rgba(0,0,0,0.2);
 	}
+	img:after {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background: black;
+		top: 0;
+		left: 0;
+	}
 	.reddit-info-box {
-		padding: 15px;
-		padding-top: 15px;
-		background: rgb(250, 250, 250);
-		margin-top: -3px;
+		margin-top: -90px;
+		width: 100%;
+		position: relative;
+		height: 90px;
+		color: white;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-top: 40px;
+		background: -webkit-linear-gradient(top, transparent, black);
+		-webkit-transition: .3s opacity;
 	}
 	.reddit-image-actions {
 		-webkit-transition: 0.3s opacity;
@@ -1697,8 +1714,8 @@ button:focus {
 		height: 50px;
 		width: 50px;
 		position: absolute;
-		margin-top: -195px;
-		margin-left: 140px;
+		margin-top: -143px;
+		margin-left: 90px;
 		-webkit-transition: 0.3s opacity;
 		opacity: 0;
 		.play-icon {
@@ -1730,9 +1747,12 @@ button:focus {
 	.reddit-image-actions, .visual-play-button {
 		opacity: 1;
 	}
+	.reddit-info-box {
+		opacity: 0;
+		pointer-events: none;
+	}
 }
 .reddit-info-box:hover {
-	background: rgb(255, 255, 255);
 }
 .reddit-info-box *, .reddit-info-box {
 	cursor: pointer;
@@ -1800,6 +1820,11 @@ button:focus {
 	top: 70px;
 	left: 180px;
 	color: white;
+	img.filter-icon {
+		width: 17px;
+		height: 17px;
+		background-size: 17px 17px;
+	}
 	.list-view-button {
 		img {
 			vertical-align: middle;
@@ -1835,6 +1860,15 @@ button:focus {
 		padding-top: 5px;
 		width: 100px;
 		top: 3px;
+	}
+	.filter-dropdown {
+		width: 400px;
+		height: 200px;
+		position: absolute;
+		background: white;
+		margin-left: 214px;
+		display: none;
+		.basic
 	}
 	.list-view-button:hover {
 		border: 1px solid rgba(0,0,0,0.25);
@@ -1876,7 +1910,7 @@ button:focus {
 		background: white;
 		top: 58px;
 		width: 200px;
-		margin-left: 85px;
+		margin-left: 111px;
 		display: none;
 		border-radius: 2px;
 	}
@@ -1994,9 +2028,6 @@ button:focus {
 }
 .reddit-page-box {
 	clear: left;
-	white-space: nowrap;
-	height: 345px;
-	overflow: hidden;
 	padding-left: 30px;
 	padding-right: 30px;
 	margin-right: -10px;

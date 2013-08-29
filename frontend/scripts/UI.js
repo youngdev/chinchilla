@@ -681,6 +681,7 @@ var closenotification 	= function() {
 }
 var playallsongs 		= function() {
 	var songs 			= $('.song'),
+		songs 			= _.shuffle(songs),
 		firstsong 		= songs.splice(0,1)[0];
 	player.queue2.clear();
 	$.each(songs, function(k, song) {
@@ -693,6 +694,18 @@ var hoversearchresult 	= function() {
 	$('.' + classname).removeClass(classname);
 	$(this).addClass(classname);
 }
+var filterdropdown 		= function() {
+	$('.filter-dropdown').toggle();
+	if ($('.filter-dropdown').is(':visible')) {
+		$('body').one('click contextmenu', function() {
+			$(".filter-dropdown").hide();
+		});
+		$('.filter-dropdown').on('click contextmenu', function(e) {
+			e.stopPropagation();
+		});
+	}
+	$('.filter-dropdown').html(_.template(templates.buildFilter()));
+} 
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -737,6 +750,7 @@ $(document)
 .on('click',		'.close-notification', 				closenotification 	) // Dismiss popup messages
 .on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
+.on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
 
