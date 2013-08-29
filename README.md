@@ -1,24 +1,25 @@
-# Chinchilla
+# Tunechilla
 
 Welcome, here you can find the source code for _chinchilla_, a web app written in node.js for playing, discovering and organizing music. 
 All of the tracks are being streamed via YouTube. 
 
-## The Idea
-
-There are many possibilities to listen to music. I want to combine them to make your music listening awesome. 
-Take the comfort of organzing music from iTunes and the huge music library from YouTube and put it together! 
-
 ## How to install
 
-First you need a MongoDB database to make this work. I chose mongolab. Then, create a directory /auth and put a file named auth.js in it. Then, put your authentication string in it like this: 
-	```javascript
-	this.auth = "username:password@server:port/dbname?auto_reconnect";
-	``` 
-Then, install all node modules!  
-	```
-	npm install 
-	```
-You're ready to go! Use foreman to start the server:
-	```
-	foreman start 
-	``
+First, you have to clone the git repository.
+
+`git clone https://github.com/JonnyBurger/chinchilla.git`
+
+You also need a database. Google for mongoctl to find the easiest way to set up a MongoDB database. Call the databse chinchilla.
+
+Install the npm packages: 
+
+`npm install`
+
+Set the DB password for Tunechilla to read (you have to do this everytime you reboot)
+
+`export password=YOUR_PASSWORD_FOR_THE_DATABASE_WITHOUT_QUOTES`
+
+Start the server! (runs on localhost:5000)
+
+`node app.js`
+
