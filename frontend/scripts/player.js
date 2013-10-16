@@ -229,8 +229,8 @@ player.setUpEvents = function() {
 				duration  		= ytplayer.getDuration(),
 				parsedcurrent 	= helpers.parsetime(current),
 				parsedduration	= helpers.parsetime(duration);
-			$("#time-right").text(parsedduration);
-			$("#time-left").text(parsedcurrent);
+			document.getElementById('time-right').innerHTML = parsedduration;
+			document.getElementById('time-left').innerHTML = parsedcurrent;
 			var percent = (current/duration)*100;
 			var val;
 			if (!player.automaticseekblocked && percent) {
@@ -239,8 +239,8 @@ player.setUpEvents = function() {
 			if (percent == NaN) {
 				var val = 0
 			}
-			$("#seek-progress").css("width", val + "%");
-		setTimeout(timeUpdate, 250)
+			document.getElementById('seek-progress').style.width = val + '%'
+		setTimeout(timeUpdate, 500)
 	}
 	timeUpdate()
 }

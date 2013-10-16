@@ -7,34 +7,29 @@
 			<h1>Welcome to Tunechilla...</h1>
 			<p>Listen to millions of songs, <strong>completely free</strong> and unlimited.</p>
 		{% endif %}
-		<div class="home-covers">
-			{% for album in background %}
-				<img src="{{album.image}}">
-			{% endfor %}
-		</div>
 	</div>
 	<div class="home-body">
 		{% if user and library.length != 0%}
-				<div class="box-wrapper">
+				<div class="box-wrapper" style="background: #c0392b">
 					<h3>Newest songs in your library<span class="main-link" data-navigate="/library">Go to library</span></h3>
 							{% for reddit in library %}
 								{% include templates.redditbox %}
 							{% endfor %}
 				</div>
 		{% endif %}
-			<div class="box-wrapper">
+			<div class="box-wrapper" style="background: #3498db">
 				<h3>iTunes Charts<span class="main-link" data-navigate="/charts">Go to charts</span></h3>
 				{% for reddit in charts %}
 					{% include templates.redditbox %}
 				{% endfor %}
 			</div>
-			<div class="reddit-feature box-wrapper">
+			<div class="reddit-feature box-wrapper" style="background: #e67e22">
 				<h3>What's hot on Reddit?<span class="main-link" data-navigate="/reddit">See genres</span></h3>
 				{% for reddit in redditsongs %}
 					{% include templates.redditbox %}
 				{% endfor %}
 			</div>
-			<div class="main-retro box-wrapper">
+			<div class="main-retro box-wrapper" style="background: #34495e">
 				<h3>What was hot in... {{randomyear}}?<span class="main-link" data-navigate="/retro-charts/{{randomyear}}">See the full list</span></h3>
 				{% for reddit in topanno %}
 					{% include templates.redditbox %}

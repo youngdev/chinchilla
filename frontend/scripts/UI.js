@@ -1,4 +1,5 @@
 var select      = function(e)   {
+	console.log('click')
 	/*
 		Send to other function if batch selecting.
 		Ctrl key selects all elements between already selected ones and the clicked.
@@ -25,7 +26,7 @@ var select      = function(e)   {
 	/*
 		If the track is already selected, make drag&drop possible
 	*/
-	if ($(this).hasClass('selected') && e.button == 0) {
+	if ($(this).hasClass('selected') && (e.button == 0 || document.getElementsByClassName('selected').length < 2)) {
 		var tounselect = $(".song.selected").not(this)
 		var toselect   = $(this)
 		$(document).one('mouseup', function () {
@@ -38,7 +39,7 @@ var select      = function(e)   {
 	/*
 		Deselect all the other songs.
 	*/
-	if (e.button == 0) {
+	if (e.button == 0 || document.getElementsByClassName('selected').length < 2) {
 		var tounselect = $(".song.selected").not(this);
 		$(this).addClass("selected");
 		$(tounselect).removeClass("selected");
@@ -707,6 +708,7 @@ var filterdropdown 		= function() {
 	var list = filterdropdown[0].dataset.list;
 	templates.buildFilter({list: list});
 } 
+var tableheadersticky = false;
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -753,7 +755,7 @@ $(document)
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 .on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
 $(window)
-.on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
+.on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 
 /*
 	When new tracks are in the DOM, there are some things we should do on the client-side...
