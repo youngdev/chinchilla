@@ -77,18 +77,21 @@ player.nowPlaying = {
 		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
 		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
 		var npimage1 = $("#nowplaying-image"), npimage2 = $("#nowplaying-image2"), cover = helpers.getHQAlbumImage(song, 225);
+		if (!$('#sidebar-player').is(':visible')) {
+			player.show();
+		}
 		if ((oldsong && oldsong.image != song.image) || (npimage1.attr('src') == '' && npimage1.attr('src') == '')) {
 			if (npimage1.hasClass('np-placeholder-used')) {
 				npimage1.removeClass('np-placeholder-used').attr('src', '');
 				npimage2.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
-					$(npimage2).css({opacity: 0.7}, 400);
+					$(npimage2).css({opacity: 1}, 400);
 					$(npimage1).css({opacity: 0}, 400);
 				});
 			}
 			else {
 				npimage2.removeClass('np-placeholder-used').attr('src', '')
 				npimage1.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
-					$(npimage1).css({opacity: 0.7}, 400);
+					$(npimage1).css({opacity: 1}, 400);
 					$(npimage2).css({opacity: 0}, 400);
 				});
 			}
@@ -207,6 +210,9 @@ var errorOccured = function(error_code) {
 			notifications.create('No video available in your country was found. We cannot play this song, sorry.');
 		}
 	}, undefined, undefined, undefined, ['restricted']);
+}
+player.show = function() {
+	$('#sidebar-player').slideDown(800).animate({'opacity': 1});
 }
 player.setUpEvents = function() {
 	/*

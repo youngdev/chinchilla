@@ -2457,7 +2457,7 @@ this.helpers = helpers;;views = {
 		views.reddit.load();
 	},
 	'/': 						function(match) {
-		views.main.get();
+		navigation.to('/home')
 	},
 	'/song/:id': 				function(match) {
 		views.song.load(match[1]);
@@ -6002,14 +6002,15 @@ templates.buildSongContextMenu = function(data) {
 	)
 	return template(data);
 }
-templates.buildFilter 			= function() {
-	var template = [
-		"<div>",
-			//"<input type='checkbox'>Hip Hop/Rap",
-			"<p style='color: black'>Coming soon!</p>",
-		"</div>"
-	].join('\n')
-	return template
+templates.buildFilter 			= function(obj) {
+	var list;
+	var afterTracksFetched = function(tracks) {
+		var template = $('#template-filter').html();
+		$('.filter-dropdown').html(_.template(template));
+	}
+	if (obj.list == '/library') {
+		DB.getTracks({ids: chinchilla.library, callback: afterTracksFetched});
+	}
 };player = {};
 player.playSong = function(song, noautoplay, nohistory) {
 	var songobj = helpers.parseDOM(song);
@@ -6089,18 +6090,21 @@ player.nowPlaying = {
 		$("#track-artist a").text(song.artist).attr('data-navigate', '/artist/' + song.artistid);
 		$("#track-album a").text(song.album).attr('data-navigate', '/album/' + song.albumid);
 		var npimage1 = $("#nowplaying-image"), npimage2 = $("#nowplaying-image2"), cover = helpers.getHQAlbumImage(song, 225);
+		if (!$('#sidebar-player').is(':visible')) {
+			player.show();
+		}
 		if ((oldsong && oldsong.image != song.image) || (npimage1.attr('src') == '' && npimage1.attr('src') == '')) {
 			if (npimage1.hasClass('np-placeholder-used')) {
 				npimage1.removeClass('np-placeholder-used').attr('src', '');
 				npimage2.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
-					$(npimage2).css({opacity: 0.7}, 400);
+					$(npimage2).css({opacity: 1}, 400);
 					$(npimage1).css({opacity: 0}, 400);
 				});
 			}
 			else {
 				npimage2.removeClass('np-placeholder-used').attr('src', '')
 				npimage1.attr('src', cover).addClass('np-placeholder-used').one('load', function() {
-					$(npimage1).css({opacity: 0.7}, 400);
+					$(npimage1).css({opacity: 1}, 400);
 					$(npimage2).css({opacity: 0}, 400);
 				});
 			}
@@ -6219,6 +6223,9 @@ var errorOccured = function(error_code) {
 			notifications.create('No video available in your country was found. We cannot play this song, sorry.');
 		}
 	}, undefined, undefined, undefined, ['restricted']);
+}
+player.show = function() {
+	$('#sidebar-player').slideDown(800).animate({'opacity': 1});
 }
 player.setUpEvents = function() {
 	/*
@@ -7767,16 +7774,17 @@ var hoversearchresult 	= function() {
 	$(this).addClass(classname);
 }
 var filterdropdown 		= function() {
-	$('.filter-dropdown').toggle();
-	if ($('.filter-dropdown').is(':visible')) {
+	var filterdropdown = $('.filter-dropdown')
+	filterdropdown.toggle();
+	if (filterdropdown.is(':visible')) {
 		$('body').one('click contextmenu', function() {
-			$(".filter-dropdown").hide();
+			filterdropdown.hide();
 		});
-		$('.filter-dropdown').on('click contextmenu', function(e) {
-			e.stopPropagation();
-		});
+		filterdropdown.on('click contextmenu', function(e) { e.stopPropagation(); });
 	}
-	$('.filter-dropdown').html(_.template(templates.buildFilter()));
+
+	var list = filterdropdown[0].dataset.list;
+	templates.buildFilter({list: list});
 } 
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks

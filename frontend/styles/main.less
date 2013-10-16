@@ -277,7 +277,7 @@ button:focus {
 		top: 186px;
 		height: 9px;
 		z-index: 1;
-		background: @sidebarbg;
+		background: white;
 		position: absolute;
 		#seek-progress {
 			height: 100%;
@@ -322,7 +322,7 @@ button:focus {
 		position: absolute;
 		top: 195px;
 		height: 31px;
-		background: @sidebarbg;
+		background: white;
 		padding-left: 15px;
 		width: 224px;
 		padding-top: 10px;
@@ -435,16 +435,18 @@ button:focus {
 	top: 0;
 	left: 0;
 	height: 100%;
-	background: rgb(240, 240, 240);
+	background: rgb(255, 255, 255);
 	border-right: 1px solid rgb(190,190,190);
 	color: #535665;
 	font-weight: 500;
 	#sidebar-player {
+		display: none;
+		opacity: 0;
 		#nowplaying-image, #nowplaying-image2 {
 			opacity: 0;
 			position: absolute;
 			-webkit-transition: opacity 0.5s ease-out;
-			background: black;
+			top: 0
 		}
 		.no-song-playing {
 			width: 100%;
@@ -1335,7 +1337,7 @@ button:focus {
 	}
 }
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 0px;
 }
  
 ::-webkit-scrollbar-track {

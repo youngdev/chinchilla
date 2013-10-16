@@ -48,12 +48,12 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 					<div class="arrow-right"></div>
 				</div>
 			</div>
+			<div id="time-left">0:00</div>
+			<div id="time-right">0:00</div>
+			<p class="nowplaying-info npinfo-first" id="track-title"><a></a></p>
+			<p class="nowplaying-info" id="track-artist"><a></a></p>
+			<p class="nowplaying-info" id="track-album"><a></a></p>
 		</div>
-		<div id="time-left">0:00</div>
-		<div id="time-right">0:00</div>
-		<p class="nowplaying-info npinfo-first" id="track-title"><a></a></p>
-		<p class="nowplaying-info" id="track-artist"><a></a></p>
-		<p class="nowplaying-info" id="track-album"><a></a></p>
 		<input type="text" id="search-field" placeholder="Search for songs or artists">
 		<div id="clear-input">x</div>
 		<div id="search-results">
@@ -199,18 +199,23 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 				<button class="show-filter-dropdown">
 					<img class="filter-icon svg-filter-black" src="/api/i/pixel"><span>Filter tracks</span></img>
 				</button>
-				<div class="filter-dropdown">
+				<div class="filter-dropdown" data-list="/library">
 
 				</div>
 			</div>
-			<div class="extendedtable">
+			<div class="extendedtable" data-list="/library">
 				<%= tmpl.tracklist %>
 			</div>
 		<% } else { %>
 			You must be logged in to use the library.
 		<% } %>
 	</script>
-
+	<script type="text/template" id="template-filter">
+		<div>,
+			<input type='checkbox'>Hip Hop/Rap,
+			<p style='color: black'>Coming soon!</p>,
+		</div>
+	</script>
 	<script type="text/template" id="template-playlist">
 		<div class="coverstack nomargin">
 			<div class="covers">

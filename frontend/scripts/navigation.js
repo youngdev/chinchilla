@@ -40,7 +40,7 @@ routes = {
 		views.reddit.load();
 	},
 	'/': 						function(match) {
-		views.main.get();
+		navigation.to('/home')
 	},
 	'/song/:id': 				function(match) {
 		views.song.load(match[1]);

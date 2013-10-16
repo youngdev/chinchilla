@@ -1,6 +1,6 @@
 var clientID       = '212482748876564';
 var clientSecret   = 'f2bdb7700ef2d87a8c05b32ac31c013a';
-var redirect_uri   = (process.env.HOME == '/Users/jonny') ? 'http://localhost:5000/auth/facebook/token'  : 'http://tunechilla.com/auth/facebook/token';
+var redirect_uri   = (process.env.HOME == '/Users/jonny' || process.env.HOME == '/Users/jonnyburger') ? 'http://localhost:5000/auth/facebook/token'  : 'http://tunechilla.com/auth/facebook/token';
 var cookies		   = require('cookies');
 var fbapi		   = require('facebook-api');
 var helpers 	   = require('../frontend/scripts/helpers').helpers;

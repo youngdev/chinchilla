@@ -695,16 +695,17 @@ var hoversearchresult 	= function() {
 	$(this).addClass(classname);
 }
 var filterdropdown 		= function() {
-	$('.filter-dropdown').toggle();
-	if ($('.filter-dropdown').is(':visible')) {
+	var filterdropdown = $('.filter-dropdown')
+	filterdropdown.toggle();
+	if (filterdropdown.is(':visible')) {
 		$('body').one('click contextmenu', function() {
-			$(".filter-dropdown").hide();
+			filterdropdown.hide();
 		});
-		$('.filter-dropdown').on('click contextmenu', function(e) {
-			e.stopPropagation();
-		});
+		filterdropdown.on('click contextmenu', function(e) { e.stopPropagation(); });
 	}
-	$('.filter-dropdown').html(_.template(templates.buildFilter()));
+
+	var list = filterdropdown[0].dataset.list;
+	templates.buildFilter({list: list});
 } 
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
