@@ -6235,8 +6235,8 @@ player.setUpEvents = function() {
 				duration  		= ytplayer.getDuration(),
 				parsedcurrent 	= helpers.parsetime(current),
 				parsedduration	= helpers.parsetime(duration);
-			$("#time-right").text(parsedduration);
-			$("#time-left").text(parsedcurrent);
+			document.getElementById('time-right').innerHTML = parsedduration;
+			document.getElementById('time-left').innerHTML = parsedcurrent;
 			var percent = (current/duration)*100;
 			var val;
 			if (!player.automaticseekblocked && percent) {
@@ -6245,8 +6245,8 @@ player.setUpEvents = function() {
 			if (percent == NaN) {
 				var val = 0
 			}
-			$("#seek-progress").css("width", val + "%");
-		setTimeout(timeUpdate, 250)
+			document.getElementById('seek-progress').style.width = val + '%'
+		setTimeout(timeUpdate, 500)
 	}
 	timeUpdate()
 }
@@ -7071,6 +7071,7 @@ playlist = {
 		notifications.create('Adding...');
 	}
 };var select      = function(e)   {
+	console.log('click')
 	/*
 		Send to other function if batch selecting.
 		Ctrl key selects all elements between already selected ones and the clicked.
@@ -7097,7 +7098,7 @@ playlist = {
 	/*
 		If the track is already selected, make drag&drop possible
 	*/
-	if ($(this).hasClass('selected') && e.button == 0) {
+	if ($(this).hasClass('selected') && (e.button == 0 || document.getElementsByClassName('selected').length < 2)) {
 		var tounselect = $(".song.selected").not(this)
 		var toselect   = $(this)
 		$(document).one('mouseup', function () {
@@ -7110,7 +7111,7 @@ playlist = {
 	/*
 		Deselect all the other songs.
 	*/
-	if (e.button == 0) {
+	if (e.button == 0 || document.getElementsByClassName('selected').length < 2) {
 		var tounselect = $(".song.selected").not(this);
 		$(this).addClass("selected");
 		$(tounselect).removeClass("selected");
@@ -7778,6 +7779,7 @@ var filterdropdown 		= function() {
 	}
 	$('.filter-dropdown').html(_.template(templates.buildFilter()));
 } 
+var tableheadersticky = false;
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -7824,7 +7826,7 @@ $(document)
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 .on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
 $(window)
-.on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!)
+.on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 
 /*
 	When new tracks are in the DOM, there are some things we should do on the client-side...

@@ -747,7 +747,7 @@ this.main 						= function(request, response) {
 		},
 		afterCollection 	= function(collections) {
 			var library 	= collections.library,
-				first5 		= _.last(library, 5).reverse();
+				first5 		= _.last(library, 4).reverse();
 			data.inlibrary  = library;
 			if (first5.length == 0) {
 				getCharts();
@@ -770,7 +770,7 @@ this.main 						= function(request, response) {
 			getCharts();
 		},
 		getCharts 		 	= function() {
-			var top5 		= _.first(charts.getFirstFive(), 5);
+			var top5 		= _.first(charts.getFirstFive(), 4);
 			var top5 		= _.map(top5, function(song) { song.inlib = (data.user && _.contains(data.inlibrary, song.id)); return song; });
 			var top5 		= _.compact(top5);
 			data.charts 	= _.map(top5, function(song) {
@@ -785,7 +785,7 @@ this.main 						= function(request, response) {
 		},
 		evaluateRetroCharts = function(charts) {
 			if (charts) {
-				dbquery.getSongsByIdList(_.first(charts.charts, 5), throwtogether);
+				dbquery.getSongsByIdList(_.first(charts.charts, 4), throwtogether);
 			}
 			else {
 				throwtogether({});
@@ -799,7 +799,7 @@ this.main 						= function(request, response) {
 					hqimg: helpers.getHQAlbumImage(song, 200)
 				}
 			});
-				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 5);
+				redditsongs	= _.first(_.shuffle(workers.returnRedditSongs('/r/music')), 4);
 			_.map(redditsongs, function(reddit) { 
 				reddit.inlib= (data.user && _.contains(data.inlibrary, reddit.song.id)); 
 				return reddit; 
