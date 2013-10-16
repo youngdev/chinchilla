@@ -707,12 +707,17 @@ var filterdropdown 		= function() {
 
 	var list = filterdropdown[0].dataset.list;
 	templates.buildFilter({list: list});
+}
+var preventScrolling 	= function(evt) {
+    var keyCode = evt.keyCode;
+    if (keyCode >= 37 && keyCode <= 40) {
+        return false;
+    }
 } 
-var tableheadersticky = false;
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
-.on('dblclick',     '.song',            				playSong    		) // Doubleclick to play. Just POC yet.
+.on('dblclick',     '.song',            				playSong    		) // Doubleclick to play.
 .on('mousedown',    '#seek-bar',         				dragSeek			) // Block autmatic seeking while dragging
 .on('click',        '#play',            				resume      		) // Play or resume song.
 .on('click',        '#pause',           				pause				) // Pause music.
@@ -754,6 +759,7 @@ $(document)
 .on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 .on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
+.on('keydown', 											preventScrolling    ) // Prevent scrolling with arrow keys
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 

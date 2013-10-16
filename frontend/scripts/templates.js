@@ -54,10 +54,35 @@ templates.buildSongContextMenu = function(data) {
 	return template(data);
 }
 templates.buildFilter 			= function(obj) {
-	var list;
 	var afterTracksFetched = function(tracks) {
+		var genres = _.groupBy(tracks, function (track) { return track.genre });
 		var template = $('#template-filter').html();
-		$('.filter-dropdown').html(_.template(template));
+		var dropdownfilter = $('.filter-dropdown');
+		if (dropdownfilter.find('.filter-initialized').size() == 1) {
+			return;
+		}
+		dropdownfilter.html(
+			_.template(template, {genres: genres})
+		);
+		_.each($('.filter-genre'), function (filter) {
+			$(filter).on('change', function() {
+				var activated = _.map($('.filter-genre:checked'), function (genre) { return genre.dataset.genre });
+				var songs = $('[data-represents="' + obj.list + '"] .song');
+				if (activated.length == 0) {
+					$(songs).show();
+				}
+				else {
+					_.each(songs, function (song) {
+						if (_.contains(activated, song.dataset.genre)) {
+							$(song).show();
+						}
+						else {
+							$(song).hide();
+						}
+					});
+				}
+			});
+		})
 	}
 	if (obj.list == '/library') {
 		DB.getTracks({ids: chinchilla.library, callback: afterTracksFetched});

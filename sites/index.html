@@ -25,7 +25,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 	<div id="sidebar">
 		<div id="sidebar-player">
 			<div id="queue"></div>
-			<div class='no-song-playing'>No song playing</div>
+			<div class='no-song-playing'></div>
 			<img src="" width='224' height='224' id='nowplaying-image'>
 			<img src="" width='224'	height='224' id='nowplaying-image2'>
 			<div id="seek-bar">
@@ -203,7 +203,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 
 				</div>
 			</div>
-			<div class="extendedtable" data-list="/library">
+			<div class="extendedtable" data-represents="/library">
 				<%= tmpl.tracklist %>
 			</div>
 		<% } else { %>
@@ -211,9 +211,10 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 		<% } %>
 	</script>
 	<script type="text/template" id="template-filter">
-		<div>,
-			<input type='checkbox'>Hip Hop/Rap,
-			<p style='color: black'>Coming soon!</p>,
+		<div class='filter-initialized'>
+			<% _.each(tmpl.genres, function (tracks, genre) { %>
+				<label><input type='checkbox' data-genre="<%= genre %>" class="filter filter-genre"><%= genre %> (<%= tracks.length %>)</label> <br>
+			<% }); %>
 		</div>
 	</script>
 	<script type="text/template" id="template-playlist">

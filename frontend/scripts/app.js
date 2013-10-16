@@ -6003,10 +6003,35 @@ templates.buildSongContextMenu = function(data) {
 	return template(data);
 }
 templates.buildFilter 			= function(obj) {
-	var list;
 	var afterTracksFetched = function(tracks) {
+		var genres = _.groupBy(tracks, function (track) { return track.genre });
 		var template = $('#template-filter').html();
-		$('.filter-dropdown').html(_.template(template));
+		var dropdownfilter = $('.filter-dropdown');
+		if (dropdownfilter.find('.filter-initialized').size() == 1) {
+			return;
+		}
+		dropdownfilter.html(
+			_.template(template, {genres: genres})
+		);
+		_.each($('.filter-genre'), function (filter) {
+			$(filter).on('change', function() {
+				var activated = _.map($('.filter-genre:checked'), function (genre) { return genre.dataset.genre });
+				var songs = $('[data-represents="' + obj.list + '"] .song');
+				if (activated.length == 0) {
+					$(songs).show();
+				}
+				else {
+					_.each(songs, function (song) {
+						if (_.contains(activated, song.dataset.genre)) {
+							$(song).show();
+						}
+						else {
+							$(song).hide();
+						}
+					});
+				}
+			});
+		})
 	}
 	if (obj.list == '/library') {
 		DB.getTracks({ids: chinchilla.library, callback: afterTracksFetched});
@@ -7786,12 +7811,17 @@ var filterdropdown 		= function() {
 
 	var list = filterdropdown[0].dataset.list;
 	templates.buildFilter({list: list});
+}
+var preventScrolling 	= function(evt) {
+    var keyCode = evt.keyCode;
+    if (keyCode >= 37 && keyCode <= 40) {
+        return false;
+    }
 } 
-var tableheadersticky = false;
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
-.on('dblclick',     '.song',            				playSong    		) // Doubleclick to play. Just POC yet.
+.on('dblclick',     '.song',            				playSong    		) // Doubleclick to play.
 .on('mousedown',    '#seek-bar',         				dragSeek			) // Block autmatic seeking while dragging
 .on('click',        '#play',            				resume      		) // Play or resume song.
 .on('click',        '#pause',           				pause				) // Pause music.
@@ -7833,6 +7863,7 @@ $(document)
 .on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 .on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
+.on('keydown', 											preventScrolling    ) // Prevent scrolling with arrow keys
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 

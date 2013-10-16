@@ -1,13 +1,4 @@
 <div class="home-container">
-	<div class="header">
-		{% if user %}
-			<h1>Welcome back!</h1>
-			<p>What will you listen to next?</p>
-		{% else %}
-			<h1>Welcome to Tunechilla...</h1>
-			<p>Listen to millions of songs, <strong>completely free</strong> and unlimited.</p>
-		{% endif %}
-	</div>
 	<div class="home-body">
 		{% if user and library.length != 0%}
 				<div class="box-wrapper" style="background: #c0392b">

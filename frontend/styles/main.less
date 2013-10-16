@@ -938,9 +938,11 @@ button:focus {
 		}
 		.home-body {
 			max-width: 1248px;
+			@media screen and (max-width: 1444px) {
+				max-width: 1017px;
+			}
 			padding: 10px 40px;
 			margin: auto;
-			margin-top: 186px;
 			.home-list-box {
 				border: 1px solid rgba(0,0,0,0.2);
 				max-height: 210px;
@@ -972,6 +974,9 @@ button:focus {
 				float: left;
 				padding: 12px;
 				padding-top: 0;
+				@media screen and (max-width: 1444px) {
+					width: 448px;
+				}
 			}
 		}
 		.home-covers {
@@ -1665,7 +1670,6 @@ button:focus {
 	height: 140px;
 	display: inline-block;
 	margin-bottom: 8px;
-	margin-right: 8px;
 	cursor: pointer;
 	border: 5px solid rgba(255,255,255,0.05);
 	font-family: Arial;
@@ -1723,6 +1727,9 @@ button:focus {
 		img {
 			width: 200px;
 			margin-left: -100px;
+		}
+		.visual-play-button {
+			margin-left: 74px !important;
 		}
 	}
 	.reddit-info-box {
@@ -1866,7 +1873,6 @@ button:focus {
 	position: absolute;
 	top: 70px;
 	left: 180px;
-	color: white;
 	img.filter-icon {
 		width: 17px;
 		height: 17px;
@@ -1909,12 +1915,16 @@ button:focus {
 		top: 3px;
 	}
 	.filter-dropdown {
-		width: 400px;
-		height: 200px;
+		width: 300px;
+		padding: 10px;
 		position: absolute;
 		background: white;
 		margin-left: 214px;
 		display: none;
+		label {
+			opacity: 0.75;
+			font-size: 0.9em;
+		}
 		.basic
 	}
 	.list-view-button:hover {
