@@ -248,10 +248,10 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 					
 				</div>
 			</div>
-			<button>
+			<button class="show-filter-dropdown" data-list="<%= tmpl.playlist.url %>">
 				<img class="filter-icon svg-filter-black" src="/api/i/pixel"><span>Filter tracks</span></img>
 			</button>
-			<div class="filter-dropdown">
+			<div class="filter-dropdown" data-list="<%= tmpl.playlist.url %>">
 
 			</div>
 			<button class="playlist-privacy">
@@ -259,7 +259,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 			</button>
 			<div class="playlist-options-dropdown"></div>
 		</div>
-		<div class="extendedtable">
+		<div class="extendedtable" data-represents="<%= tmpl.playlist.url %>">
 			<div class="album-tracks">
 				<%= tmpl.tracklist %>
 			</div>

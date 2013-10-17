@@ -1,7 +1,7 @@
 this.settings = [
 	{
 		key: 'favicon_album',
-		value: false,
+		value: true,
 		label: 'Use the album cover as favicon'
 	}
 	,

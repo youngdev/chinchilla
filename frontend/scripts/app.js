@@ -2532,7 +2532,7 @@ navigation = {
 				$.publish('view-gets-loaded')
 				var method = prevent ? 'replaceState' : 'pushState';
 				history[method](null, null, path);
-				$('#view').attr('data-route', path);
+				$('#view').attr('data-route', path).scrollTop(0);
 			}
 		});
 	}
@@ -6035,6 +6035,9 @@ templates.buildFilter 			= function(obj) {
 	}
 	if (obj.list == '/library') {
 		DB.getTracks({ids: chinchilla.library, callback: afterTracksFetched});
+	}
+	else {
+		DB.getTracks({ids: _.where(chinchilla.playlists, {url: obj.list})[0].tracks, callback: afterTracksFetched});
 	}
 };player = {};
 player.playSong = function(song, noautoplay, nohistory) {

@@ -87,4 +87,7 @@ templates.buildFilter 			= function(obj) {
 	if (obj.list == '/library') {
 		DB.getTracks({ids: chinchilla.library, callback: afterTracksFetched});
 	}
+	else {
+		DB.getTracks({ids: _.where(chinchilla.playlists, {url: obj.list})[0].tracks, callback: afterTracksFetched});
+	}
 }

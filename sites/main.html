@@ -1,26 +1,26 @@
 <div class="home-container">
 	<div class="home-body">
 		{% if user and library.length != 0%}
-				<div class="box-wrapper" style="background: #c0392b">
+				<div class="box-wrapper">
 					<h3>Newest songs in your library<span class="main-link" data-navigate="/library">Go to library</span></h3>
 							{% for reddit in library %}
 								{% include templates.redditbox %}
 							{% endfor %}
 				</div>
 		{% endif %}
-			<div class="box-wrapper" style="background: #3498db">
+			<div class="box-wrapper">
 				<h3>iTunes Charts<span class="main-link" data-navigate="/charts">Go to charts</span></h3>
 				{% for reddit in charts %}
 					{% include templates.redditbox %}
 				{% endfor %}
 			</div>
-			<div class="reddit-feature box-wrapper" style="background: #e67e22">
+			<div class="reddit-feature box-wrapper">
 				<h3>What's hot on Reddit?<span class="main-link" data-navigate="/reddit">See genres</span></h3>
 				{% for reddit in redditsongs %}
 					{% include templates.redditbox %}
 				{% endfor %}
 			</div>
-			<div class="main-retro box-wrapper" style="background: #34495e">
+			<div class="main-retro box-wrapper">
 				<h3>What was hot in... {{randomyear}}?<span class="main-link" data-navigate="/retro-charts/{{randomyear}}">See the full list</span></h3>
 				{% for reddit in topanno %}
 					{% include templates.redditbox %}

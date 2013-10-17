@@ -91,7 +91,7 @@ button:focus {
 			}
 			th {
 				background: darken(#8c8c8c, 30%);
-				box-shadow: 0 0 5px rgba(0,0,0,0.5);
+				//box-shadow: 0 0 5px rgba(0,0,0,0.5);
 				color: rgba(255,255,255,0.7);
 				font-weight: 300;
 				text-transform: uppercase;
@@ -957,7 +957,7 @@ button:focus {
 				opacity: 0.8;
 				margin: 12px;
 				margin-left: 0;
-				color: rgba(255,255,255,0.8);
+				color: rgba(0,0,0,0.8);
 				.main-link {
 					font-size: 0.6em;
 					margin-left: 5px;
@@ -1657,6 +1657,9 @@ button:focus {
 		}
 	}
 }
+.reddit-box {
+	border: 5px solid lighten(#7f8c8d, 25%)
+}
 .reddit-box:hover {
 	border: 5px solid darken(#7f8c8d, 40%);
 	-webkit-transition: 0.3s;
@@ -1671,7 +1674,6 @@ button:focus {
 	display: inline-block;
 	margin-bottom: 8px;
 	cursor: pointer;
-	border: 5px solid rgba(255,255,255,0.05);
 	font-family: Arial;
 	overflow: hidden;
 	.reddit-song-name {

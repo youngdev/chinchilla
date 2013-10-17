@@ -115,7 +115,7 @@ navigation = {
 				$.publish('view-gets-loaded')
 				var method = prevent ? 'replaceState' : 'pushState';
 				history[method](null, null, path);
-				$('#view').attr('data-route', path);
+				$('#view').attr('data-route', path).scrollTop(0);
 			}
 		});
 	}
