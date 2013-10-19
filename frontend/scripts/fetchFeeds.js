@@ -145,7 +145,7 @@ views = {
 				afterAllTracksFetched 		= function(tracks) {
 					data.tracks = (helpers.sortTracks(library, tracks)).reverse();
 					var html = templates.buildLibrary(data);
-					$('#view').html(html);
+					$('#view').html(html).scrollTop(0);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')
@@ -179,7 +179,7 @@ views = {
 					data.tracks = (helpers.sortTracks(playlist.tracks, tracks))
 					if (playlist.newestattop) { data.tracks = data.tracks.reverse(); };
 					var html = templates.buildPlaylist(data);
-					$('#view').html(html);
+					$('#view').html(html).scrollTop(0);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')

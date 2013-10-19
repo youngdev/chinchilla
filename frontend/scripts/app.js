@@ -2262,7 +2262,7 @@ this.helpers = helpers;;views = {
 				afterAllTracksFetched 		= function(tracks) {
 					data.tracks = (helpers.sortTracks(library, tracks)).reverse();
 					var html = templates.buildLibrary(data);
-					$('#view').html(html);
+					$('#view').html(html).scrollTop(0);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')
@@ -2296,7 +2296,7 @@ this.helpers = helpers;;views = {
 					data.tracks = (helpers.sortTracks(playlist.tracks, tracks))
 					if (playlist.newestattop) { data.tracks = data.tracks.reverse(); };
 					var html = templates.buildPlaylist(data);
-					$('#view').html(html);
+					$('#view').html(html).scrollTop(0);
 					views.loadingindicator.hide();
 					$.publish('new-tracks-entered-dom');
 					$.publish('view-got-loaded')
@@ -7106,7 +7106,6 @@ playlist = {
 		notifications.create('Adding...');
 	}
 };var select      = function(e)   {
-	console.log('click')
 	/*
 		Send to other function if batch selecting.
 		Ctrl key selects all elements between already selected ones and the clicked.
@@ -7570,16 +7569,8 @@ var searchkeys 			= function(key) {
 		}
 	}
 }
-var keys 				= function(e) {
+var keysdown 			= function(e) {
 	var key = e.keyCode;
-	/*
-		Don't trigger this function when focus is in input
-	*/
-	var srcElement = e.srcElement || e.target;
-	if ($(srcElement).is('input') && !($(srcElement).is('.add-tracks-input')) && !($(srcElement).is('#search-field'))) {
-		return;
-	}
-	e.preventDefault();
 	/*
 		Down key
 	*/
@@ -7601,6 +7592,17 @@ var keys 				= function(e) {
 			thissong.removeClass('selected');
 		}
 	}
+}
+var keys 				= function(e) {
+	var key = e.keyCode;
+	/*
+		Don't trigger this function when focus is in input
+	*/
+	var srcElement = e.srcElement || e.target;
+	if ($(srcElement).is('input') && !($(srcElement).is('.add-tracks-input')) && !($(srcElement).is('#search-field'))) {
+		return;
+	}
+	e.preventDefault();
 	/*
 		Enter key
 	*/
@@ -7824,6 +7826,7 @@ var preventScrolling 	= function(evt) {
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
+.on('keydown', 		'body',								keysdown 			) // Keys with faster feedback
 .on('dblclick',     '.song',            				playSong    		) // Doubleclick to play.
 .on('mousedown',    '#seek-bar',         				dragSeek			) // Block autmatic seeking while dragging
 .on('click',        '#play',            				resume      		) // Play or resume song.
