@@ -1183,6 +1183,10 @@ button:focus {
 			td:nth-child(4), th:nth-child(4) {
 				left: 60%;
 				width: 25%;
+				/*
+					Hack
+				*/
+				max-width: 20px;
 			}
 			td:nth-child(5), th:nth-child(5) {
 				left: 85%;
@@ -1424,46 +1428,39 @@ button:focus {
 	overflow: hidden;
 	position: fixed;
 	z-index: 4;
-	width: 225px;
-	background: white;
-	border: 1px solid @bordercolor;
-	min-height: 40px;
+	width: 450px;
+	background: rgba(255,255,255,0.9);
+	border: 1px solid rgba(0,0,0,0.2);
+	height: 225px;
 	.context-tip {
-		overflow: hidden;
-		height: 100px;
+		margin-left: 225px;
 		background: rgba(0,0,0,0.2);
 		img {
+			position:absolute;
+		}
+		.context-tip-layover {
+			width: 225px;
+			height: 225px;
+			position: absolute;
+			background: rgba(255,255,255,0.8);
+			opacity:0;
+			padding: 5px;
+			p {
+				color: rgba(0,0,0,0.5);
+				margin-top: 5px;
+				margin-bottom: 0;
+				font-size: 10px;
+				text-transform: uppercase;
+			}
+			a {
+				color: @sidebarcolor !important;
+			}
+			a:hover {
+				cursor: pointer;
+			}
+		}
+		.context-tip-layover:hover {
 			opacity: 1;
-		}
-		h1, h2 {
-			left: 10px;
-			text-transform: none !important;
-			font-weight: 300;
-			position: absolute !important;
-			overflow: hidden;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-			width: 205px;
-			color: white !important;
-		}
-		h1 {
-			top: 60px !important;
-			font-size: 16px;
-			font-weight: bold;
-			text-shadow: 1px 1px 5px black;
-		}
-		h2 {
-			top: 45px;
-			font-size: 14px !important;
-			margin-top: 3px !important;
-			font-weight: bold;
-			text-shadow: 1px 1px 5px black;
-		}
-		a {
-			color: white !important;
-		}
-		a:hover {
-			cursor: pointer;
 		}
 	}
 	.contextmenu-arrow {
@@ -1473,15 +1470,11 @@ button:focus {
 		z-index: 1;
 		top: 85px;
 		left: 12px;
-		border-bottom: 10px solid white;
-		border-left: 10px solid transparent;
-		border-right: 10px solid transparent;
 	}
 	.playlist-context-tip {
 		min-height: 45px;
 		height: 45px;
 		background: rgba(0,0,0,0.05);
-		border-bottom: 1px solid @bordercolor;
 		h1, h2 {
 			left: 20px;
 			padding-left: 0 !important;
@@ -1505,9 +1498,9 @@ button:focus {
 		}
 	}
 	.context-options {
-		padding-top: 5px;
-		padding-bottom: 5px;
-		background: white;
+		width: 225px;
+		height: 225px;
+		overflow-y: scroll;
 		div {
 			padding: 8px;
 			padding-left: 20px;

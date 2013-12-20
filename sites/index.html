@@ -321,8 +321,14 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 	<script type="text/template" id="template-contextmenu">
 		<div class="context-tip">
 			<img src="<%= helpers.getHQAlbumImage(tmpl.song, 225) %>" onload="$(this).removeClass('image-op0')" class="image-op0">
-			<h1><a data-navigate="/song/<%= tmpl.song.id %>"><%= tmpl.song.name %></a></h1>
-			<h2><a data-navigate="/artist/<%= tmpl.song.artistid %>"><%= tmpl.song.artist %></a></h2>
+			<div class="context-tip-layover">
+				<p>Name</p>
+				<a data-navigate="/song/<%= tmpl.song.id %>"><%= tmpl.song.name %></a>
+				<p>Artist</p>
+				<a data-navigate="/artist/<%= tmpl.song.artistid %>"><%= tmpl.song.artist %></a>
+				<p>Album</p>
+				<a data-navigate="/album/<%= tmpl.song.albumid %>"><%= tmpl.song.album %></a>
+			</div>
 		</div>
 		<div class="contextmenu-arrow"></div>
 		<div class="context-options">

@@ -295,7 +295,8 @@ var contextmenu 		= function(obj) {
 	var menu = $('<div>', {
 		class: 'contextmenu',
 	}).css({
-		left: 	offsets.left
+		left: 	offsets.left,
+		top: 	offsets.top
 	})
 	.css(toporbottom, pos).
 	html('<div class="loading-indicator"><div class="spinner"></div></div>').appendTo(placeToAppend);
