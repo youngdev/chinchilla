@@ -33,6 +33,7 @@ var getAlbumCovers 		= function() {
 var getRedditTracks 	= function(subreddit) {
 	json.get('http://www.reddit.com' + subreddit + '/search.json?q=site%3Ayoutube.com&restrict_sr=on&sort=top&t=week', function(err, json) {
 		redditsongs[subreddit] = [];
+		if (!json) return;
 		var songs = json.data.children;
 		var songs = _.filter(songs, function (song) { return song.data.domain == 'youtube.com'});
 		//var songs = _.filter(songs, function (song) { return song.data.title.indexOf(" - ") != -1});
