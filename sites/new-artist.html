@@ -1,11 +1,12 @@
 <div class="artist-page">
 	{% if artist %}
 		<div class="coverstack">
+			<h1 class="oncoverstack">{{artist.name}}</h1>
 			<div class="covers">
 				{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+				<div class="coverstack-overlay"></div>
 			</div>
 		</div>
-		<h1 class="oncoverstack">{{artist.name}}</h1>
 		<div class="artist-page-two-columns">
 			<!--
 			<div class="artist-page-left-column">

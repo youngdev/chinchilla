@@ -122,6 +122,7 @@ navigation = {
 };
 window.onpopstate = function() {
 	var pathname			= window.location.pathname;
+	if (document.getElementById('view').dataset.route == pathname) return;
 	navigation.to(pathname, true);
 }
 window.currentroute = {

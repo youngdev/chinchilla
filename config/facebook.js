@@ -230,6 +230,9 @@ this.inlib				= function(song, token, callback) {
 	});
 }
 this.ownspl 			= function(playlist, token, callback) {
+	if (!token) {
+		callback(false); return;
+	}
 	db.getUser(token, function(user) {
 		if (user) {
 			db.getUserCollections(user, function(collections) {

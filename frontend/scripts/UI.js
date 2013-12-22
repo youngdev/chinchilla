@@ -471,7 +471,7 @@ var keysdown 			= function(e) {
 	if (key == 40 || key == 38) {
 		e.preventDefault();
 		e.stopPropagation();
-		if ($('.add-tracks-dropdown').is(':visible')) {
+		if ($('.add-tracks-input').is(':focus')) {
 			addtrackskeys(key)
 			return;
 		}
@@ -623,29 +623,10 @@ var remsongfrompl 		= function() {
 	socket.emit('remove-song-from-playlist', data);
 }
 var pldropdown 			= function() {
-	$('.playlist-options-dropdown').toggle();
-	if ($('.playlist-options-dropdown').is(':visible')) {
-		$('body').one('click contextmenu', function() {
-			$(".playlist-options-dropdown").hide();
-		});
-		$('.playlist-options-dropdown').html(loader.spinner());
-		socket.emit('get-playlist-options', {playlist: $('#view').attr('data-route'), token: chinchilla.token });
-		socket.once('playlist-options', function(data) {
-			$('.playlist-options-dropdown').html(data.html);
-		});
-	}
-}
-var addtracksdd 		= function() {
-	$('.add-tracks-dropdown').toggle();
-	if ($('.add-tracks-dropdown').is(':visible')) {
-		$('body').one('click contextmenu', function() {
-			$(".add-tracks-dropdown").hide();
-		});
-		$('.add-tracks-dropdown').on('click contextmenu', function(e) {
-			e.stopPropagation();
-		});
-		$('.add-tracks-input').focus();
-	}
+	socket.emit('get-playlist-options', {playlist: $('#view').attr('data-route'), token: chinchilla.token });
+	socket.once('playlist-options', function(data) {
+		$('.playlist-options-dropdown').html(data.html);
+	});
 }
 var mkplpublic 			= function() {
 	var playlist 	= $('#view').attr('data-route');
@@ -688,7 +669,16 @@ var playallsongs 		= function() {
 		songs 			= _.shuffle(songs),
 		firstsong 		= songs.splice(0,1)[0];
 	player.queue2.clear();
-	$.each(songs, function(k, song) {
+	_.each(songs, function(song) {
+		player.queue2.add(song);
+	});
+	player.playSong(firstsong);
+}
+var playallsongsinorder = function() {
+	var songs 			= $('.song'),
+		firstsong 		= songs.splice(0,1)[0];
+	player.queue2.clear();
+	_.each(songs, function(song) {
 		player.queue2.add(song);
 	});
 	player.playSong(firstsong);
@@ -699,16 +689,7 @@ var hoversearchresult 	= function() {
 	$(this).addClass(classname);
 }
 var filterdropdown 		= function() {
-	var filterdropdown = $('.filter-dropdown')
-	filterdropdown.toggle();
-	if (filterdropdown.is(':visible')) {
-		$('body').one('click contextmenu', function() {
-			filterdropdown.hide();
-		});
-		filterdropdown.on('click contextmenu', function(e) { e.stopPropagation(); });
-	}
-
-	var list = filterdropdown[0].dataset.list;
+	var list = this.dataset.list;
 	templates.buildFilter({list: list});
 }
 var preventScrolling 	= function(evt) {
@@ -717,6 +698,16 @@ var preventScrolling 	= function(evt) {
         return false;
     }
 } 
+var trigger  			= function() {
+	this.dataset.untrigger = this.dataset.trigger;
+	$('.' + this.dataset.trigger).show();
+	delete this.dataset.trigger
+}
+var untrigger 			= function() {
+	this.dataset.trigger = this.dataset.untrigger;
+	$('.' + this.dataset.untrigger).hide();
+	delete this.dataset.untrigger;
+}
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -754,16 +745,18 @@ $(document)
 .on('click',		'.add-song-to-playlist-button', 	addsongtopl 		) // Add a song to a playlist 
 .on('click',		'.remove-song-from-playlist-button',remsongfrompl 		) // Remove song from playlist
 .on('click', 		'.playlist-privacy',		 		pldropdown 			) // click to reveal privacy options
-.on('click', 		'.add-tracks-quickly',		 		addtracksdd 		) // click to reveal privacy options
 .on('click', 		'.make-playlist-public', 			mkplpublic 			) // Contextmenu option to make playlist public
 .on('click', 		'.make-playlist-private',			mkplprivate 		) // Contextmenu option to make playlist private
 .on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
 .on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
 .on('click',		'.close-notification', 				closenotification 	) // Dismiss popup messages
 .on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
+.on('click', 		'.play-all-songs-in-order', 		playallsongsinorder ) // Play, but don't shuffle songs
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 .on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
 .on('keydown', 											preventScrolling    ) // Prevent scrolling with arrow keys
+.on('click',		'[data-trigger]',					trigger 			) // Slide down functionality
+.on('click', 		'[data-untrigger]', 				untrigger 			) // Reverse function of trigger
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 

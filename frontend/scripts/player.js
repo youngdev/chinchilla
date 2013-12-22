@@ -212,7 +212,7 @@ var errorOccured = function(error_code) {
 	}, undefined, undefined, undefined, ['restricted']);
 }
 player.show = function() {
-	$('#sidebar-player').slideDown(800).animate({'opacity': 1});
+	$('#sidebar-player').slideDown(600).animate({'opacity': 1});
 }
 player.setUpEvents = function() {
 	/*

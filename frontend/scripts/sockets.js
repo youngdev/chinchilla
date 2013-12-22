@@ -122,6 +122,9 @@ socket.on('multiple-playlist-songs-added', function (data) {
 		}
 	});
 	libdom.addSongsToPlaylistLocal(data.view, data.tracks)
+	_.each(data.songs, function(song) {
+		DB.addTrack(song)
+	});
 	_.each(data.tracks, function (trackid) {
 		$('[data-route="/song/' + trackid + '"]')
 		.find("[data-url='" + data.view + "']")

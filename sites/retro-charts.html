@@ -1,25 +1,34 @@
 {% if year %}
 <div class="coverstack nomargin">
+	<button class="play-all-songs-in-order">
+		<img class="list-header-play-icon svg-play-white" src="/api/i/pixel"><span>Play</span>
+	</button>
+	<button class="play-all-songs">
+		<img class="list-header-play-icon svg-shuffle-white" src="/api/i/pixel"><span>Shuffle</span>
+	</button>
+	<h1 class="oncoverstack">Retro Charts: {{year}}</h1>
 	<div class="covers">
-		{% for track in coverstack %}<img src="{{track.image}}" border="0">{% endfor %}
+		{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+		<div class="coverstack-overlay"></div>
+	</div>
+	<div class="playlistdescription">
+		<p>Top {{year}} songs according to <a target="_blank" href="http://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_{{year}}">Wikipedia</a></p>
+		<p>The following years are available:</p>
+		<p>
+			<span class="lighttext">1956</span> <span class="lighttext">1957</span> <span class="lighttext">1958</span>
+			{% for anno in range %}
+			<span data-navigate="/retro-charts/{{anno}}">{% if anno == year %}<strong>{% endif %}{{anno}}{% if anno == year %}</strong>{% endif %}</span> {% if (anno % 5 == 0) %} <br> {% endif %}
+			{% endfor %}
+			<span class="lighttext">2014</span> <span class="lighttext">2015</span>
+		</p>
 	</div>
 </div>
 
-<h1 class="oncoverstack">Retro Charts: {{year}}</h1>
-<div class="coverstack-description">
-	<p>Check out the other years:</p>
-	<p>
-		{% for anno in range %}
-		<span data-navigate="/retro-charts/{{anno}}">{% if anno == year %}<strong>{% endif %}{{anno}}{% if anno == year %}</strong>{% endif %}</span> 
-		{% endfor %}
-	</p>
-</div>
 <div class="extendedtable">
 	<div class="album-tracks">
 		{% include templates.tracklist %}
 	</div>
 </div>
-<p class="attribution"><a target="_blank" href="http://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_{{year}}">Source: Wikipedia</a></p>
 {% else %}
 Sorry, we don't have charts for this year. Try a year between <a data-navigate="/retro-charts/1959">1959</a> and <a data-navigate="/retro-charts/2012">2012</a>.
 {% endif %}

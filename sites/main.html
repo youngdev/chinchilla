@@ -1,4 +1,27 @@
 <div class="home-container">
+	{% if !user %}
+		<h1>Welcome to <span class="tunechilla">tunechilla</span></h1>
+		<p>Double-click to play, right-click to see more options!</p>
+		<table>
+			<tr><td>Without an account, you can:
+					<ul>
+						<li>Listen to millions of songs</li>
+						<li>Play retro charts</li>
+						<li>See lyrics</li>
+					</ul>
+				</td>
+				<td>If you login, you can also:
+					<ul>
+						<li>Save tracks into a library</li>
+						<li>Create playlists</li>
+					</ul>
+					<button class='login-button' onclick="window.location.href='/auth/facebook'" class="facebook">Login with Facebook</button>
+					<br>
+					<small>No posts to your timeline, no emails, no evil things.</small>
+				</td>
+			</tr>
+		</table>
+	{% endif %}
 	<div class="home-body">
 		{% if user and library.length != 0%}
 				<div class="box-wrapper">
@@ -21,7 +44,7 @@
 				{% endfor %}
 			</div>
 			<div class="main-retro box-wrapper">
-				<h3>What was hot in... {{randomyear}}?<span class="main-link" data-navigate="/retro-charts/{{randomyear}}">See the full list</span></h3>
+				<h3>Popular songs from... {{randomyear}}<span class="main-link" data-navigate="/retro-charts/{{randomyear}}">See full retro charts</span></h3>
 				{% for reddit in topanno %}
 					{% include templates.redditbox %}
 				{% endfor %}

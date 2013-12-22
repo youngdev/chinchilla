@@ -1,18 +1,20 @@
 <div class="coverstack nomargin">
+	<button class="play-all-songs-in-order">
+		<img class="list-header-play-icon svg-play-white" src="/api/i/pixel"><span>Play</span>
+	</button>
+	<button class="play-all-songs">
+		<img class="list-header-play-icon svg-shuffle-white" src="/api/i/pixel"><span>Shuffle</span>
+	</button>
 	<div class="covers">
-		{% for track in coverstack %}<img src="{{track.image}}" border="0">{% endfor %}
+		{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+		<div class="coverstack-overlay"></div>
 	</div>
 </div>
 
 <h1 class="oncoverstack">Best selling tracks</h1>
-<div class="playlistdescription">
-	<button class="play-all-songs">
-		<img src="/api/i/pixel" class="list-header-play-icon svg-shuffle-black"><span>Shuffle play</span>
-	</button>
-	<button class="retro-charts" onclick="navigation.to('/retro-charts/2012')">
-		<img src="/api/i/pixel" class="list-header-play-icon svg-retro-black"><span>Retro charts</span>
-	</button>
-</div>
+<p class="playlist-info">
+	<span data-navigate='/retro-charts/2012'>Retro charts</span>
+</p>
 <div class="extendedtable">
 	<div class="album-tracks">
 		{% include templates.tracklist %}

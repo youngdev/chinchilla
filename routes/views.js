@@ -210,7 +210,7 @@ this.artist 					= function(request, response) {
 	 		var collections 	= _.filter(collections, function(album) { return album.tracks > 3 });
 	 		var collections 	= _.map(collections, function(album) { return helpers.parseAlbumTitle(album) });
 	 		var collections 	= _.uniq(collections, false, function(album) { return album.name });
-	 		data.coverstack		= _.first(_.pluck(collections, 'image'), 9);
+	 		data.coverstack		= helpers.coverArrayToHQ(_.first(_.pluck(collections, 'image'), 4), 225);
 	 		data.albums 		= collections;
 	 		freebaseSearch();
 	 		
@@ -604,7 +604,7 @@ this.charts         			= function(request, response) {
 						parseduration:      parseduration,
 						parsetext: 			parsetext,
 						showartistalbum:    true,
-						coverstack:         _.first(table, 9),
+						coverstack:         helpers.coverArrayToHQ(_.pluck(_.first(songs, 4), 'image'), 225),
 						user: 				user,
 						type: 				'charts',
 						templates: 			templates
@@ -649,7 +649,7 @@ this.retrocharts 				= function(request, response) {
 				data.table = _.map(data.table, function(song) { song.inlib = _.contains(user.collections.library, song.id); return song});
 			}
 			data.album = {cds: [data.table]};
-			data.coverstack = _.first(data.table, 9);
+			data.coverstack = helpers.coverArrayToHQ(_.pluck(_.first(data.table, 4), 'image'), 225);
 			render();
 		},
 		render 				= function() {

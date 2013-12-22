@@ -188,17 +188,28 @@ views = {
 				DB.getTracks({ids: playlist.tracks, callback: afterLocalTracksFetched});
 			}
 			else {
-				$.ajax({
-					url: '/api' + url,
-					dataType: 'html',
-					success: function(data) {
-						var view = $('#view');
-						view.html(data);
-						views.loadingindicator.hide();
-						$.publish('new-tracks-entered-dom');
-						$.publish('view-got-loaded');
+				socket.emit('/api/playlists/get-tracks', {playlist: url, token: chinchilla.token});
+				socket.on('/api/playlists/get-tracks/response', function (response) {
+					if (response.error) {
+						$.ajax({
+							url: '/api/error/502',
+							dataType: 'html',
+							success: function(data) {
+								var view = $('#view');
+								view.html(data);
+								views.loadingindicator.hide();
+								$.publish('view-got-loaded');
+							}
+						})
+					}
+					else {
+						playlist = response.playlist;
+						data.playlist = response.playlist;
+						chinchilla.playlists = [playlist];
+						DB.getTracks({ids: response.playlist.tracks, callback: afterLocalTracksFetched});
 					}
 				})
+				
 			}
 		}
 	},

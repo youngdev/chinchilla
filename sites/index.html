@@ -6,6 +6,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 	<meta charset="UTF-8">
 	<title>Tunechilla</title>
 	<link id="favicon" rel="shortcut icon" type="image/png" />
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:600,400,300">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	{% if live %}
 	<script src="/api/script/app.min"></script>
@@ -167,97 +168,123 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 <script type="text/template" id="template-library">
 		<% if (tmpl.user) { %>
 			<div class="coverstack nomargin">
+				<button class="play-all-songs-in-order">
+					<img class="list-header-play-icon svg-play-white" src="/api/i/pixel"><span>Play</span>
+				</button>
+				<button class="play-all-songs">
+					<img class="list-header-play-icon svg-shuffle-white" src="/api/i/pixel"><span>Shuffle</span>
+				</button>
 				<div class="covers">
 					<% _.each(tmpl.coverstack, function(image) { %>
 						<img src="<%- image %>" border="0">
 					<% }); %>
+					<div class="coverstack-overlay"></div>
 				</div>
-			</div>
-			<h1 class="oncoverstack">Your library</h1>
-			<div class="playlistdescription">
-				<p class="playlist-info">
-				  <% if (tmpl.trackcount) { %>
-					<span class="playlist-trackcount"><%- tmpl.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.trackcount == 1) { %>track<% } else { %>tracks<% } %></span> - <span data-duration="<%- tmpl.rawduration %>" class="playlist-duration"><%- tmpl.duration %></span>
-				  <% } else { %>
-					<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span> - <span data-duration="0" class="playlist-duration">0 minutes</span>
-				  <% } %>
-				</p>
-				<button class="play-all-songs">
-					<img src="/api/i/pixel" class="list-header-play-icon svg-shuffle-black"><span>Shuffle play</span>
-				</button>
-				<button class="add-tracks-quickly">
-					<img class="plus-icon svg-plus-black" src="/api/i/pixel"><span>Add tracks</span>
-				</button>
-				<div class="add-tracks-dropdown">
-					<div class="add-tracks-header">
-						<input type="text" class="add-tracks-input" autofocus placeholder='Search for songs'>
+				<h1 class="oncoverstack">Your library</h1>
+				<div class="playlistdescription">
+					<p class="playlist-info">
+					  <% if (tmpl.trackcount) { %>
+						<span class="playlist-trackcount"><%- tmpl.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.trackcount == 1) { %>track<% } else { %>tracks<% } %></span><span data-duration="<%- tmpl.rawduration %>" class="playlist-duration"><%- tmpl.duration %></span>
+					  <% } else { %>
+						<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span><span data-duration="0" class="playlist-duration">0 minutes</span>
+					  <% } %>
+					</p>
+					<button class="add-tracks-quickly" data-untrigger="add-tracks-dropdown">
+						<img class="plus-icon svg-play-black" src="/api/i/pixel"><span>Add tracks</span>
+					</button><br>
+					<div class="add-tracks-dropdown">
+						<div class="add-tracks-header">
+							<input type="text" class="add-tracks-input" placeholder='Search for songs'>
+						</div>
+						<div class="add-tracks-results">
+							
+						</div>
 					</div>
-					<div class="add-tracks-results">
-			
-					</div>
-				</div>
-				<button class="show-filter-dropdown">
-					<img class="filter-icon svg-filter-black" src="/api/i/pixel"><span>Filter tracks</span></img>
-				</button>
-				<div class="filter-dropdown" data-list="/library">
+					<button class="show-filter-dropdown" data-list="/library" data-trigger="filter-dropdown">
+						<img class="filter-icon svg-play-black" src="/api/i/pixel"><span>Filter tracks</span></img>
+					</button>
+					<div class="filter-dropdown" data-list="/library">
 
+					</div>
+					</div>
 				</div>
 			</div>
 			<div class="extendedtable" data-represents="/library">
 				<%= tmpl.tracklist %>
 			</div>
 		<% } else { %>
-			You must be logged in to use the library.
+			<div class="facebook-login-dialog">
+				<h1>Build your library and create playlists.</h1>
+				<p>
+					With Tunechilla, you can listen to millions of tracks for free. <br>
+					When you login, you can save your favorite songs into one list so you can find them easily later. <br>
+
+					<button class='login-button' onclick="window.location.href='/auth/facebook'" class="facebook">Login with Facebook</button> <br>
+					<small>We <strong>do not</strong> post to your timeline.</small> <br>
+					<small>We <strong>do not</strong> send you emails.</small> <br>
+					<small>We <strong>can not</strong> access your private data.</small>
+				</p>
+			</div>
 		<% } %>
 	</script>
 	<script type="text/template" id="template-filter">
 		<div class='filter-initialized'>
 			<% _.each(tmpl.genres, function (tracks, genre) { %>
-				<label><input type='checkbox' data-genre="<%= genre %>" class="filter filter-genre"><%= genre %> (<%= tracks.length %>)</label> <br>
+				<input type='checkbox' id='filter-<%= genre %>' data-genre="<%= genre %>" class="filter filter-genre"><label for='filter-<%= genre %>'><%= genre %> (<%= tracks.length %>)</label>
 			<% }); %>
 		</div>
 	</script>
 	<script type="text/template" id="template-playlist">
 		<div class="coverstack nomargin">
+		<button class="play-all-songs-in-order">
+			<img class="list-header-play-icon svg-play-white" src="/api/i/pixel"><span>Play</span>
+		</button>
+		<button class="play-all-songs">
+			<img class="list-header-play-icon svg-shuffle-white" src="/api/i/pixel"><span>Shuffle</span>
+		</button>
+		<h1 class="oncoverstack"><%- tmpl.playlist.name %></h1>
+		<p class='playlist-info'>
+			<% if (tmpl.playlist.trackcount) { %>
+				<span class="playlist-trackcount"><%- tmpl.playlist.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.playlist.trackcount == 1) { %>track<% } else { %>tracks<% } %></span><span data-duration="<%- tmpl.playlist.rawduration %>" class="playlist-duration"><%- tmpl.playlist.duration %></span>
+			<% } else { %>
+				<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span><span data-duration="0" class="playlist-duration">0 minutes</span>
+			<% } %>
+		</p>
 			<div class="covers">
 				<% _.each(tmpl.coverstack, function(image) { %>
 					<img src="<%- image %>" border="0">
 				<% }); %>
+				<div class="coverstack-overlay"></div>
 			</div>
-		</div>
-		<h1 class="oncoverstack"><%- tmpl.playlist.name %></h1>
-		<div class="playlistdescription coverstack-description">
-			<p class="playlist-info">
-			  <% if (tmpl.playlist.trackcount) { %>
-				<span class="playlist-trackcount"><%- tmpl.playlist.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.playlist.trackcount == 1) { %>track<% } else { %>tracks<% } %></span> - <span data-duration="<%- tmpl.playlist.rawduration %>" class="playlist-duration"><%- tmpl.playlist.duration %></span>
-			  <% } else { %>
-				<span class="playlist-trackcount">0</span> <span class="playlist-plural-singular-track">tracks</span> - <span data-duration="0" class="playlist-duration">0 minutes</span>
-			  <% } %>
-			</p>
-			<button class="play-all-songs">
-				<img class="list-header-play-icon svg-shuffle-black" src="/api/i/pixel"><span>Shuffle play</span>
-			</button>
-			<button class="add-tracks-quickly">
-				<img class="plus-icon svg-plus-black" src="/api/i/pixel"><span>Add tracks</span>
-			</button>
-			<div class="add-tracks-dropdown">
-				<div class="add-tracks-header">
-					<input type="text" class="add-tracks-input" autofocus placeholder='Search for songs'>
+			<div class="playlistdescription coverstack-description">
+				<p class="playlist-info">
+				</p>
+				<% if (chinchilla.user == tmpl.playlist.owner) { %>
+				<button class="add-tracks-quickly" data-untrigger="add-tracks-dropdown">
+					<img class="plus-icon svg-play-black" src="/api/i/pixel"><span>Add tracks</span>
+				</button><br>
+				<div class="add-tracks-dropdown">
+					<div class="add-tracks-header">
+						<input type="text" class="add-tracks-input" placeholder='Search for songs'>
+					</div>
+					<div class="add-tracks-results">
+						
+					</div>
 				</div>
-				<div class="add-tracks-results">
-					
-				</div>
-			</div>
-			<button class="show-filter-dropdown" data-list="<%= tmpl.playlist.url %>">
-				<img class="filter-icon svg-filter-black" src="/api/i/pixel"><span>Filter tracks</span></img>
-			</button>
-			<div class="filter-dropdown" data-list="<%= tmpl.playlist.url %>">
+				<% } %>
+				<button class="show-filter-dropdown" data-list="<%= tmpl.playlist.url %>" data-trigger="filter-dropdown">
+					<img class="filter-icon svg-play-black" src="/api/i/pixel"><span>Filter tracks</span></img>
+				</button>
+				<div class="filter-dropdown" data-list="<%= tmpl.playlist.url %>">
 
+				</div><br>
+				<% if (chinchilla.user == tmpl.playlist.owner) { %>
+				<button class="playlist-privacy" data-trigger="playlist-options-dropdown">
+					<img class="lock-icon svg-play-black" src="/api/i/pixel"><span>Settings</span>
+				</button>
+				<div class="playlist-options-dropdown"></div>
+				<% } %>
 			</div>
-			<button class="playlist-privacy">
-				<img class="lock-icon svg-wheel-black" src="/api/i/pixel"><span>Settings</span>
-			</button>
-			<div class="playlist-options-dropdown"></div>
 		</div>
 		<div class="extendedtable" data-represents="<%= tmpl.playlist.url %>">
 			<div class="album-tracks">

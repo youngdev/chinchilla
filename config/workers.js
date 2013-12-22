@@ -20,7 +20,7 @@ var subreddits 			= [
 	'/r/gamemusic',
 	'/r/jazz',
 ].sort();
-var fullyears 			= _.range(1959, 2013);
+var fullyears 			= _.range(1959, 2014);
 var years 				= fullyears;
 var redditsongs 		= {};
 var retrocharts 		= {};

@@ -4,9 +4,9 @@ templates.buildLibrary = function(data) {
 	var template = _.template(
 		$('#template-library').html()
 	)
-	data.coverstack = 	_.first(
-							_.pluck(data.tracks, 'image'), 
-						9);
+	data.coverstack = 	helpers.coverArrayToHQ(
+						_.first(_.pluck(data.tracks, 'image'),4)
+					, 225)
 	data.showartistalbum = true;
 	data.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
 	data.duration = helpers.parsehours(data.rawduration);
@@ -19,9 +19,9 @@ templates.buildPlaylist = function(data) {
 	var template = _.template(
 		$('#template-playlist').html()
 	)
-	data.coverstack = _.first(
-							_.pluck(data.tracks, 'image'),
-						9);
+	data.coverstack = helpers.coverArrayToHQ(
+						_.first(_.pluck(data.tracks, 'image'),4)
+					, 225)
 	data.showartistalbum = true;
 	data.tracklist = templates.buildTrackList(data);
 	data.playlist.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
@@ -57,9 +57,6 @@ templates.buildFilter 			= function(obj) {
 		var genres = _.groupBy(tracks, function (track) { return track.genre });
 		var template = $('#template-filter').html();
 		var dropdownfilter = $('.filter-dropdown');
-		if (dropdownfilter.find('.filter-initialized').size() == 1) {
-			return;
-		}
 		dropdownfilter.html(
 			_.template(template, {genres: genres})
 		);

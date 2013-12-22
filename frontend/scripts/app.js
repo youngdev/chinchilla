@@ -2305,17 +2305,28 @@ this.helpers = helpers;;views = {
 				DB.getTracks({ids: playlist.tracks, callback: afterLocalTracksFetched});
 			}
 			else {
-				$.ajax({
-					url: '/api' + url,
-					dataType: 'html',
-					success: function(data) {
-						var view = $('#view');
-						view.html(data);
-						views.loadingindicator.hide();
-						$.publish('new-tracks-entered-dom');
-						$.publish('view-got-loaded');
+				socket.emit('/api/playlists/get-tracks', {playlist: url, token: chinchilla.token});
+				socket.on('/api/playlists/get-tracks/response', function (response) {
+					if (response.error) {
+						$.ajax({
+							url: '/api/error/502',
+							dataType: 'html',
+							success: function(data) {
+								var view = $('#view');
+								view.html(data);
+								views.loadingindicator.hide();
+								$.publish('view-got-loaded');
+							}
+						})
+					}
+					else {
+						playlist = response.playlist;
+						data.playlist = response.playlist;
+						chinchilla.playlists = [playlist];
+						DB.getTracks({ids: response.playlist.tracks, callback: afterLocalTracksFetched});
 					}
 				})
+				
 			}
 		}
 	},
@@ -2539,6 +2550,7 @@ navigation = {
 };
 window.onpopstate = function() {
 	var pathname			= window.location.pathname;
+	if (document.getElementById('view').dataset.route == pathname) return;
 	navigation.to(pathname, true);
 }
 window.currentroute = {
@@ -5903,6 +5915,9 @@ socket.on('multiple-playlist-songs-added', function (data) {
 		}
 	});
 	libdom.addSongsToPlaylistLocal(data.view, data.tracks)
+	_.each(data.songs, function(song) {
+		DB.addTrack(song)
+	});
 	_.each(data.tracks, function (trackid) {
 		$('[data-route="/song/' + trackid + '"]')
 		.find("[data-url='" + data.view + "']")
@@ -5953,9 +5968,9 @@ templates.buildLibrary = function(data) {
 	var template = _.template(
 		$('#template-library').html()
 	)
-	data.coverstack = 	_.first(
-							_.pluck(data.tracks, 'image'), 
-						9);
+	data.coverstack = 	helpers.coverArrayToHQ(
+						_.first(_.pluck(data.tracks, 'image'),4)
+					, 225)
 	data.showartistalbum = true;
 	data.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
 	data.duration = helpers.parsehours(data.rawduration);
@@ -5968,9 +5983,9 @@ templates.buildPlaylist = function(data) {
 	var template = _.template(
 		$('#template-playlist').html()
 	)
-	data.coverstack = _.first(
-							_.pluck(data.tracks, 'image'),
-						9);
+	data.coverstack = helpers.coverArrayToHQ(
+						_.first(_.pluck(data.tracks, 'image'),4)
+					, 225)
 	data.showartistalbum = true;
 	data.tracklist = templates.buildTrackList(data);
 	data.playlist.rawduration = _.reduce(data.tracks, function(a, b) { return a + parseFloat(b.duration) }, 0)
@@ -6006,9 +6021,6 @@ templates.buildFilter 			= function(obj) {
 		var genres = _.groupBy(tracks, function (track) { return track.genre });
 		var template = $('#template-filter').html();
 		var dropdownfilter = $('.filter-dropdown');
-		if (dropdownfilter.find('.filter-initialized').size() == 1) {
-			return;
-		}
 		dropdownfilter.html(
 			_.template(template, {genres: genres})
 		);
@@ -6252,7 +6264,7 @@ var errorOccured = function(error_code) {
 	}, undefined, undefined, undefined, ['restricted']);
 }
 player.show = function() {
-	$('#sidebar-player').slideDown(800).animate({'opacity': 1});
+	$('#sidebar-player').slideDown(600).animate({'opacity': 1});
 }
 player.setUpEvents = function() {
 	/*
@@ -7577,7 +7589,7 @@ var keysdown 			= function(e) {
 	if (key == 40 || key == 38) {
 		e.preventDefault();
 		e.stopPropagation();
-		if ($('.add-tracks-dropdown').is(':visible')) {
+		if ($('.add-tracks-input').is(':focus')) {
 			addtrackskeys(key)
 			return;
 		}
@@ -7729,29 +7741,10 @@ var remsongfrompl 		= function() {
 	socket.emit('remove-song-from-playlist', data);
 }
 var pldropdown 			= function() {
-	$('.playlist-options-dropdown').toggle();
-	if ($('.playlist-options-dropdown').is(':visible')) {
-		$('body').one('click contextmenu', function() {
-			$(".playlist-options-dropdown").hide();
-		});
-		$('.playlist-options-dropdown').html(loader.spinner());
-		socket.emit('get-playlist-options', {playlist: $('#view').attr('data-route'), token: chinchilla.token });
-		socket.once('playlist-options', function(data) {
-			$('.playlist-options-dropdown').html(data.html);
-		});
-	}
-}
-var addtracksdd 		= function() {
-	$('.add-tracks-dropdown').toggle();
-	if ($('.add-tracks-dropdown').is(':visible')) {
-		$('body').one('click contextmenu', function() {
-			$(".add-tracks-dropdown").hide();
-		});
-		$('.add-tracks-dropdown').on('click contextmenu', function(e) {
-			e.stopPropagation();
-		});
-		$('.add-tracks-input').focus();
-	}
+	socket.emit('get-playlist-options', {playlist: $('#view').attr('data-route'), token: chinchilla.token });
+	socket.once('playlist-options', function(data) {
+		$('.playlist-options-dropdown').html(data.html);
+	});
 }
 var mkplpublic 			= function() {
 	var playlist 	= $('#view').attr('data-route');
@@ -7794,7 +7787,16 @@ var playallsongs 		= function() {
 		songs 			= _.shuffle(songs),
 		firstsong 		= songs.splice(0,1)[0];
 	player.queue2.clear();
-	$.each(songs, function(k, song) {
+	_.each(songs, function(song) {
+		player.queue2.add(song);
+	});
+	player.playSong(firstsong);
+}
+var playallsongsinorder = function() {
+	var songs 			= $('.song'),
+		firstsong 		= songs.splice(0,1)[0];
+	player.queue2.clear();
+	_.each(songs, function(song) {
 		player.queue2.add(song);
 	});
 	player.playSong(firstsong);
@@ -7805,16 +7807,7 @@ var hoversearchresult 	= function() {
 	$(this).addClass(classname);
 }
 var filterdropdown 		= function() {
-	var filterdropdown = $('.filter-dropdown')
-	filterdropdown.toggle();
-	if (filterdropdown.is(':visible')) {
-		$('body').one('click contextmenu', function() {
-			filterdropdown.hide();
-		});
-		filterdropdown.on('click contextmenu', function(e) { e.stopPropagation(); });
-	}
-
-	var list = filterdropdown[0].dataset.list;
+	var list = this.dataset.list;
 	templates.buildFilter({list: list});
 }
 var preventScrolling 	= function(evt) {
@@ -7823,6 +7816,16 @@ var preventScrolling 	= function(evt) {
         return false;
     }
 } 
+var trigger  			= function() {
+	this.dataset.untrigger = this.dataset.trigger;
+	$('.' + this.dataset.trigger).show();
+	delete this.dataset.trigger
+}
+var untrigger 			= function() {
+	this.dataset.trigger = this.dataset.untrigger;
+	$('.' + this.dataset.untrigger).hide();
+	delete this.dataset.untrigger;
+}
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
 .on('keyup',		'body',								keys				) // Keys
@@ -7860,16 +7863,18 @@ $(document)
 .on('click',		'.add-song-to-playlist-button', 	addsongtopl 		) // Add a song to a playlist 
 .on('click',		'.remove-song-from-playlist-button',remsongfrompl 		) // Remove song from playlist
 .on('click', 		'.playlist-privacy',		 		pldropdown 			) // click to reveal privacy options
-.on('click', 		'.add-tracks-quickly',		 		addtracksdd 		) // click to reveal privacy options
 .on('click', 		'.make-playlist-public', 			mkplpublic 			) // Contextmenu option to make playlist public
 .on('click', 		'.make-playlist-private',			mkplprivate 		) // Contextmenu option to make playlist private
 .on('click', 		'.make-playlist-newest-at-top',		mkplnwattop 		) // Puts the newest songs at the top of the playlist.
 .on('click', 		'.make-playlist-newest-at-bottom',	mkplnwatbottom 		) // Puts the newest songs at the bottom of the playlist.
 .on('click',		'.close-notification', 				closenotification 	) // Dismiss popup messages
 .on('click', 		'.play-all-songs',					playallsongs 		) // Play all songs button
+.on('click', 		'.play-all-songs-in-order', 		playallsongsinorder ) // Play, but don't shuffle songs
 .on('hover',		'#search-results-wrapper li',		hoversearchresult 	) // Add visual indicator for search when hovering
 .on('click', 		'.show-filter-dropdown', 			filterdropdown 		) // Filter dropdown
 .on('keydown', 											preventScrolling    ) // Prevent scrolling with arrow keys
+.on('click',		'[data-trigger]',					trigger 			) // Slide down functionality
+.on('click', 		'[data-untrigger]', 				untrigger 			) // Reverse function of trigger
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 

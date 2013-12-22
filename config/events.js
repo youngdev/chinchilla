@@ -192,6 +192,18 @@ this.connection = function (socket) {
 			}
 			checkPlaylistOwner();
 		});
+		socket.on('/api/playlists/get-tracks', 					function (data) {
+			db.getPlaylist(data.playlist, function (playlist) {
+				fb.ownspl(data.url, data.token, function (ownspl) {
+					if (ownspl || playlist.public) {
+						socket.emit('/api/playlists/get-tracks/response', {playlist: playlist});
+					}
+					else {
+						socket.emit('/api/playlists/get-tracks/response', {error: 'not_public'})
+					}
+				}) 
+			})
+		})
 		socket.on('change-playlist-privacy', 		function (data) {
 			if (data.token) {
 				fb.ownspl(data.playlist, data.token, function (ownspl) {
@@ -443,6 +455,7 @@ this.connection = function (socket) {
 										view: data.destination, trackcount: playlist.tracks.length, 
 										lengthdifference: diff, 
 										notification: output,
+										songs: data.songs,
 										tracks: _.pluck(data.songs, 'id')
 									});
 								});
