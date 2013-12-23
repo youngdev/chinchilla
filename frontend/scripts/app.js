@@ -6251,6 +6251,10 @@ var errorOccured = function(error_code) {
 	/*
 		Find an alternative video
 	*/
+	helpers.localStorageSafety('banned_videos');
+	var banned_videos = JSON.parse(localStorage.banned_videos);
+	banned_videos.push((player.nowPlaying.get()).ytid);
+	localStorage.banned_videos = JSON.stringify(banned_videos)
 	var song = player.nowPlaying.get()
 	recognition.findVideo(song, function(video) {
 		if (video != undefined) {
@@ -6883,6 +6887,10 @@ recognition = {
                     return views
                 })
             mostviews = mostviewed.yt$statistics ? mostviewed.yt$statistics.viewCount : 0;
+        if (typeof localStorage != 'undefined') {
+            var banned_videos = JSON.parse(localStorage.banned_videos);
+            var videos = _.reject(videos, function(video) { return _.contains(banned_videos, video['media$group']['yt$videoid']['$t']) });
+        }
         _.map(videos, function(video) {
 
             /*

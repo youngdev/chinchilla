@@ -196,6 +196,10 @@ var errorOccured = function(error_code) {
 	/*
 		Find an alternative video
 	*/
+	helpers.localStorageSafety('banned_videos');
+	var banned_videos = JSON.parse(localStorage.banned_videos);
+	banned_videos.push((player.nowPlaying.get()).ytid);
+	localStorage.banned_videos = JSON.stringify(banned_videos)
 	var song = player.nowPlaying.get()
 	recognition.findVideo(song, function(video) {
 		if (video != undefined) {
