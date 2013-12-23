@@ -285,18 +285,19 @@ var contextmenu 		= function(obj) {
 	*/
 	var placeToAppend = obj.song ? '#view' : '#sidebar'
 	var scrollHeight = $(placeToAppend)[0].scrollHeight;
+	var height = $(document).height();
 	var offsets = {
 		top:  obj.e.pageY,
 		left: obj.left,
-		bottom: document.height - obj.e.pageY
+		bottom: height - obj.e.pageY
 	}
-	var pos = (obj.e.pageY < document.height/2) ? offsets.top : offsets.bottom;
-	var toporbottom = (obj.e.pageY < (document.height/2)) ? 'top' : 'bottom'
+	console.log('obj.e.pageY', obj.e.pageY, 'height', height, 'offsets.top', offsets.top, 'offsets.bottom', offsets.bottom)
+	var pos = (obj.e.pageY < height/2) ? offsets.top : offsets.bottom;
+	var toporbottom = (obj.e.pageY < (height/2)) ? 'top' : 'bottom'
 	var menu = $('<div>', {
 		class: 'contextmenu',
 	}).css({
-		left: 	offsets.left,
-		top: 	offsets.top
+		left: 	offsets.left
 	})
 	.css(toporbottom, pos).
 	html('<div class="loading-indicator"><div class="spinner"></div></div>').appendTo(placeToAppend);
@@ -327,6 +328,7 @@ var contextmenu 		= function(obj) {
 		var playlist = obj.playlist.dataset.navigate;
 		socket.emit('get-playlist-contextmenu', {playlist: playlist, state: chinchilla});
 		socket.once('playlist-contextmenu', function(data) {
+			menu.addClass('playlist-contextmenu');
 			menu.html(data.html);
 		})
 	}
@@ -707,6 +709,10 @@ var untrigger 			= function() {
 	this.dataset.trigger = this.dataset.untrigger;
 	$('.' + this.dataset.untrigger).hide();
 	delete this.dataset.untrigger;
+}
+var loadcover 			= function() {
+	console.log('loaded')
+	$(this).fadeIn().addClass('coverstack-coer-loaded');
 }
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks

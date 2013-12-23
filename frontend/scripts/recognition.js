@@ -233,6 +233,7 @@ recognition = {
     	json.ytid = videoid;
         json.id = parseFloat(json.id);
         socket.emit('new-ytid', json);
+        DB.addYTIDToTrack(track ,videoid)
     },
     uploadAlbum: function(album) {
     	var json = $(album).data();

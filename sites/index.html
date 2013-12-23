@@ -176,7 +176,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 				</button>
 				<div class="covers">
 					<% _.each(tmpl.coverstack, function(image) { %>
-						<img src="<%- image %>" border="0">
+						<img onload="$(this).addClass('coverstack-cover-loaded')" src="<%- image %>" border="0">
 					<% }); %>
 					<div class="coverstack-overlay"></div>
 				</div>
@@ -252,7 +252,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 		</p>
 			<div class="covers">
 				<% _.each(tmpl.coverstack, function(image) { %>
-					<img src="<%- image %>" border="0">
+					<img onload="$(this).addClass('coverstack-cover-loaded')" src="<%- image %>" border="0">
 				<% }); %>
 				<div class="coverstack-overlay"></div>
 			</div>

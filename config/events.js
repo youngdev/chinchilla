@@ -194,6 +194,10 @@ this.connection = function (socket) {
 		});
 		socket.on('/api/playlists/get-tracks', 					function (data) {
 			db.getPlaylist(data.playlist, function (playlist) {
+				if (!playlist) {
+					socket.emit('/api/playlists/get-tracks/response', {error: 'does_not_exist'});
+					return;
+				}
 				fb.ownspl(data.url, data.token, function (ownspl) {
 					if (ownspl || playlist.public) {
 						socket.emit('/api/playlists/get-tracks/response', {playlist: playlist});

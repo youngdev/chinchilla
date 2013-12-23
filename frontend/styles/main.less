@@ -73,9 +73,7 @@ button:focus {
 					height: 12px;
 					width: 12px;
 					position: relative;
-					top: 6px;
 					margin-left: 10px;
-					position: absolute;
 				}
 			}
 			td:first-child, th:first-child {
@@ -414,7 +412,7 @@ button:focus {
 	#time-left, #time-right {
 		position: absolute;
 		font-size: 0.8em;
-		margin-top: 205px;
+		top: 205px;
 	}
 	#time-left {
 		left: 125px;
@@ -802,21 +800,44 @@ button:focus {
 				width: 250px;
 				position: relative;
 			}
-			img:nth-child(1) {
+			@-webkit-keyframes coverstackslideup {
+				from {
+					-webkit-transform: translateY(200px);
+				}
+				to {
+					-webkit-transform: translateY(0px);
+				}
+			}
+			img:nth-child(1).coverstack-cover-loaded {
 				top: 0;
 				z-index: 1;
+				-webkit-animation: coverstackslideup 0.25s;
 			}
-			img:nth-child(2) {
+			img:nth-child(2).coverstack-cover-loaded {
 				margin-top: -200px;
 				z-index: 2;
+				-webkit-animation: coverstackslideup 0.5s;
+
 			}
-			img:nth-child(3) {
+			img:nth-child(3).coverstack-cover-loaded {
 				margin-top: -200px;
 				z-index: 3;
+				-webkit-animation: coverstackslideup 0.75s;
+
 			}
-			img:nth-child(4) {
+			img:nth-child(4).coverstack-cover-loaded {
 				margin-top: -200px;
 				z-index: 4;
+				-webkit-animation: coverstackslideup 1s;
+
+			}
+			@-webkit-keyframes coverstackoverlayfadein {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
 			}
 			.coverstack-overlay {
 				position: absolute;
@@ -825,6 +846,8 @@ button:focus {
 				width: 250px;
 				height: 186px;
 				background: rgba(0,0,0,0.8);
+				-webkit-animation: coverstackoverlayfadein 1s;
+				-webkit-animation-fill-mode: forwards;
 			}
 		}
 		.play-all-songs, .play-all-songs-in-order {
@@ -1592,7 +1615,9 @@ button:focus {
 	.playlist-context-tip {
 		min-height: 45px;
 		height: 45px;
-		background: rgba(0,0,0,0.05);
+		background: transparent;
+		position: absolute;
+		padding: 5px;
 		h1, h2 {
 			left: 20px;
 			padding-left: 0 !important;
@@ -2245,6 +2270,9 @@ button:focus {
 .contextmenu .not-in-playlist::before, .dropdown-no-check::before {
 	content: '';
 	padding-left: 24px;
+}
+.playlist-contextmenu {
+	height: 96px;
 }
 .footnote {
 	font-size: 0.7em;
