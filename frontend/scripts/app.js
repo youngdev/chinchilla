@@ -6888,6 +6888,7 @@ recognition = {
                 })
             mostviews = mostviewed.yt$statistics ? mostviewed.yt$statistics.viewCount : 0;
         if (typeof localStorage != 'undefined') {
+            helpers.localStorageSafety('banned_videos'); 
             var banned_videos = JSON.parse(localStorage.banned_videos);
             var videos = _.reject(videos, function(video) { return _.contains(banned_videos, video['media$group']['yt$videoid']['$t']) });
         }
