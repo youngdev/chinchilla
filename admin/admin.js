@@ -3,6 +3,7 @@ var swig 	= require('swig'),
 	cookies = require('cookies'),
 	db 		= require('../db/queries'),
 	reddit 	= require('../config/reddit'),
+	_ 		= require('underscore'),
 	admin 	= this;
 
 this.home = function (request, response) {
@@ -14,10 +15,11 @@ this.home = function (request, response) {
 	}
 	var afterSongCount = function(count) {
 		data.songCount = count;
-		db.getUserCount(afterUserCount);
+		db.getUserList(afterUserList);
 	}
-	var afterUserCount = function(count) {
-		data.userCount = count;
+	var afterUserList = function(users) {
+		data.userCount = users.length;
+		data.users = _.pluck(users, 'username');
 		db.getWatchIds(afterWatchIds);
 	}
 	var afterWatchIds = function(item) {

@@ -337,6 +337,13 @@ this.getUserCount			= function(callback) {
 		callback(count);
 	});
 }
+this.getUserList 			= function(callback) {
+	connection.collection("users").find({}, {limit: 100}).toArray(function (err, users) {
+		if (!err) {
+			callback(users);
+		}
+	});
+}
 this.getRedditThread		= function(id, callback) {
 	connection.collection("thread").findOne({thread_id: id}, function(err, item) {
 		callback(item);

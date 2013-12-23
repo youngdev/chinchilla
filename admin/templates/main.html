@@ -8,6 +8,11 @@
 	<h1>Statistics</h1>
 	<h2>Songs ({{songCount}})</h2>
 	<h2>Users ({{userCount}})</h2>
+	<ul>
+		{% for user in users %}
+		<p>{{user}}</p>
+		{% endfor%}
+	</ul>
 	<h2>Reddit bot</h2>
 	<ul>
 		{% for id in watchIds %}
