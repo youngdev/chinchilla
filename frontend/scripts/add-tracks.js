@@ -28,7 +28,7 @@ addtracks = {
 								var div = $('<div>', { class: 'search-result' });
 										  $('<div>', { class: 'search-result-title' }).text(result[info.title]).appendTo(div);
 										  $('<div>', { class: 'search-result-sub' }).text(result[info.sub]).appendTo(div);
-								var a   = $('<a>'  , { 'data-id' : result.trackId }).html(div).on('click', function() {
+								var a   = $('<span>'  , { 'data-id' : result.trackId }).html(div).on('click', function() {
 									var route = $('#view').attr('data-route');
 									if (route == '/library') {
 										library.add({id: result.trackId});

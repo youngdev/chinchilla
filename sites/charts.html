@@ -6,18 +6,19 @@
 		<img class="list-header-play-icon svg-shuffle-white" src="/api/i/pixel"><span>Shuffle</span>
 	</button>
 	<div class="covers">
-		{% for image in coverstack %}<img src="{{image}}" border="0">{% endfor %}
+		{% for image in coverstack %}<img onload="$(this).addClass('coverstack-cover-loaded')" src="{{image}}" border="0">{% endfor %}
 		<div class="coverstack-overlay"></div>
 	</div>
+	<h1 class="oncoverstack">Best selling tracks</h1>
+	<p class="playlist-info">
+		<span data-navigate='/retro-charts/2012'>Retro charts</span>
+	</p>
+	<p class="playlistdscription">
+		<p class="attribution">Source: iTunes</p>
+	</p>
 </div>
-
-<h1 class="oncoverstack">Best selling tracks</h1>
-<p class="playlist-info">
-	<span data-navigate='/retro-charts/2012'>Retro charts</span>
-</p>
 <div class="extendedtable">
 	<div class="album-tracks">
 		{% include templates.tracklist %}
 	</div>
 </div>
-<p class="attribution">Source: iTunes</p>

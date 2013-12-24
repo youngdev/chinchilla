@@ -443,7 +443,7 @@ var addtrackskeys 		= function(key) {
 	else {
 		var dom = $('.' + classname);
 		var direction = (key == 38) ? 'prev' : 'next'
-		var next = dom[direction]('a');
+		var next = dom[direction]('span');
 		if (next.length != 0) {
 			$(next)	.addClass(classname);
 			$(dom)	.removeClass(classname);
@@ -711,8 +711,14 @@ var untrigger 			= function() {
 	delete this.dataset.untrigger;
 }
 var loadcover 			= function() {
-	console.log('loaded')
 	$(this).fadeIn().addClass('coverstack-coer-loaded');
+}
+var showYouTubePage 	= function() {
+	$('body').addClass('youtube-player-visible');
+	$('#view').html('');
+}
+var hideYouTubePage 	= function() {
+	$('body').removeClass('youtube-player-visible');
 }
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks

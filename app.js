@@ -41,7 +41,8 @@ app.get('/library',                     views.wrapper           );
 app.get('/settings',                    views.wrapper           );
 app.get('/reddit',                      views.wrapper           );
 app.get('/remote',                      views.wrapper           );
-app.get('/rmt',                         views.rmt               ); 
+app.get('/youtube',                     views.wrapper           ); 
+app.get('/rmt',                         views.rmt               );
 
 /*
     Backend routes

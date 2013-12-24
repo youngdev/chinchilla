@@ -2490,6 +2490,9 @@ this.helpers = helpers;;views = {
 	},
 	'/remote': 					function(match) {
 		views.remote.get();
+	},
+	'/youtube': 				function(match) {
+		showYouTubePage();
 	}
 };
 $(document)
@@ -2540,7 +2543,8 @@ navigation = {
 			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-.]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
 			if ((match && match != '/') || (match == '/' && path == '/')) {
-				$('#drop-target-label').text('your library')
+				$('#drop-target-label').text('your library');
+				hideYouTubePage();
 				callback(match);
 				showSpinner();
 				$.publish('view-gets-loaded')
@@ -6272,6 +6276,7 @@ var errorOccured = function(error_code) {
 }
 player.show = function() {
 	$('#sidebar-player').slideDown(600).animate({'opacity': 1});
+	$('[data-navigate="/youtube"]').show();
 }
 player.setUpEvents = function() {
 	/*
@@ -6492,7 +6497,7 @@ player.togglePlayState 	= function() {
 								var div = $('<div>', { class: 'search-result' });
 										  $('<div>', { class: 'search-result-title' }).text(result[info.title]).appendTo(div);
 										  $('<div>', { class: 'search-result-sub' }).text(result[info.sub]).appendTo(div);
-								var a   = $('<a>'  , { 'data-id' : result.trackId }).html(div).on('click', function() {
+								var a   = $('<span>'  , { 'data-id' : result.trackId }).html(div).on('click', function() {
 									var route = $('#view').attr('data-route');
 									if (route == '/library') {
 										library.add({id: result.trackId});
@@ -7574,7 +7579,7 @@ var addtrackskeys 		= function(key) {
 	else {
 		var dom = $('.' + classname);
 		var direction = (key == 38) ? 'prev' : 'next'
-		var next = dom[direction]('a');
+		var next = dom[direction]('span');
 		if (next.length != 0) {
 			$(next)	.addClass(classname);
 			$(dom)	.removeClass(classname);
@@ -7842,8 +7847,14 @@ var untrigger 			= function() {
 	delete this.dataset.untrigger;
 }
 var loadcover 			= function() {
-	console.log('loaded')
 	$(this).fadeIn().addClass('coverstack-coer-loaded');
+}
+var showYouTubePage 	= function() {
+	$('body').addClass('youtube-player-visible');
+	$('#view').html('');
+}
+var hideYouTubePage 	= function() {
+	$('body').removeClass('youtube-player-visible');
 }
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks

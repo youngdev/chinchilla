@@ -217,6 +217,7 @@ var errorOccured = function(error_code) {
 }
 player.show = function() {
 	$('#sidebar-player').slideDown(600).animate({'opacity': 1});
+	$('[data-navigate="/youtube"]').show();
 }
 player.setUpEvents = function() {
 	/*

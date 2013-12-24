@@ -59,6 +59,9 @@ routes = {
 	},
 	'/remote': 					function(match) {
 		views.remote.get();
+	},
+	'/youtube': 				function(match) {
+		showYouTubePage();
 	}
 };
 $(document)
@@ -109,7 +112,8 @@ navigation = {
 			var routeMatcher	= new RegExp(route.replace(/:[name]+/g, '([\\a-z0-9-.]+)').replace(/:[id]+/g, '([\\d]+)')),
 				match           = path.match(routeMatcher);
 			if ((match && match != '/') || (match == '/' && path == '/')) {
-				$('#drop-target-label').text('your library')
+				$('#drop-target-label').text('your library');
+				hideYouTubePage();
 				callback(match);
 				showSpinner();
 				$.publish('view-gets-loaded')
