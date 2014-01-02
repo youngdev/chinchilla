@@ -631,16 +631,22 @@ var pldropdown 			= function() {
 	});
 }
 var mkplpublic 			= function() {
+	$('.make-playlist-public').addClass('dropdown-check').removeClass('dropdown-no-check')
+	$('.make-playlist-private').addClass('dropdown-no-check').removeClass('dropdown-check')
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy')
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': true});
 }
 var mkplprivate 		= function() {
+	$('.make-playlist-public').removeClass('dropdown-check').addClass('dropdown-no-check')
+	$('.make-playlist-private').removeClass('dropdown-no-check').addClass('dropdown-check')
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': false});
 }
 var mkplnwattop 		= function() {
+	$('.make-playlist-newest-at-top').removeClass('dropdown-no-check').addClass('dropdown-check');
+	$('.make-playlist-newest-at-bottom').addClass('dropdown-no-check').removeClass('dropdown-check');
 	var url 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: url, token: chinchilla.token, 'newestattop': true});
@@ -652,6 +658,8 @@ var mkplnwattop 		= function() {
 	});
 }
 var mkplnwatbottom 		= function() {
+	$('.make-playlist-newest-at-top').addClass('dropdown-no-check').removeClass('dropdown-check');
+	$('.make-playlist-newest-at-bottom').removeClass('dropdown-no-check').addClass('dropdown-check');
 	var url 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: url, token: chinchilla.token, 'newestattop': false});
@@ -716,9 +724,31 @@ var loadcover 			= function() {
 var showYouTubePage 	= function() {
 	$('body').addClass('youtube-player-visible');
 	$('#view').html('');
+	$.publish('view-got-loaded')
 }
 var hideYouTubePage 	= function() {
 	$('body').removeClass('youtube-player-visible');
+}
+var showImportPage 		= function() {
+	var template = $('#import-template').html();
+	var output = _.template(template, {
+		importqueue: importqueue,
+		tracktmpl: $('#import-track-template').html(),
+		playlists: chinchilla.playlists
+	});
+
+	$('#view').html(output);
+	$('#playlist-target').val(chinchilla.playlist_target ? chinchilla.playlist_target : '/library')
+	$.publish('view-got-loaded');
+}
+var startqueue 			= function() {
+	startQueue();
+}
+var stopqueue 			= function() {
+	stopQueue();
+}
+var pltargetchanged 	= function() {
+	chinchilla.playlist_target = this.value;
 }
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
@@ -769,6 +799,9 @@ $(document)
 .on('keydown', 											preventScrolling    ) // Prevent scrolling with arrow keys
 .on('click',		'[data-trigger]',					trigger 			) // Slide down functionality
 .on('click', 		'[data-untrigger]', 				untrigger 			) // Reverse function of trigger
+.on('click', 		'#start-queue', 					startqueue 			) // Start queue
+.on('click', 		'#stop-queue', 						stopqueue 			) // Stop queue
+.on('change', 		'#playlist-target', 				pltargetchanged 	) // Playlist target changed
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 

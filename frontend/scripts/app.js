@@ -2493,6 +2493,10 @@ this.helpers = helpers;;views = {
 	},
 	'/youtube': 				function(match) {
 		showYouTubePage();
+	},
+	'/import': 					function(match) {
+		showImportPage();
+		views.loadingindicator.hide();
 	}
 };
 $(document)
@@ -2546,7 +2550,7 @@ navigation = {
 				$('#drop-target-label').text('your library');
 				hideYouTubePage();
 				callback(match);
-				showSpinner();
+				//showSpinner();
 				$.publish('view-gets-loaded')
 				var method = prevent ? 'replaceState' : 'pushState';
 				history[method](null, null, path);
@@ -6589,7 +6593,17 @@ determineProvider = function(link) {
 
 addToImportQueue = function(track) {
 	importqueue.push(track);
-	return queuechanged();
+	$('.import-trackcount').text(importqueue.length + (importqueue.length == 1 ? ' track' : ' tracks'));
+	$('#importqueue').append(
+		_.template(
+			$("#import-track-template").html(), 
+			{track: track}
+		)
+	)
+	if (importqueue.length != 0) {
+		$('.import-no-tracks').remove();
+	}
+	//return queuechanged();
 };
 
 queuechanged = function() {
@@ -6607,16 +6621,19 @@ queuechanged = function() {
 startQueue = function() {
 	queuestarted = true;
 	console.log('Queue started');
+	$('body').addClass('queuestarted')
 	return recognizeTracks();
 };
 
 stopQueue = function() {
 	queuestarted = false;
+	$('body').removeClass('queuestarted')
 	return console.log('Queue ended');
 };
 
 recognizeTracks = function() {
 	var firsttrack;
+	if (importqueue.length == 0) { stopQueue(); return; }
 	firsttrack = importqueue.shift();
 	return recognize(firsttrack, function(song) {
 		addToCollections(firsttrack, song);
@@ -6640,23 +6657,37 @@ recognize = function(track, callback) {
 };
 
 recognizeSpotify = function(track, callback) {
+	var dom = $('.import-track[data-importid="' + track.type.provider + '-' + track.type.id + '"]');
+	var domstatus = $(dom).find('.import-status');
+	var domname = $(dom).find('.import-trackname');
+	domstatus.text('Looking up track...')
 	return $.getJSON('http://ws.spotify.com/lookup/1/.json?uri=spotify:track:' + track.type.id, function(json) {
 		track = {
 			name: json.track.name,
 			artist: json.track.artists[0].name
 		};
+		domname.text(track.name + ' - ' + track.artist);
+		domstatus.text('Requesting track info...')
 		socket.emit('request-track-info', track);
 		return socket.once('receive-track-info', function(data) {
 			var song;
 			if (data.error) {
+				domstatus.text('Not found on Tunechilla.')
 				return callback(null);
 			} else {
 				song = data.song;
+				domstatus.text('Finding YouTube video...')
 				return recognition.findVideo(song, function(video) {
+					if (!video) {
+						domstatus.text('No video found.');
+						return callback(null);
+					}
 					song.ytid = helpers.parseYTId(video);
 					socket.emit('new-track', song);
+					domstatus.text('Adding...')
 					return socket.once('track-uploaded', function(id) {
 						if (id === song.id) {
+							domstatus.text('Imported.')
 							return callback(song);
 						}
 					});
@@ -6707,7 +6738,7 @@ recognizeFile = function(track, callback) {
 
 addToCollections = function(info, song) {
 	var target;
-	target = info.target;
+	target = chinchilla.playlist_target ? chinchilla.playlist_target : '/library';
 	if (song) {
 		if (_s.contains(target, '/u/') && _s.contains(target, '/p/')) {
 			return socket.emit('add-tracks-to-collection', {
@@ -6747,6 +6778,13 @@ $(document).ready(function() {
 		cancelEverything(e);
 		files = e.dataTransfer.files;
 		text = e.dataTransfer.getData('Text');
+		var pathname = window.location.pathname;
+		if (window.location.pathname != '/import') {
+			if ((_s.contains(pathname, '/u/') && _s.contains(pathname, '/p/')) || pathname == '/library') {
+				chinchilla.playlist_target = pathname;
+			}
+			navigation.to('/import')
+		}
 		if (files.length !== 0) {
 			return fileDropped(files);
 		} else if (text !== '') {
@@ -6877,7 +6915,9 @@ recognition = {
             url: "http://gdata.youtube.com/feeds/api/videos",
             data: data,
             success: function (json) {
+                console.log(json)
               recognition.findBestVideo(json, song, function(video) {
+                console.log(video)
                 callback(video);
               }, _, _s, options);
             }
@@ -6891,6 +6931,7 @@ recognition = {
                     var views =  video.yt$statistics != undefined ? parseFloat(video.yt$statistics.viewCount) : 0;
                     return views
                 })
+            if (!mostviewed) { callback(null); return; }
             mostviews = mostviewed.yt$statistics ? mostviewed.yt$statistics.viewCount : 0;
         if (typeof localStorage != 'undefined') {
             helpers.localStorageSafety('banned_videos'); 
@@ -6925,6 +6966,8 @@ recognition = {
                 }
             });
             var levpoints = 300*(matches.length/tfragments.length) - vtitle.replace(/\s/g, '').length*2
+            levpoints = (levpoints < 0) ? 0 : levpoints
+            console.log('Levenshtein', levpoints)
             video.points += levpoints;
 
             /*
@@ -6939,7 +6982,7 @@ recognition = {
                 minuspoints     = difference === 0 ? 0 : (difference-1),
                 durpoints       = minuspoints;
             video.points -= durpoints;
-
+            console.log('video duration points', durpoints)
             /*
                 50 Points: View count
                 -Best video gets 50 Points
@@ -6948,6 +6991,7 @@ recognition = {
             var viewCount       = video.yt$statistics ? parseFloat(video.yt$statistics.viewCount) : 0,
                 ratio           = viewCount / mostviews;
                 viepoints       = Math.ceil(ratio*50);
+                console.log('viepoints', viepoints)
             video.points += viepoints;
 
             /*
@@ -7767,16 +7811,22 @@ var pldropdown 			= function() {
 	});
 }
 var mkplpublic 			= function() {
+	$('.make-playlist-public').addClass('dropdown-check').removeClass('dropdown-no-check')
+	$('.make-playlist-private').addClass('dropdown-no-check').removeClass('dropdown-check')
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy')
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': true});
 }
 var mkplprivate 		= function() {
+	$('.make-playlist-public').removeClass('dropdown-check').addClass('dropdown-no-check')
+	$('.make-playlist-private').removeClass('dropdown-no-check').addClass('dropdown-check')
 	var playlist 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-privacy', {playlist: playlist, token: chinchilla.token, 'public': false});
 }
 var mkplnwattop 		= function() {
+	$('.make-playlist-newest-at-top').removeClass('dropdown-no-check').addClass('dropdown-check');
+	$('.make-playlist-newest-at-bottom').addClass('dropdown-no-check').removeClass('dropdown-check');
 	var url 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: url, token: chinchilla.token, 'newestattop': true});
@@ -7788,6 +7838,8 @@ var mkplnwattop 		= function() {
 	});
 }
 var mkplnwatbottom 		= function() {
+	$('.make-playlist-newest-at-top').addClass('dropdown-no-check').removeClass('dropdown-check');
+	$('.make-playlist-newest-at-bottom').removeClass('dropdown-no-check').addClass('dropdown-check');
 	var url 	= $('#view').attr('data-route');
 	var label 		= $('.playlist-privacy');
 	socket.emit('change-playlist-order', {playlist: url, token: chinchilla.token, 'newestattop': false});
@@ -7852,9 +7904,31 @@ var loadcover 			= function() {
 var showYouTubePage 	= function() {
 	$('body').addClass('youtube-player-visible');
 	$('#view').html('');
+	$.publish('view-got-loaded')
 }
 var hideYouTubePage 	= function() {
 	$('body').removeClass('youtube-player-visible');
+}
+var showImportPage 		= function() {
+	var template = $('#import-template').html();
+	var output = _.template(template, {
+		importqueue: importqueue,
+		tracktmpl: $('#import-track-template').html(),
+		playlists: chinchilla.playlists
+	});
+
+	$('#view').html(output);
+	$('#playlist-target').val(chinchilla.playlist_target ? chinchilla.playlist_target : '/library')
+	$.publish('view-got-loaded');
+}
+var startqueue 			= function() {
+	startQueue();
+}
+var stopqueue 			= function() {
+	stopQueue();
+}
+var pltargetchanged 	= function() {
+	chinchilla.playlist_target = this.value;
 }
 $(document)
 .on('mousedown',    'tr.song',            				select      		) // Selecting tracks
@@ -7905,6 +7979,9 @@ $(document)
 .on('keydown', 											preventScrolling    ) // Prevent scrolling with arrow keys
 .on('click',		'[data-trigger]',					trigger 			) // Slide down functionality
 .on('click', 		'[data-untrigger]', 				untrigger 			) // Reverse function of trigger
+.on('click', 		'#start-queue', 					startqueue 			) // Start queue
+.on('click', 		'#stop-queue', 						stopqueue 			) // Stop queue
+.on('change', 		'#playlist-target', 				pltargetchanged 	) // Playlist target changed
 $(window)
 .on('beforeunload', 									warnexit			) // Warn before exit (Only when user set it in settings!
 

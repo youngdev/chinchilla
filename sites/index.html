@@ -90,6 +90,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 			<li data-navigate="/charts"><a><img src="/api/i/pixel" class="svg-star-black">Charts</a></li>
 			<li data-navigate="/reddit"><a><img src="/api/i/pixel" class="svg-upvote-black">Reddit</a></li>
 			<h2>Tunechilla</h2>
+			<li data-navigate="/import"><a><img src="/api/i/pixel" class="svg-filter-black"></a>Import</li>
 			<li data-navigate="/settings"><a><img src="/api/i/pixel" class="svg-wheel-black">Settings</a></li>
 			<li data-navigate="/info"><a><img src="/api/i/pixel" class="svg-info-black">Info</a></li>
 			{% if user %}
@@ -126,8 +127,8 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 	</div>
 	<div id="dropfilescontent">
 		<h1>Drop your music here</h1>
-		<p>You can drag MP3 files or Spotify music.</p>
-		<p>Your music will be added to <span id="drop-target-label">your library</span>.</p>
+		<p>You can drop Spotify files here.</p>
+		<p>Import from other services will be available soon.</p>
 	</div>
 	<div id="draglabel">Hello</div>
 	<div id="ytplayer" style="opacity: 0; position: absolute; z-index: -3; top: -3000px">
@@ -182,7 +183,7 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 					<div class="coverstack-overlay"></div>
 				</div>
 				<h1 class="oncoverstack">Your library</h1>
-				<div class="playlistdescription">
+				<div class="playlistdescription coverstack-description">
 					<p class="playlist-info">
 					  <% if (tmpl.trackcount) { %>
 						<span class="playlist-trackcount"><%- tmpl.trackcount %></span> <span class="playlist-plural-singular-tracks"><% if (tmpl.trackcount == 1) { %>track<% } else { %>tracks<% } %></span><span data-duration="<%- tmpl.rawduration %>" class="playlist-duration"><%- tmpl.duration %></span>
@@ -206,6 +207,13 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 					</button>
 					<div class="filter-dropdown" data-list="/library">
 
+					</div><br>
+					<button data-trigger="playlist-import-tip">
+						<img class="lock-icon svg-play-black" src="/api/i/pixel"><span>Import</span>
+					</button><br>
+					<div class="playlist-import-tip">
+					You can import Spotify tracks by dragging them into this window!
+					Tip: Use Ctrl+A / ⌘A to select all tracks in Spotify!
 					</div>
 					</div>
 				</div>
@@ -280,6 +288,13 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 
 				</div><br>
 				<% if (chinchilla.user == tmpl.playlist.owner) { %>
+				<button data-trigger="playlist-import-tip">
+					<img class="lock-icon svg-play-black" src="/api/i/pixel"><span>Import</span>
+				</button><br>
+				<div class="playlist-import-tip">
+				You can import Spotify tracks by dragging them into this window!
+				Tip: Use Ctrl+A / ⌘A to select all tracks in Spotify!
+				</div>
 				<button class="playlist-privacy" data-trigger="playlist-options-dropdown">
 					<img class="lock-icon svg-play-black" src="/api/i/pixel"><span>Settings</span>
 				</button>
@@ -376,6 +391,81 @@ xmlns:fb="http://www.facebook.com/2008/fbml">
 				Login to see more options 
 			</div>
 		<% } %>
+	</script>
+	<script type="text/template" id="import-template">
+		<% if (chinchilla.loggedin) { %>
+		<div class='import-page'>
+			<p class='import-header'>
+				Import <span class="import-trackcount"><%= tmpl.importqueue.length %> tracks</span> into 
+				<span class="underline"><select id="playlist-target">
+				 		<option value="/library">Library</option>
+				 		<% _.each(tmpl.playlists, function(playlist) { %>
+				 			<option value="<%= playlist.url %>"><%= playlist.name %></option>
+				 		<% }); %>
+				 	</select></span>
+				<button id="stop-queue">Stop queue</button>
+				<button id="start-queue">Start queue</button>
+			</p>
+			<hr>
+			<div class="import-body">
+				<table id="importqueue">
+					<tr>
+						<th>Source</th>
+						<th>Track</th>
+						<th>Status</th>
+					</tr>
+					<% _.each(tmpl.importqueue, function(track) { %>
+							<%= _.template(tmpl.tracktmpl, {track: track}) %>
+					<% }) %>
+				</table>
+				<% if (tmpl.importqueue.length == 0) { %>
+					<p class='import-no-tracks'>No tracks to import</p>
+				<% } %>
+			</div>
+			<hr>
+			<div class='import-instructions'>
+				<h2>How you can import tracks:</h2>
+				<div class='import-ways'>
+					<table>
+						<tr>
+							<td class="import-spotify">
+								<h3>Spotify</h3>
+								<p>Use Ctrl+A / ⌘A to select all tracks in Spotify. Then drag them into this window. </p>
+							</td>
+							<td>
+								<h3>YouTube</h3>
+								<p>Coming next!</p>
+							</td>
+							<td>
+								<h3>MP3/iTunes</h3>
+								<p>Working on it!</p>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<% }  else { %>
+			<div class="facebook-login-dialog">
+				<h1>Already have a music collection? Import it.</h1>
+				<p>
+					When you create an account, you can import Spotify playlists and show them to your friends without them having to download anything! <br>
+
+					<button class='login-button' onclick="window.location.href='/auth/facebook'" class="facebook">Login with Facebook</button> <br>
+					<small>We <strong>do not</strong> post to your timeline.</small> <br>
+					<small>We <strong>do not</strong> send you emails.</small> <br>
+					<small>We <strong>can not</strong> access your private data.</small>
+				</p>
+			</div>
+		<% } %>
+	</script>
+	<script type="text/template" id="import-track-template">
+		<tr class='import-track' 
+		data-importid='<%= tmpl.track.type.provider %>-<%= tmpl.track.type.id %>'>
+			<td><%= tmpl.track.type.provider %></td>
+			<td class="import-trackname">Track <%= tmpl.track.type.id %></td>
+			<td class='import-status'>Ready to import</td>
+		</tr>
 	</script>
 </body>
 </html>

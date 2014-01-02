@@ -66,7 +66,17 @@ determineProvider = function(link) {
 
 addToImportQueue = function(track) {
 	importqueue.push(track);
-	return queuechanged();
+	$('.import-trackcount').text(importqueue.length + (importqueue.length == 1 ? ' track' : ' tracks'));
+	$('#importqueue').append(
+		_.template(
+			$("#import-track-template").html(), 
+			{track: track}
+		)
+	)
+	if (importqueue.length != 0) {
+		$('.import-no-tracks').remove();
+	}
+	//return queuechanged();
 };
 
 queuechanged = function() {
@@ -84,16 +94,19 @@ queuechanged = function() {
 startQueue = function() {
 	queuestarted = true;
 	console.log('Queue started');
+	$('body').addClass('queuestarted')
 	return recognizeTracks();
 };
 
 stopQueue = function() {
 	queuestarted = false;
+	$('body').removeClass('queuestarted')
 	return console.log('Queue ended');
 };
 
 recognizeTracks = function() {
 	var firsttrack;
+	if (importqueue.length == 0) { stopQueue(); return; }
 	firsttrack = importqueue.shift();
 	return recognize(firsttrack, function(song) {
 		addToCollections(firsttrack, song);
@@ -117,23 +130,37 @@ recognize = function(track, callback) {
 };
 
 recognizeSpotify = function(track, callback) {
+	var dom = $('.import-track[data-importid="' + track.type.provider + '-' + track.type.id + '"]');
+	var domstatus = $(dom).find('.import-status');
+	var domname = $(dom).find('.import-trackname');
+	domstatus.text('Looking up track...')
 	return $.getJSON('http://ws.spotify.com/lookup/1/.json?uri=spotify:track:' + track.type.id, function(json) {
 		track = {
 			name: json.track.name,
 			artist: json.track.artists[0].name
 		};
+		domname.text(track.name + ' - ' + track.artist);
+		domstatus.text('Requesting track info...')
 		socket.emit('request-track-info', track);
 		return socket.once('receive-track-info', function(data) {
 			var song;
 			if (data.error) {
+				domstatus.text('Not found on Tunechilla.')
 				return callback(null);
 			} else {
 				song = data.song;
+				domstatus.text('Finding YouTube video...')
 				return recognition.findVideo(song, function(video) {
+					if (!video) {
+						domstatus.text('No video found.');
+						return callback(null);
+					}
 					song.ytid = helpers.parseYTId(video);
 					socket.emit('new-track', song);
+					domstatus.text('Adding...')
 					return socket.once('track-uploaded', function(id) {
 						if (id === song.id) {
+							domstatus.text('Imported.')
 							return callback(song);
 						}
 					});
@@ -184,7 +211,7 @@ recognizeFile = function(track, callback) {
 
 addToCollections = function(info, song) {
 	var target;
-	target = info.target;
+	target = chinchilla.playlist_target ? chinchilla.playlist_target : '/library';
 	if (song) {
 		if (_s.contains(target, '/u/') && _s.contains(target, '/p/')) {
 			return socket.emit('add-tracks-to-collection', {
@@ -224,6 +251,13 @@ $(document).ready(function() {
 		cancelEverything(e);
 		files = e.dataTransfer.files;
 		text = e.dataTransfer.getData('Text');
+		var pathname = window.location.pathname;
+		if (window.location.pathname != '/import') {
+			if ((_s.contains(pathname, '/u/') && _s.contains(pathname, '/p/')) || pathname == '/library') {
+				chinchilla.playlist_target = pathname;
+			}
+			navigation.to('/import')
+		}
 		if (files.length !== 0) {
 			return fileDropped(files);
 		} else if (text !== '') {

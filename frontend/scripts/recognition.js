@@ -115,7 +115,9 @@ recognition = {
             url: "http://gdata.youtube.com/feeds/api/videos",
             data: data,
             success: function (json) {
+                console.log(json)
               recognition.findBestVideo(json, song, function(video) {
+                console.log(video)
                 callback(video);
               }, _, _s, options);
             }
@@ -129,6 +131,7 @@ recognition = {
                     var views =  video.yt$statistics != undefined ? parseFloat(video.yt$statistics.viewCount) : 0;
                     return views
                 })
+            if (!mostviewed) { callback(null); return; }
             mostviews = mostviewed.yt$statistics ? mostviewed.yt$statistics.viewCount : 0;
         if (typeof localStorage != 'undefined') {
             helpers.localStorageSafety('banned_videos'); 
@@ -163,6 +166,8 @@ recognition = {
                 }
             });
             var levpoints = 300*(matches.length/tfragments.length) - vtitle.replace(/\s/g, '').length*2
+            levpoints = (levpoints < 0) ? 0 : levpoints
+            console.log('Levenshtein', levpoints)
             video.points += levpoints;
 
             /*
@@ -177,7 +182,7 @@ recognition = {
                 minuspoints     = difference === 0 ? 0 : (difference-1),
                 durpoints       = minuspoints;
             video.points -= durpoints;
-
+            console.log('video duration points', durpoints)
             /*
                 50 Points: View count
                 -Best video gets 50 Points
@@ -186,6 +191,7 @@ recognition = {
             var viewCount       = video.yt$statistics ? parseFloat(video.yt$statistics.viewCount) : 0,
                 ratio           = viewCount / mostviews;
                 viepoints       = Math.ceil(ratio*50);
+                console.log('viepoints', viepoints)
             video.points += viepoints;
 
             /*
