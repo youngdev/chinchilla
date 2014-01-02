@@ -2550,7 +2550,7 @@ navigation = {
 				$('#drop-target-label').text('your library');
 				hideYouTubePage();
 				callback(match);
-				//showSpinner();
+				showSpinner();
 				$.publish('view-gets-loaded')
 				var method = prevent ? 'replaceState' : 'pushState';
 				history[method](null, null, path);
