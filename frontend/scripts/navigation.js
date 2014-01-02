@@ -118,8 +118,9 @@ navigation = {
 			if ((match && match != '/') || (match == '/' && path == '/')) {
 				$('#drop-target-label').text('your library');
 				hideYouTubePage();
-				callback(match);
+				$('#view').html("");
 				showSpinner();
+				callback(match);
 				$.publish('view-gets-loaded')
 				var method = prevent ? 'replaceState' : 'pushState';
 				history[method](null, null, path);
